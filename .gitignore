@@ -1,0 +1,20 @@
+# Node.js dependencies
+backend/node_modules/
+frontend/node_modules/
+
+# Archivos de log
+*.log
+
+# Archivos de entorno
+backend/.env
+frontend/.env
+
+# Next.js / NestJS build / cache
+frontend/.next/
+backend/dist/
+
+# Sistema / editor
+.DS_Store
+.vscode/
+.idea/
+
