@@ -156,21 +156,38 @@ html {
 
 /* SECTION 2 CSS  */
 
-.section {
-  padding: 100px 20px;
-  text-align: center;
-  background-color: #f5f5f5;
-  min-height: 80vh;
-
-  /* Inicialmente invisible y desplazado hacia abajo */
+.aboutTitle,
+.aboutText {
   opacity: 0;
-  transform: translateY(50px);
-  transition: opacity 1s ease, transform 1s ease;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.fadeIn {
+.aboutTitle.visible,
+.aboutText.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.aboutTitle {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #000032;
+  font-family: "Arial Black", Arial, sans-serif;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.aboutText {
+  font-size: 1.6rem;
+  color: #000;
+  font-family: 'Montserrat', Arial, sans-serif;
+  line-height: 1.4;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  font-weight: 500;
 }
 
 

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import styles from "./css/Home.module.css";
 import Header from "./components/Header";
+import AboutSection from "./components/AboutSection";
 
 export default function Home() {
   return (
@@ -24,17 +25,7 @@ export default function Home() {
       </section>
 
       {/* Sección 2: Contenido */}
-      <section id="about" className={styles.section}>
-  <h2>¿QUIÉNES SOMOS?</h2>
-  <p>
-    DL Combat Strike es una marca de deportes de contacto enfocada en
-    la seguridad personal y basada en técnicas de krav maga israelí. 
-    Cuya misión es permitir que las personas tengan la oportunidad de 
-    saber defenderse y tener conocimientos básicos de defensa basada en 
-    situaciones reales. La marca atrae a una comunidad única llena de 
-    actitud de quienes buscan aprender y convertirse en luchadores.
-  </p>
-</section>
+      <AboutSection />
 
       {/* Sección 3: Cursos */}
       <section className={styles.section}>
