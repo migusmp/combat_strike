@@ -1,5 +1,7 @@
+"use client"
 import { useRef, useEffect, useState } from "react";
 import styles from "../css/Home.module.css";
+import Image from "next/image";
 
 export default function MissionVisionSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -29,8 +31,6 @@ export default function MissionVisionSection() {
         </div>
         <div className={styles.visionDiagonalBlock}>
           <div className={styles.visionTitleRow}>
-            <span className={`${styles.arrowRight} ${visible ? styles.visible : ""}`}>
-            </span>
             <h2 className={`${styles.visionTitle} ${visible ? styles.visible : ""}`}>Visión</h2>
           </div>
           <p className={`${styles.visionText} ${visible ? styles.visible : ""}`}>

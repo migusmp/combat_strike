@@ -154,7 +154,7 @@ html {
 }
 
 .loginIconMobile {
-  width: 60px;
+  width: 40px;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -198,7 +198,7 @@ html {
 /* SECTION MISSION A VISION 3 */
 .missionVisionDiagonalSection {
   background: #8AA6BE;
-  min-height: 70vh;
+  min-height: 80vh;
   padding: 60px 10px;
   display: flex;
   align-items: center;
@@ -211,7 +211,8 @@ html {
   grid-template-rows: 1fr 1fr;
   gap: 0;
   width: 100%;
-  max-width: 1100px; /* <--- Reduce el ancho máximo */
+  max-width: 1100px;
+  /* <--- Reduce el ancho máximo */
   height: 500px;
   position: relative;
 }
@@ -225,7 +226,8 @@ html {
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  padding: 30px 15px 0 15px; /* <--- Reduce el padding */
+  padding: 30px 15px 0 15px;
+  /* <--- Reduce el padding */
   box-sizing: border-box;
   width: 100%;
 }
@@ -239,7 +241,8 @@ html {
   flex-direction: column;
   align-items: flex-end;
   position: relative;
-  padding: 0 15px 30px 15px; /* <--- Reduce el padding */
+  padding: 0 15px 30px 15px;
+  /* <--- Reduce el padding */
   box-sizing: border-box;
   width: 100%;
 }
@@ -258,9 +261,9 @@ html {
 
 .missionTitle,
 .visionTitle {
-  font-size: 2.2rem;
+  font-size: 3rem;
   font-weight: bold;
-  color: #18182b;
+  color: #000032;
   font-family: "Arial Black", Arial, sans-serif;
   margin-bottom: 18px;
   text-align: left;
@@ -273,8 +276,8 @@ html {
 
 .missionText,
 .visionText {
-  font-size: 1.1rem;
-  color: #18182b;
+  font-size: 1.3rem;
+  color: #000032;
   font-family: 'Montserrat', Arial, sans-serif;
   line-height: 1.4;
   max-width: 500px;
@@ -313,7 +316,7 @@ html {
 .arrow {
   opacity: 0;
   transform: translateX(-60px);
-  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(.77,.2,.32,1.01);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(.77, .2, .32, 1.01);
 }
 
 .visionTitle,
@@ -321,7 +324,7 @@ html {
 .arrowRight {
   opacity: 0;
   transform: translateX(60px);
-  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(.77,.2,.32,1.01);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(.77, .2, .32, 1.01);
 }
 
 .missionTitle.visible,
@@ -344,37 +347,46 @@ html {
     display: flex;
     flex-direction: column;
     height: auto;
-    gap: 40px;
+    gap: 10px;
+    /* <--- Reduce el espacio entre bloques */
     align-items: center;
     max-width: 100%;
+    padding: 0;
+  }
+
+  .missionVisionDiagonalSection {
+    min-height: 60vh;
   }
 
   .missionDiagonalBlock,
   .visionDiagonalBlock {
     align-items: center;
-    padding: 20px 5px;
+    padding: 20px 0;
     width: 100%;
   }
 
   .missionTitleRow,
   .visionTitleRow {
     justify-content: center;
-    gap: 10px;
+
   }
 
   .missionTitle,
   .visionTitle {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+    /* <--- Reduce el margen inferior */
   }
 
   .missionText,
   .visionText {
-    font-size: 1rem;
+    font-size: 1.1rem;
     text-align: center;
     max-width: 100%;
-    padding: 0 5px;
+    padding: 0 10px;
+    margin-bottom: 0;
+    /* <--- Elimina margen extra */
   }
 
   .arrow,
@@ -390,6 +402,250 @@ html {
     height: 20px;
   }
 }
+
+/* VALORES SECTION CSS */
+.valoresSection {
+  background: #5E96BE;
+  padding: 60px 10px;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.valoresGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) 1.2fr;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 32px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.valorBlock {
+  background: transparent;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(.77,.2,.32,1.01), transform 0.8s cubic-bezier(.77,.2,.32,1.01);
+}
+
+.valorBlock.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.valorTitle {
+  font-family: 'Caveat', cursive, Arial, sans-serif;
+  font-size: 2.2rem;
+  color: #2d2d4d;
+  font-weight: bold;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #f5e6f7 60%, transparent 100%);
+  display: inline-block;
+  padding: 0 10px;
+  border-radius: 24px;
+}
+
+.valorText {
+  font-size: 1.1rem;
+  color: #222;
+  font-family: 'Montserrat', Arial, sans-serif;
+  line-height: 1.5;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.valorImageBlock {
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.valorImage {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  object-fit: cover;
+  filter: grayscale(0.2) contrast(1.1);
+  margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .valoresGrid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .valorImageBlock {
+    order: 5;
+    margin-top: 30px;
+  }
+  .valorImage {
+    max-width: 50vw;
+    height: auto;
+  }
+  .valorBlock {
+    padding: 0 5px;
+    text-align: center;
+  }
+  .valorTitle {
+    font-size: 1.5rem;
+    padding: 0 5px;
+  }
+  .valorLabel {
+    font-size: 2rem;
+  }
+}
+
+/* CURSOS SECTION */
+.cursosSection {
+  background: #bfc0c7;
+  min-height: 80vh;
+  padding: 40px 0 60px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursosGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  width: 90vw;
+  max-width: 1200px;
+  margin-bottom: 40px;
+}
+
+.cursoVideo {
+  background: #0a3770;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 600px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  position: relative;
+}
+
+.cursoInfo {
+  background: #0a3770;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  position: relative;
+}
+
+.cursoLabel {
+  color: #fff;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.cursoButtonRow {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.cursoButton {
+  background: #0a3770;
+  color: #fff;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: 50px;
+  padding: 18px 80px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 24px 0 rgba(10,55,112,0.18);
+  transition: background 0.3s;
+}
+
+.cursoButton:hover {
+  background: #1451a3;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cursosGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 98vw;
+  }
+  .cursoVideo,
+  .cursoInfo {
+    height: 200px;
+    font-size: 1rem;
+  }
+  .cursoButton {
+    padding: 14px 40px;
+    font-size: 1.1rem;
+  }
+}
+
+/* FOOTER SECTION CSS */
+.footer {
+  background: #0a3770;
+  color: #fff;
+  padding: 30px 0 20px 0;
+  text-align: center;
+  width: 100%;
+  margin-top: 40px;
+}
+
+.footerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.footerNav {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.footerNav a {
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.footerNav a:hover {
+  color: #bfc0c7;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .footerNav {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/*--------------------*/
 
 @media (max-width: 1273px) {
   .buttonRegister {

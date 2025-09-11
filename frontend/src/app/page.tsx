@@ -4,6 +4,9 @@ import styles from "./css/Home.module.css";
 import Header from "./components/Header";
 import AboutSection from "./components/AboutSection";
 import MissionVisionSection from "./components/MissionVisionSection";
+import ValoresSection from "./components/ValoresSection";
+import CursosSection from "./components/CursosSection";
+import Footer from "./components/Footer";
 
 export default function Home() {
   return (
@@ -28,14 +31,15 @@ export default function Home() {
       {/* Sección 2: Contenido */}
       <AboutSection />
 
-      {/* Sección 3: Cursos */}
+      {/* Sección 3: Misión y Visión del proyecto */}
       <MissionVisionSection />
 
       {/* Sección 4: Contacto */}
-      <section className={styles.section}>
-        <h2>Contacto</h2>
-        <p>Formulario o información de contacto aquí.</p>
-      </section>
+      <ValoresSection />
+
+      <CursosSection />
+
+      <Footer />
     </div>
   );
 }

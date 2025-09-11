@@ -11,6 +11,9 @@ export default function HeaderMobile() {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
 
+    // Inicializa el fondo según el scroll actual al cargar
+    setScrolled(window.scrollY > 20);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
