@@ -19,7 +19,7 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .header {
@@ -125,4 +125,48 @@
 
 .heroContent h2 {
   font-size: 3rem;
+}
+
+.loginIcon {
+  width: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.loginIconMobile {
+  width: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+@media (max-width: 1273px) {
+  .buttonRegister {
+    display: none;
+  }
+}
+
+@media (max-width: 956px) {
+  .nav {
+    gap: 25px;
+  }
+  .nav a {
+    font-size: 20px;
+    padding: 0;
+  }
+  .nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0px;
+    width: 0;
+    height: 3px;
+    background-color: #fff;
+    transition: width 0.3s ease;
+  }
+}
+
+@media (max-width: 890px) {
+  .header {
+    justify-content: space-between;
+  }
 }
