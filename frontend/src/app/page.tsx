@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "./css/Home.module.css";
 import Header from "./components/Header";
 import AboutSection from "./components/AboutSection";
+import MissionVisionSection from "./components/MissionVisionSection";
 
 export default function Home() {
   return (
@@ -28,10 +29,7 @@ export default function Home() {
       <AboutSection />
 
       {/* Sección 3: Cursos */}
-      <section className={styles.section}>
-        <h2>Cursos</h2>
-        <p>Detalles de tus cursos, imágenes y enlaces.</p>
-      </section>
+      <MissionVisionSection />
 
       {/* Sección 4: Contacto */}
       <section className={styles.section}>
