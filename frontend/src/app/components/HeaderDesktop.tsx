@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useState } from 'react';
 import styles from '../css/Home.module.css'
+import Link from "next/link";
 
 export default function HeaderDesktop() {
   const [scrolled, setScrolled] = useState(false);
@@ -33,28 +34,28 @@ export default function HeaderDesktop() {
   >
     {/* Menú centrado */}
     <nav className={styles.nav}>
-      <a href="#home">Inicio</a>
-      <a href="#tienda">Cursos</a>
-      <a href="#tienda">Tienda</a>
-      <a href="#contact">Contáctanos</a>
+      <Link href="/">Inicio</Link>
+      <Link href="/cursos">Cursos</Link>
+      <Link href="/shop">Tienda</Link>
+      <Link href="/contact">Contáctanos</Link>
     </nav>
 
     {/* Botones a la derecha */}
     <div className={styles.buttons}>
       {isMobile ? (
         // Imagen que se muestra en móvil
-        <Image
-          src="/assets/usuario-sin-logo.png"
-          alt="Login"
-          width={32}
-          height={32}
-          className={styles.loginIcon}
-        />
+        <Link href="/login">
+          <button className={styles.buttonLoginMobile}>Login</button>
+        </Link>
       ) : (
         // Botón que se muestra en desktop
-        <button className={styles.buttonLogin}>Iniciar sesión</button>
+        <Link href="/login">
+          <button className={styles.buttonLogin}>Iniciar sesión</button>
+        </Link>
       )}
-      <button className={styles.buttonRegister}>Registrate</button>
+      <Link href="/register">
+        <button className={styles.buttonRegister}>Registrate</button>
+      </Link>
     </div>
   </header>
 }

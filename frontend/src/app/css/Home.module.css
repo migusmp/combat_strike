@@ -106,6 +106,23 @@ html {
   color: #fff;
 }
 
+.buttonLoginMobile {
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buttonLoginMobile:hover {
+  background-color: #000;
+  color: #fff;
+}
+
 .buttonRegister {
   padding: 10px 20px;
   font-size: 18px;
@@ -712,5 +729,16 @@ html {
 
   .section {
     min-height: 50vh;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav {
+    gap: 15px;
+  }
+
+  .nav a {
+    font-size: 18px;
+    padding: 0;
   }
 }

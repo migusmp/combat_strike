@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import styles from "../css/Home.module.css";
+import Link from "next/link";
 
 export default function HeaderMobile() {
   const [scrolled, setScrolled] = useState(false);
@@ -34,13 +35,9 @@ export default function HeaderMobile() {
     >
       {/* Imagen a la izquierda */}
       <div>
-        <Image
-          src="/assets/usuario-sin-logo.png"
-          alt="Logo"
-          width={160}
-          height={40}
-          className={styles.loginIconMobile}
-        />
+        <Link href="/login">
+          <button className={styles.buttonLoginMobile}>Iniciar sesión</button>
+        </Link>
       </div>
 
       {/* Icono hamburguesa a la derecha */}
