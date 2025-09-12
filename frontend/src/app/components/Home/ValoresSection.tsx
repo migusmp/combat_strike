@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import styles from "../css/Home.module.css";
+import styles from "../../css/Home.module.css";
 
 export default function ValoresSection() {
   const sectionRef = useRef<HTMLDivElement>(null);

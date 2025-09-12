@@ -1,0 +1,171 @@
+.container {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: #000032;
+  overflow: hidden;
+  padding: 1rem; /* padding para que en mobile no quede pegado a los bordes */
+}
+
+.backgroundLogo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.08; /* transparencia para que no moleste */
+  pointer-events: none; /* evita que interfiera con inputs */
+  z-index: 1;
+}
+
+.formBox {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 450px;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.logoWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #055293;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #055293;
+  margin-bottom: 0.3rem;
+}
+
+.field input {
+  padding: 0.8rem;
+  border: 1px solid #5e96be;
+  border-radius: 0.5rem;
+  background-color: rgba(138, 166, 190, 0.2);
+  color: #055293;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  font-size: 1rem;
+}
+
+.field input::placeholder {
+  color: #055293;
+}
+
+.field input:focus {
+  border-color: #8aa6be;
+  box-shadow: 0 0 0 2px #8aa6be;
+}
+
+.button {
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+  background-color: #5e96be;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #8aa6be;
+}
+
+.registerText {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #055293;
+}
+
+.registerText a {
+  color: #055293;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.registerText a:hover {
+  text-decoration: underline;
+}
+
+/* 📱 Responsive */
+@media (max-width: 900px) {
+  .formBox {
+    padding: 1.8rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .formBox {
+    padding: 1.7rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .field input {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+
+  .button {
+    font-size: 0.95rem;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .formBox {
+    max-width: 100%;
+    border-radius: 0.8rem;
+    padding: 1.2rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .field input {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+  }
+
+  .button {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+  }
+
+  .registerText {
+    font-size: 0.8rem;
+  }
+}

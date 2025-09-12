@@ -1,7 +1,6 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useState } from 'react';
-import styles from '../css/Home.module.css'
+import styles from '../../css/Home.module.css'
 import Link from "next/link";
 
 export default function HeaderDesktop() {

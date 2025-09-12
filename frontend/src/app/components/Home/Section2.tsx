@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import styles from "../css/Home.module.css";
+import styles from "../../css/Home.module.css";
 
 export default function Section2() {
   const sectionRef = useRef<HTMLElement | null>(null);

@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
 import styles from "./css/Home.module.css";
-import Header from "./components/Header";
-import AboutSection from "./components/AboutSection";
-import MissionVisionSection from "./components/MissionVisionSection";
-import ValoresSection from "./components/ValoresSection";
-import CursosSection from "./components/CursosSection";
-import Footer from "./components/Footer";
+import Header from "./components/Home/Header";
+import AboutSection from "./components/Home/AboutSection";
+import MissionVisionSection from "./components/Home/MissionVisionSection";
+import ValoresSection from "./components/Home/ValoresSection";
+import CursosSection from "./components/Home/CursosSection";
+import Footer from "./components/Home/Footer";
 
 export default function Home() {
   return (
