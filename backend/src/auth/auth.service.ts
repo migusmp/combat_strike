@@ -21,10 +21,6 @@ export class AuthService {
     });
 
     if (existingUser) {
-      // ❌ Esto lanza error 500
-      // throw new Error('El correo ya está en uso');
-
-      // ✅ Esto devuelve un error controlado 400
       throw new BadRequestException('El correo ya está en uso');
     }
     // Encriptar la contraseña
@@ -38,7 +34,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const savedUser = await this.userRepository.save(createdUser); // <--- usar este
+    const savedUser = await this.userRepository.save(createdUser);
     return {
       message: 'Usuario registrado correctamente',
       user: {
