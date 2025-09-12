@@ -3,14 +3,51 @@ import Image from "next/image";
 import { useState } from "react";
 import styles from "../css/Login.module.css";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [alert, setAlert] = useState("");
+
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAlert("");
+
+    try {
+      const res = await fetch("http://localhost:4000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.message === "Debes verificar tu correo antes de iniciar sesión...") {
+          setAlert(data.message);
+        } else if (Array.isArray(data.message)) {
+          setAlert(data.message.join(" | "));
+        } else {
+          setAlert(data.message || "Error al iniciar sesión.");
+        }
+      } else {
+        // Aquí puedes guardar el token, redirigir, etc.
+        // Por ejemplo: router.push("/dashboard");
+        router.push("/");
+      }
+    } catch (err) {
+      setAlert("Error de conexión.");
+    }
+  };
 
   return (
     <div className={styles.container}>
-        <div className={styles.backgroundLogo}>
+      <div className={styles.backgroundLogo}>
         <Image
           src="/assets/logo-blanco-sin-texto.png"
           alt="Logo fondo"
@@ -19,9 +56,7 @@ export default function Login() {
         />
       </div>
 
-      {/* Formulario */}
       <div className={styles.formBox}>
-        {/* Logo arriba */}
         <div className={styles.logoWrapper}>
           <Image
             src="/assets/logo-negro-sin-texto.png"
@@ -31,9 +66,20 @@ export default function Login() {
           />
         </div>
 
-        {/* <h2 className={styles.title}>Iniciar Sesión</h2> */}
+        {/* ALERTA ROJA CON EFECTO */}
+        {alert === "Debes verificar tu correo antes de iniciar sesión..." && (
+          <div className={styles.alertRed + " " + styles.alertVisible}>
+            {alert}
+          </div>
+        )}
+        {/* Otros errores */}
+        {alert && alert !== "Debes verificar tu correo antes de iniciar sesión..." && (
+          <div className={styles.alertRed + " " + styles.alertVisible}>
+            {alert}
+          </div>
+        )}
 
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
             <label htmlFor="email">Correo electrónico</label>
             <input

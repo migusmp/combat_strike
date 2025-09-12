@@ -10,6 +10,58 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage("");
+
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:4000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: nombre,
+          second_name: apellidos,
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (Array.isArray(data.message)) {
+          setError(data.message.join(" | "));
+        } else {
+          setError(data.message || "Error al registrar.");
+        }
+      } else {
+        // Limpiar campos
+        setNombre("");
+        setApellidos("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+
+        // Mostrar mensaje de éxito
+        setSuccessMessage(
+          "¡Registro exitoso! Revisa tu correo para verificar tu cuenta."
+        );
+      }
+    } catch (err) {
+      setError("Error de conexión.");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -37,7 +89,24 @@ export default function Register() {
 
         <h2 className={styles.title}>Crear Cuenta</h2>
 
-        <form className={styles.form}>
+        {/* Cartel de éxito */}
+        {successMessage && (
+          <div
+            style={{
+              backgroundColor: "#42cd38ff",
+              color: "#072a06ff",
+              padding: "1rem",
+              borderRadius: "8px",
+              marginBottom: "1rem",
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            {successMessage}
+          </div>
+        )}
+
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
             <label htmlFor="nombre">Nombre</label>
             <input
@@ -45,7 +114,7 @@ export default function Register() {
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              placeholder="Tu nombre"
+              placeholder="Nombre"
               required
             />
           </div>
@@ -57,7 +126,7 @@ export default function Register() {
               type="text"
               value={apellidos}
               onChange={(e) => setApellidos(e.target.value)}
-              placeholder="Tus apellidos"
+              placeholder="Apellidos"
               required
             />
           </div>
@@ -98,14 +167,15 @@ export default function Register() {
             />
           </div>
 
+          {error && <p className={styles.error}>{error}</p>}
+
           <button type="submit" className={styles.button}>
             Registrarse
           </button>
         </form>
 
         <p className={styles.registerText}>
-          ¿Ya tienes cuenta?{" "}
-          <Link href="/login">Inicia sesión</Link>
+          ¿Ya tienes cuenta? <Link href="/login">Inicia sesión</Link>
         </p>
       </div>
     </div>
