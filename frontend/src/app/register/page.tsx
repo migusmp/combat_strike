@@ -5,7 +5,8 @@ import Link from "next/link";
 import styles from "../css/Login.module.css";
 
 export default function Register() {
-  const [name, setName] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [apellidos, setApellidos] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,13 +39,25 @@ export default function Register() {
 
         <form className={styles.form}>
           <div className={styles.field}>
-            <label htmlFor="name">Nombre completo</label>
+            <label htmlFor="nombre">Nombre</label>
             <input
-              id="name"
+              id="nombre"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Tu nombre completo"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Tu nombre"
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="apellidos">Apellidos</label>
+            <input
+              id="apellidos"
+              type="text"
+              value={apellidos}
+              onChange={(e) => setApellidos(e.target.value)}
+              placeholder="Tus apellidos"
               required
             />
           </div>

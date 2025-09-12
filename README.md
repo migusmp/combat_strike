@@ -7,17 +7,17 @@ docker-compose down
 
 # base de datos docker
 docker run -d \
-  --name gymdb \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=gymdb \
+  --name combatstrikedb \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=REDACTED_DB_PASSWORD \
+  -e POSTGRES_DB=combatstrikedb \
   -p 5432:5432 \
   postgres:15-alpine
 
 # conectarse a la bbdd
-docker exec -it gymdb psql -U postgres -d gymdb
+docker exec -it combatstrikedb psql -U admin -d combatstrikedb
 
-psql -h localhost -p 5432 -U postgres -d gymdb
+psql -h localhost -p 5432 -U admin -d combatstrikedb
 
 # instalar backend
 cd ./backend
