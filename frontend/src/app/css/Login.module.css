@@ -158,6 +158,30 @@
   transform: translateY(0);
 }
 
+.forgotPassword {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.forgotPassword a {
+  color: #055293; /* azul tipo Tailwind */
+  text-decoration: underline;
+}
+
+.forgotPassword a:hover {
+  color: #2563eb;
+}
+
+.alertGreen {
+  background-color: #16a34a; /* verde tipo Tailwind */
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+
 /* 📱 Responsive */
 @media (max-width: 900px) {
   .formBox {

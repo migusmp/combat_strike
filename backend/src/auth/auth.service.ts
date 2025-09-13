@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +14,9 @@ import { MailService } from '../mail/mail.service'; // 👈 importamos el servic
 
 import { v4 as uuidv4 } from 'uuid'; // para tokens temporales
 import { VerificationToken } from './entities/verificationToken.entity';
+import { PasswordResetToken } from './entities/forgotPasswordToken.entity';
+
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -18,8 +25,10 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(VerificationToken)
     private readonly tokenRepository: Repository<VerificationToken>,
+    @InjectRepository(PasswordResetToken)
+    private readonly passwordResetRepository: Repository<PasswordResetToken>, // 👈 nuevo
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.userRepository.findOne({
@@ -131,5 +140,62 @@ export class AuthService {
     await this.tokenRepository.delete(verificationToken.id);
 
     return { message: 'Cuenta verificada correctamente' };
+  }
+
+  async validateToken(token: string) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET! || 'secret');
+      return decoded; // aquí puedes devolver el userId, email, etc.
+    } catch (err) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  // 🔹 Método para enviar correo de recuperación
+  async forgotPassword(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) return false;
+
+    // Generar token aleatorio
+    const token = randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
+
+    const resetToken = this.passwordResetRepository.create({
+      user,
+      token,
+      expiresAt,
+    });
+    await this.passwordResetRepository.save(resetToken);
+
+    // Enviar correo con link de recuperación
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    await this.mailService.sendResetPasswordEmail(user.email, resetLink);
+
+    return true;
+  }
+
+  // 🔹 Método para resetear la contraseña usando el token
+  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+    const resetToken = await this.passwordResetRepository.findOne({
+      where: { token },
+      relations: ['user'],
+    });
+
+    if (!resetToken) {
+      throw new BadRequestException('Sesión expirada o token inválido');
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      throw new BadRequestException('Token expirado');
+    }
+
+    // Actualizar contraseña
+    resetToken.user.password = await bcrypt.hash(newPassword, 10);
+    await this.userRepository.save(resetToken.user);
+
+    // Eliminar token para que no se reutilice
+    await this.passwordResetRepository.delete(resetToken.id);
+
+    return true;
   }
 }

@@ -4,11 +4,15 @@ import { useState } from "react";
 import styles from "../css/Login.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuthContext } from "../context/AuthContext";
+import GuestGuard from "../utils/GuestGuard";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [alert, setAlert] = useState("");
+
+  const { setAuthenticated } = useAuthContext();
 
   const router = useRouter();
 
@@ -23,6 +27,7 @@ export default function Login() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: "include", // para manejar cookies HttpOnly
       });
 
       const data = await res.json();
@@ -38,6 +43,7 @@ export default function Login() {
       } else {
         // Aquí puedes guardar el token, redirigir, etc.
         // Por ejemplo: router.push("/dashboard");
+        setAuthenticated(true);
         router.push("/");
       }
     } catch (err) {
@@ -46,74 +52,80 @@ export default function Login() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.backgroundLogo}>
-        <Image
-          src="/assets/logo-blanco-sin-texto.png"
-          alt="Logo fondo"
-          width={1000}
-          height={1000}
-        />
-      </div>
-
-      <div className={styles.formBox}>
-        <div className={styles.logoWrapper}>
+    <GuestGuard>
+      <div className={styles.container}>
+        <div className={styles.backgroundLogo}>
           <Image
-            src="/assets/logo-negro-sin-texto.png"
-            alt="Logo"
-            width={100}
-            height={100}
+            src="/assets/logo-blanco-sin-texto.png"
+            alt="Logo fondo"
+            width={1000}
+            height={1000}
           />
         </div>
 
-        {/* ALERTA ROJA CON EFECTO */}
-        {alert === "Debes verificar tu correo antes de iniciar sesión..." && (
-          <div className={styles.alertRed + " " + styles.alertVisible}>
-            {alert}
-          </div>
-        )}
-        {/* Otros errores */}
-        {alert && alert !== "Debes verificar tu correo antes de iniciar sesión..." && (
-          <div className={styles.alertRed + " " + styles.alertVisible}>
-            {alert}
-          </div>
-        )}
-
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <label htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tuemail@ejemplo.com"
-              required
+        <div className={styles.formBox}>
+          <div className={styles.logoWrapper}>
+            <Image
+              src="/assets/logo-negro-sin-texto.png"
+              alt="Logo"
+              width={100}
+              height={100}
             />
           </div>
 
-          <div className={styles.field}>
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
-              required
-            />
-          </div>
+          {/* ALERTA ROJA CON EFECTO */}
+          {alert === "Debes verificar tu correo antes de iniciar sesión..." && (
+            <div className={styles.alertRed + " " + styles.alertVisible}>
+              {alert}
+            </div>
+          )}
+          {/* Otros errores */}
+          {alert && alert !== "Debes verificar tu correo antes de iniciar sesión..." && (
+            <div className={styles.alertRed + " " + styles.alertVisible}>
+              {alert}
+            </div>
+          )}
 
-          <button type="submit" className={styles.button}>
-            Entrar
-          </button>
-        </form>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.field}>
+              <label htmlFor="email">Correo electrónico</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tuemail@ejemplo.com"
+                required
+              />
+            </div>
 
-        <p className={styles.registerText}>
-          ¿No tienes cuenta?{" "}
-          <Link href="/register">Regístrate</Link>
-        </p>
+            <div className={styles.field}>
+              <label htmlFor="password">Contraseña</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="********"
+                required
+              />
+            </div>
+            {/* Enlace para recuperar contraseña */}
+            <p className={styles.forgotPassword}>
+              <Link href="/forgot-password">¿Has olvidado la contraseña?</Link>
+            </p>
+
+            <button type="submit" className={styles.button}>
+              Entrar
+            </button>
+          </form>
+
+          <p className={styles.registerText}>
+            ¿No tienes cuenta?{" "}
+            <Link href="/register">Regístrate</Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </GuestGuard>
   );
 }
