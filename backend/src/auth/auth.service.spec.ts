@@ -58,6 +58,7 @@ describe('AuthService', () => {
         { provide: getRepositoryToken(VerificationToken), useValue: createMockRepository<VerificationToken>() },
         { provide: getRepositoryToken(PasswordResetToken), useValue: createMockRepository<PasswordResetToken>() },
         { provide: MailService, useValue: mockMailService },
+        { provide: MailService, useValue: mockMailService }, // Aseguramos que el MailService está mockeado
       ],
     }).compile();
 
@@ -65,12 +66,18 @@ describe('AuthService', () => {
     userRepository = module.get<MockRepository<User>>(getRepositoryToken(User));
     tokenRepository = module.get<MockRepository<VerificationToken>>(getRepositoryToken(VerificationToken));
     passwordResetRepository = module.get<MockRepository<PasswordResetToken>>(getRepositoryToken(PasswordResetToken));
+    mailService = module.get<MailService>(MailService); // obtenemos el mock para usarlo en los tests
     // Mock de jwt.sign
     signSpy = jest.spyOn(jwt, 'sign').mockReturnValue('mocked-jwt-token');
+    jest.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {
+    (console.error as jest.Mock).mockRestore();
     signSpy.mockRestore(); // restaurar para otros tests
+    jest.restoreAllMocks(); // Restaura los originales
+    jest.clearAllMocks(); // Limpia llamadas y contadores
+    jest.resetAllMocks(); // Resetea implementaciones mock
   });
 
   it('should register a new user successfully', async () => {
@@ -297,5 +304,88 @@ describe('AuthService', () => {
     });
 
     await expect(service.resetPassword('token123', 'newpass')).rejects.toThrow('hash error');
+  });
+
+  // Nuevo test para userRepository.save en register --------------------------------------------------------
+  it('should throw error if userRepository.save fails', async () => {
+    userRepository.findOne.mockResolvedValue(undefined);
+    userRepository.create.mockImplementation(dto => dto);
+    userRepository.save.mockRejectedValue(new Error('DB error'));
+
+    const registerDto = { name: 'test', second_name: 'test', email: 'test@example.com', password: '1234' };
+
+    await expect(service.register(registerDto)).rejects.toThrow('Error al registrar el usuario');
+  });
+
+  it('should throw error if passwordResetRepository.save fails', async () => {
+    const user = { id: 1, email: 'test@example.com' };
+    userRepository.findOne.mockResolvedValue(user);
+    passwordResetRepository.create.mockImplementation(dto => dto);
+    passwordResetRepository.save.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.forgotPassword('test@example.com')).rejects.toThrow('DB error');
+  });
+
+  it('should throw error if sendResetPasswordEmail fails', async () => {
+    const user = { id: 1, email: 'test@example.com' };
+    userRepository.findOne.mockResolvedValue(user);
+    passwordResetRepository.create.mockImplementation(dto => dto);
+    passwordResetRepository.save.mockResolvedValue({});
+    mockMailService.sendResetPasswordEmail.mockRejectedValue(new Error('Email error'));
+
+    await expect(service.forgotPassword('test@example.com')).rejects.toThrow('Email error');
+  });
+
+  it('should throw error if userRepository.save fails during reset', async () => {
+    const user = { id: 1, password: 'oldpass' };
+    const resetToken = { id: 1, token: 'token123', user, expiresAt: new Date(Date.now() + 1000 * 60) };
+
+    passwordResetRepository.findOne.mockResolvedValue(resetToken);
+    userRepository.save.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.resetPassword('token123', 'newpass')).rejects.toThrow('DB error');
+  });
+
+  it('should throw error if passwordResetRepository.delete fails', async () => {
+    const user = { id: 1, password: 'oldpass' };
+    const resetToken = { id: 1, token: 'token123', user, expiresAt: new Date(Date.now() + 1000 * 60) };
+
+    passwordResetRepository.findOne.mockResolvedValue(resetToken);
+    userRepository.save.mockResolvedValue(user);
+    passwordResetRepository.delete.mockRejectedValue(new Error('DB error'));
+
+    await expect(service.resetPassword('token123', 'newpass')).rejects.toThrow('DB error');
+  });
+
+  it('should throw error if bcrypt.compare fails', async () => {
+    const user = { id: 1, email: 'test@example.com', password: 'hashed', isVerified: true };
+    userRepository.findOne.mockResolvedValue(user);
+    (bcrypt.compare as jest.Mock).mockRejectedValue(new Error('hash error'));
+
+    const loginDto = { email: 'test@example.com', password: '1234' };
+
+    await expect(service.login(loginDto)).rejects.toThrow('hash error');
+  });
+
+  it('should call mailService.sendVerificationEmail on register', async () => {
+    const registerDto = {
+      name: 'Test',
+      second_name: 'User',
+      email: 'test@example.com',
+      password: '1234',
+    };
+
+    userRepository.findOne.mockResolvedValue(undefined);
+    userRepository.create.mockImplementation(dto => dto);
+    userRepository.save.mockResolvedValue({ ...registerDto, id: 1 });
+
+    const sendMailSpy = jest.spyOn(mailService, 'sendVerificationEmail');
+
+    await service.register(registerDto);
+
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      registerDto.email,
+      expect.any(String),
+    );
   });
 });

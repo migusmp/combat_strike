@@ -51,7 +51,7 @@ export class MailService {
     await this.transporter.sendMail({
       from: `"DL Combat Strike" <${process.env.EMAIL_USER}>`,
       to,
-      subject: 'Recuperación de contraseña',
+      subject: 'Restablecer contraseña',
       html: `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h1 style="color: #055293;">Recupera tu contraseña</h1>

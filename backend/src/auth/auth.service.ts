@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
@@ -28,7 +29,7 @@ export class AuthService {
     @InjectRepository(PasswordResetToken)
     private readonly passwordResetRepository: Repository<PasswordResetToken>, // 👈 nuevo
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.userRepository.findOne({
@@ -48,29 +49,34 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const savedUser = await this.userRepository.save(createdUser);
+    try {
+      const savedUser = await this.userRepository.save(createdUser);
 
-    // 🔹 Generamos y guardamos el token de verificación
-    const token = uuidv4();
-    const verificationToken = this.tokenRepository.create({
-      token,
-      user: savedUser,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hora
-    });
-    await this.tokenRepository.save(verificationToken);
+      // 🔹 Generamos y guardamos el token de verificación
+      const token = uuidv4();
+      const verificationToken = this.tokenRepository.create({
+        token,
+        user: savedUser,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hora
+      });
+      await this.tokenRepository.save(verificationToken);
 
-    // 🔹 Enviamos el email
-    await this.mailService.sendVerificationEmail(savedUser.email, token);
+      // 🔹 Enviamos el email
+      await this.mailService.sendVerificationEmail(savedUser.email, token);
 
-    return {
-      message: 'Usuario registrado. Revisa tu correo para verificar la cuenta.',
-      user: {
-        id: savedUser.id,
-        name: savedUser.name,
-        second_name: savedUser.second_name,
-        email: savedUser.email,
-      },
-    };
+      return {
+        message: 'Usuario registrado. Revisa tu correo para verificar la cuenta.',
+        user: {
+          id: savedUser.id,
+          name: savedUser.name,
+          second_name: savedUser.second_name,
+          email: savedUser.email,
+        },
+      };
+    } catch (e) {
+      console.error('Error saving user:', e);
+      throw new InternalServerErrorException('Error al registrar el usuario');
+    }
   }
 
   async login(loginDto: LoginDto) {
