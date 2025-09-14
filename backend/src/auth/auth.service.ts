@@ -78,7 +78,7 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user)
-      throw new UnauthorizedException('Correo o contraseña incorrectos');
+      throw new UnauthorizedException('No existe ninguna cuenta con este correo');
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)

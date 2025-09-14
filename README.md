@@ -37,3 +37,17 @@ pnpm run dev
 o
 npm run dev
 
+# data .env
+PORT=4000
+
+DB_HOST=localhost
+DB_PORT=5433
+DB_USER=admin
+DB_PASSWORD="REDACTED_DB_PASSWORD"
+DB_NAME=combatstrikedb
+
+EMAIL_USER=REDACTED_EMAIL
+EMAIL_PASS=REDACTED_EMAIL_APP_PASSWORD 
+
+JWT_SECRET="2,098hj_-09jklmokÑ-.,@%/__"
+

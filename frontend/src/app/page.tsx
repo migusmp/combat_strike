@@ -1,5 +1,5 @@
 'use client';
-import LoggedHome from './components/Home/LoggedHome';
+import LoggedHome from './components/LoggedHome/LoggedHome';
 import GuestHome from './components/Home/GuestHome';
 import LoadingSpinner from './components/LoadingSpinner';
 import { useAuthContext } from './context/AuthContext';
