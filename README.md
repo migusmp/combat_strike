@@ -11,7 +11,7 @@ docker run -d \
   -e POSTGRES_USER=admin \
   -e POSTGRES_PASSWORD=REDACTED_DB_PASSWORD \
   -e POSTGRES_DB=combatstrikedb \
-  -p 5432:5432 \
+  -p 5433:5432 \
   postgres:15-alpine
 
 # conectarse a la bbdd
