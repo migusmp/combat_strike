@@ -1,0 +1,60 @@
+.header {
+    width: 100%;
+    height: 85px;
+    background-color: #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
+.buttons {
+    display: flex;
+    gap: 7px;
+}
+
+.buttons nav {
+    display: flex;
+    align-items: center;
+    font-size: 1.3rem;
+    margin-right: 50px;
+    color: #fff;
+    gap: 20px;
+}
+
+.loginBtn {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #fff;
+    padding: 13px 18px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.loginBtn:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+.registerBtn {
+    background-color: transparent;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.registerBtn:hover {
+    background-color: #055293;
+    border: 1px solid #055293;
+}
