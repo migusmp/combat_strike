@@ -1,10 +1,34 @@
 .header {
+    position: fixed;
+    /* correcto */
+    top: 0;
+    /* falta: asegura que esté pegado arriba */
+    left: 0;
+    /* opcional, pero recomendable */
     width: 100%;
     height: 90px;
     background-color: #000032;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 20px;
+    z-index: 999;
+    /* siempre encima del contenido */
+}
+
+.header section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header section nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 1.3rem;
+    margin-right: 50px;
+    color: #fff;
 }
 
 .usermenu {
