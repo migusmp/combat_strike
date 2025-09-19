@@ -1,20 +1,15 @@
-# Build stage
-FROM node:20 AS build
+FROM node:20
 WORKDIR /app
 
+# Instalar dependencias
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
+# Copiar código
 COPY . .
-RUN npm run build
 
-# Production stage
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=build /app ./
-
-# Puerto que usa Next.js
+# Exponer puerto
 EXPOSE 3000
 
-# Ejecutamos Next.js en producción
-CMD ["npm", "run", "start"]
+# Servir la app directamente en modo Node
+CMD ["npm", "run", "dev"]
