@@ -1,4 +1,4 @@
-import LoggedLayout from "../components/LoggedHome/LoggedHome"
+import LoggedLayout from "../components/LoggedHome/LoggedLayout";
 
 export default function CursosPage() {
     return (
