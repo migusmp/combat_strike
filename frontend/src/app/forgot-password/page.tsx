@@ -33,6 +33,7 @@ export default function ForgotPassword() {
       }
     } catch (err) {
       setAlert("Error de conexión.");
+      console.error(err);
     }
   };
 

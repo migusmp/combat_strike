@@ -4,14 +4,14 @@ import { User } from './user.entity';
 @Entity('password_reset_tokens')
 export class PasswordResetToken {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  token: string;
+  token!: string;
 
   @Column()
-  expiresAt: Date;
+  expiresAt!: Date;
 
   @ManyToOne(() => User)
-  user: User;
+  user!: User;
 }

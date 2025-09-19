@@ -56,10 +56,9 @@ export class AuthController {
     try {
       const result = await this.authService.verifyUser(token);
       return result; // { message: 'Cuenta verificada correctamente' }
-    } catch (error) {
-      // Si hay error, lo lanzamos como BadRequest
+    } catch (error: unknown) {
       throw new BadRequestException(
-        error.message || 'Error al verificar la cuenta',
+        (error as Error).message || 'Error al verificar la cuenta',
       );
     }
   }

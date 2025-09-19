@@ -61,6 +61,7 @@ export default function Register() {
       }
     } catch (err) {
       setError("Error de conexión.");
+      console.error(err);
     }
   };
 

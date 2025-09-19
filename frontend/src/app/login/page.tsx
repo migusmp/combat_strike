@@ -48,6 +48,7 @@ export default function Login() {
       }
     } catch (err) {
       setAlert("Error de conexión.");
+      console.error(err);
     }
   };
 

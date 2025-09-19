@@ -4,14 +4,14 @@ import { User } from './user.entity';
 @Entity('verification_tokens')
 export class VerificationToken {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  token: string;
+  token!: string;
 
   @ManyToOne(() => User)
-  user: User;
+  user!: User;
 
   @Column()
-  expiresAt: Date;
+  expiresAt!: Date;
 }

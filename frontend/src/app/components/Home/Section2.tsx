@@ -6,22 +6,21 @@ export default function Section2() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const section = sectionRef.current; // Guardamos referencia estable
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.unobserve(entry.target); // Observa solo una vez
+          observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.2 } // 20% visible para disparar animación
+      { threshold: 0.2 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    if (section) observer.observe(section);
 
     return () => {
-      if (sectionRef.current) observer.unobserve(sectionRef.current);
+      if (section) observer.unobserve(section);
     };
   }, []);
 
@@ -33,10 +32,10 @@ export default function Section2() {
       <h2>¿QUIÉNES SOMOS?</h2>
       <p>
         DL Combat Strike es una marca de deportes de contacto enfocada en
-        la seguridad personal y basada en técnicas de krav maga israelí. 
-        Cuya misión es permitir que las personas tengan la oportunidad de 
-        saber defenderse y tener conocimientos básicos de defensa basada en 
-        situaciones reales. La marca atrae a una comunidad única llena de 
+        la seguridad personal y basada en técnicas de krav maga israelí.
+        Cuya misión es permitir que las personas tengan la oportunidad de
+        saber defenderse y tener conocimientos básicos de defensa basada en
+        situaciones reales. La marca atrae a una comunidad única llena de
         actitud de quienes buscan aprender y convertirse en luchadores.
       </p>
     </section>
