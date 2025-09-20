@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { API_URL } from '../utils/api_url';
 
 export default function VerifyPage() {
   const [message, setMessage] = useState('Verificando...');
@@ -18,7 +19,7 @@ export default function VerifyPage() {
 
     const verifyAccount = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/auth/verify?token=${token}`);
+        const res = await fetch(`${API_URL}/auth/verify?token=${token}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al verificar la cuenta');
         setMessage(data.message);

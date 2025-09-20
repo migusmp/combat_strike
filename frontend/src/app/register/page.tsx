@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "../css/Login.module.css";
 import GuestGuard from "../utils/GuestGuard";
+import { API_URL } from "../utils/api_url";
 
 export default function Register() {
   const [nombre, setNombre] = useState("");
@@ -25,7 +26,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/auth/register", {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

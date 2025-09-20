@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "../css/Login.module.css"; // puedes reutilizar estilos
 import Link from "next/link";
 import GuestGuard from "../utils/GuestGuard";
+import { API_URL } from "../utils/api_url";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ export default function ForgotPassword() {
     setSuccess("");
 
     try {
-      const res = await fetch("http://localhost:4000/auth/forgot-password", {
+      const res = await fetch(`${API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

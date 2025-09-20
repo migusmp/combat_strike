@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { API_URL } from '../utils/api_url';
 
 interface AuthContextType {
   isAuthenticated: boolean | null;
@@ -17,7 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch('http://localhost:4000/auth/validate', {
+        const res = await fetch(`${API_URL}/auth/validate`, {
           credentials: 'include', // para enviar la cookie httpOnly
         });
         console.log("RESPUESTA DEL SERVIDOR: ",res);
