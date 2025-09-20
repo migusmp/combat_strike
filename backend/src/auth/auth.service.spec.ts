@@ -49,6 +49,7 @@ describe('AuthService', () => {
   let tokenRepository: MockRepository<VerificationToken>;
   let passwordResetRepository: MockRepository<PasswordResetToken>;
   let signSpy: jest.SpyInstance;
+  let mailService: MailService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +59,6 @@ describe('AuthService', () => {
         { provide: getRepositoryToken(VerificationToken), useValue: createMockRepository<VerificationToken>() },
         { provide: getRepositoryToken(PasswordResetToken), useValue: createMockRepository<PasswordResetToken>() },
         { provide: MailService, useValue: mockMailService },
-        { provide: MailService, useValue: mockMailService }, // Aseguramos que el MailService está mockeado
       ],
     }).compile();
 
@@ -66,10 +66,15 @@ describe('AuthService', () => {
     userRepository = module.get<MockRepository<User>>(getRepositoryToken(User));
     tokenRepository = module.get<MockRepository<VerificationToken>>(getRepositoryToken(VerificationToken));
     passwordResetRepository = module.get<MockRepository<PasswordResetToken>>(getRepositoryToken(PasswordResetToken));
-    mailService = module.get<MailService>(MailService); // obtenemos el mock para usarlo en los tests
-    // Mock de jwt.sign
-    signSpy = jest.spyOn(jwt, 'sign').mockReturnValue('mocked-jwt-token');
-    jest.spyOn(console, 'error').mockImplementation(() => { });
+    mailService = module.get<MailService>(MailService);
+
+    // dentro del beforeEach
+    signSpy = jest.spyOn(jwt as any, 'sign').mockReturnValue('mocked-jwt-token');
+
+    // forzar verify a any para que no importe la firma ni el retorno
+    (jest.spyOn(jwt, 'verify') as jest.Mock).mockImplementation(() => {
+      return { id: 1, email: 'test@example.com' };
+    });
   });
 
   afterEach(() => {
@@ -280,11 +285,14 @@ describe('AuthService', () => {
 
   it('should return decoded payload for valid token', async () => {
     const payload = { id: 1, email: 'test@example.com' };
-    jest.spyOn(jwt, 'verify').mockReturnValue(payload);
+
+    // Forzamos jwt.verify a devolver el payload
+    (jwt.verify as jest.Mock).mockImplementation(() => payload);
 
     const result = await service.validateToken('validtoken');
     expect(result).toEqual(payload);
   });
+
 
   it('should throw UnauthorizedException for invalid token', async () => {
     jest.spyOn(jwt, 'verify').mockImplementation(() => { throw new Error('fail'); });

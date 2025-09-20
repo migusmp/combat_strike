@@ -11,6 +11,9 @@ RUN npm install --legacy-peer-deps
 # Copiamos todo el código
 COPY . .
 
+# Copiar .env (producción)
+COPY .env.production .env
+
 # Compilamos TypeScript
 RUN npm run build
 

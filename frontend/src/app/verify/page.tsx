@@ -1,9 +1,14 @@
 // src/app/verify/page.tsx
-'use client'; // ⚠️ Necesario para deshabilitar SSR
+'use client';
 
-import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+import VerifyPage from './VerifyPage';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-// Importamos dinámicamente el componente sin SSR
-const VerifyPage = dynamic(() => import('./VerifyPage'), { ssr: false });
-
-export default VerifyPage;
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <VerifyPage />
+    </Suspense>
+  );
+}
