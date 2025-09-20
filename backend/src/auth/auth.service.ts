@@ -30,7 +30,7 @@ export class AuthService {
     @InjectRepository(PasswordResetToken)
     private readonly passwordResetRepository: Repository<PasswordResetToken>, // 👈 nuevo
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.userRepository.findOne({
@@ -61,8 +61,7 @@ export class AuthService {
         userId: savedUser.id,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hora
       });
-      const savedToken = await this.tokenRepository.save(verificationToken);
-      console.log('Token guardado:', savedToken);
+      await this.tokenRepository.save(verificationToken);
 
       // 🔹 Enviamos el email
       await this.mailService.sendVerificationEmail(savedUser.email, token);
@@ -113,7 +112,6 @@ export class AuthService {
   }
 
   async verifyUser(token: string) {
-    console.log('Verificando token:', token);
     const verificationToken = await this.tokenRepository.findOne({
       where: { token },
       relations: ['user'],
@@ -126,15 +124,10 @@ export class AuthService {
     if (verificationToken.expiresAt < new Date()) {
       throw new BadRequestException('Token expirado');
     }
-    console.log('Ahora:', new Date());
-    console.log('ExpiresAt:', verificationToken.expiresAt);
 
     // Marcamos al usuario como verificado
     verificationToken.user.isVerified = true;
     await this.userRepository.save(verificationToken.user);
-
-    const tokens = await this.tokenRepository.find();
-    console.log('Tokens en DB:', tokens);
 
     // Eliminamos el token de la DB
     await this.tokenRepository.remove(verificationToken);

@@ -17,7 +17,7 @@ export class MailService {
 
   async sendVerificationEmail(to: string, token: string) {
     const verifyUrl = `${process.env.FRONTEND_URL}/verify?token=${token}`;
-    console.log('URL de verificación:', verifyUrl);
+
     await this.transporter.sendMail({
       from: `"DL Combat Strike" <${process.env.EMAIL_USER}>`,
       to,
