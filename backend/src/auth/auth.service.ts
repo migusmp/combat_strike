@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
@@ -95,26 +96,10 @@ export class AuthService {
 
     // Verificar si el usuario ha confirmado su correo
     if (!user.isVerified) {
-      // Buscamos el token de verificación asociado al usuario
-      const tokenRecord = await this.tokenRepository.findOne({
-        where: { user: { id: user.id } },
+      throw new UnauthorizedException({
+        message: 'Debes verificar tu correo antes de iniciar sesión.',
+        canResend: true, // 👈 Para que el frontend muestre el botón
       });
-
-      let tiempoRestante = '';
-      if (tokenRecord) {
-        const now = new Date();
-        const diffMs = tokenRecord.expiresAt.getTime() - now.getTime();
-        if (diffMs > 0) {
-          const diffMinutes = Math.floor(diffMs / 1000 / 60);
-          tiempoRestante = `Te queda ${diffMinutes} minutos para verificar tu correo.`;
-        } else {
-          tiempoRestante = 'El enlace de verificación ha expirado.';
-        }
-      }
-
-      throw new UnauthorizedException(
-        `Debes verificar tu correo antes de iniciar sesión. ${tiempoRestante}`,
-      );
     }
 
     // Generamos JWT
@@ -157,11 +142,52 @@ export class AuthService {
     return { message: 'Cuenta verificada correctamente' };
   }
 
+  async resendVerification(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    if (user.isVerified) {
+      throw new BadRequestException('El usuario ya está verificado');
+    }
+
+    // Generar nuevo token (JWT o random string)
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '1h' },
+    );
+
+    // Guardar o actualizar token en la DB
+    let tokenRecord = await this.tokenRepository.findOne({ where: { user: { id: user.id } } });
+
+    if (tokenRecord) {
+      tokenRecord.token = token;
+      tokenRecord.expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1h
+      await this.tokenRepository.save(tokenRecord);
+    } else {
+      tokenRecord = this.tokenRepository.create({
+        token,
+        user,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      });
+      await this.tokenRepository.save(tokenRecord);
+    }
+
+    // Enviar email
+    await this.mailService.sendVerificationEmail(user.email, token);
+
+    return { message: 'Correo de verificación reenviado' };
+  }
+
   async validateToken(token: string) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET! || 'secret');
       return decoded; // aquí puedes devolver el userId, email, etc.
     } catch (err) {
+      console.error('Token validation error:', err);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

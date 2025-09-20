@@ -63,6 +63,12 @@ export class AuthController {
     }
   }
 
+  // auth.controller.ts
+  @Post('resend-verification')
+  async resendVerification(@Body('email') email: string) {
+    return this.authService.resendVerification(email);
+  }
+
   // Valida si el token en la cookie es válido
   @Get('validate')
   async validate(@Req() req: Request) {

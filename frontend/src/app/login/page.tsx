@@ -11,15 +11,19 @@ import { API_URL } from "../utils/api_url";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [alert, setAlert] = useState("");
+  const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | null }>({
+    message: "",
+    type: null,
+  });
+  const [canResend, setCanResend] = useState(false);
 
   const { setAuthenticated } = useAuthContext();
-
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAlert("");
+    setAlert({ message: "", type: null });
+    setCanResend(false);
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -28,28 +32,49 @@ export default function Login() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include", // para manejar cookies HttpOnly
+        credentials: "include",
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.message === "Debes verificar tu correo antes de iniciar sesión...") {
-          setAlert(data.message);
+        if (typeof data.message === "string") {
+          setAlert({ message: data.message, type: "error" });
         } else if (Array.isArray(data.message)) {
-          setAlert(data.message.join(" | "));
+          setAlert({ message: data.message.join(" | "), type: "error" });
         } else {
-          setAlert(data.message || "Error al iniciar sesión.");
+          setAlert({ message: "Error al iniciar sesión.", type: "error" });
+        }
+
+        if (data.canResend) {
+          setCanResend(true);
         }
       } else {
-        // Aquí puedes guardar el token, redirigir, etc.
-        // Por ejemplo: router.push("/dashboard");
         setAuthenticated(true);
         router.push("/");
       }
     } catch (err) {
-      setAlert("Error de conexión.");
+      setAlert({ message: "Error de conexión.", type: "error" });
       console.error(err);
+    }
+  };
+
+  // Función para reenviar verificación
+  const handleResend = async () => {
+    try {
+      const res = await fetch(`${API_URL}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setAlert({ message: "Se ha reenviado el correo de verificación.", type: "success" });
+        setCanResend(false);
+      } else {
+        setAlert({ message: "Error al reenviar el correo.", type: "error" });
+      }
+    } catch (err) {
+      setAlert({ message: "Error de conexión.", type: "error" });
     }
   };
 
@@ -75,17 +100,21 @@ export default function Login() {
             />
           </div>
 
-          {/* ALERTA ROJA CON EFECTO */}
-          {alert === "Debes verificar tu correo antes de iniciar sesión..." && (
-            <div className={styles.alertRed + " " + styles.alertVisible}>
-              {alert}
+          {/* ALERTA con colores dinámicos */}
+          {alert.message && (
+            <div
+              className={`${styles.alertVisible} ${alert.type === "success" ? styles.alertGreen : styles.alertRed
+                }`}
+            >
+              {alert.message}
             </div>
           )}
-          {/* Otros errores */}
-          {alert && alert !== "Debes verificar tu correo antes de iniciar sesión..." && (
-            <div className={styles.alertRed + " " + styles.alertVisible}>
-              {alert}
-            </div>
+
+          {/* Botón para reenviar verificación */}
+          {canResend && (
+            <button onClick={handleResend} className={styles.resendButtonVerification}>
+              Reenviar correo de verificación
+            </button>
           )}
 
           <form className={styles.form} onSubmit={handleSubmit}>
@@ -112,7 +141,7 @@ export default function Login() {
                 required
               />
             </div>
-            {/* Enlace para recuperar contraseña */}
+
             <p className={styles.forgotPassword}>
               <Link href="/forgot-password">¿Has olvidado la contraseña?</Link>
             </p>
@@ -123,8 +152,7 @@ export default function Login() {
           </form>
 
           <p className={styles.registerText}>
-            ¿No tienes cuenta?{" "}
-            <Link href="/register">Regístrate</Link>
+            ¿No tienes cuenta? <Link href="/register">Regístrate</Link>
           </p>
         </div>
       </div>
