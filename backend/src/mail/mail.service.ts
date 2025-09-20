@@ -16,7 +16,7 @@ export class MailService {
   }
 
   async sendVerificationEmail(to: string, token: string) {
-    const verifyUrl = `http://localhost:3000/verify?token=${token}`;
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify?token=${token}`;
 
     await this.transporter.sendMail({
       from: `"DL Combat Strike" <${process.env.EMAIL_USER}>`,

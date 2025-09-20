@@ -174,7 +174,7 @@ export class AuthService {
     await this.passwordResetRepository.save(resetToken);
 
     // Enviar correo con link de recuperación
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
     await this.mailService.sendResetPasswordEmail(user.email, resetLink);
 
     return true;

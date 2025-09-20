@@ -8,9 +8,12 @@ RUN npm install --legacy-peer-deps
 # Copiar código
 COPY . .
 
+RUN npm run build
+
 # Exponer puerto
 EXPOSE 3000
 
 # Servir la app directamente en modo Node
 # CMD ["npm", "run", "dev"]
-CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0", "-p", "3000"]
+# CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0", "-p", "3000"]
+CMD ["npm", "run", "start"]
