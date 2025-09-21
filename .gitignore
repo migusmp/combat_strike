@@ -9,6 +9,9 @@ frontend/node_modules/
 backend/.env
 frontend/.env
 
+backend/.env.production
+frontend/.env.production
+
 # Next.js / NestJS build / cache
 frontend/.next/
 backend/dist/
