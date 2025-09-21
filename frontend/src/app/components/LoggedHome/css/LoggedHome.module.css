@@ -1,3 +1,9 @@
+.mainContent {
+    margin-top: 90px;
+    /* espacio para el header */
+}
+
+/* HEADER STYLES */
 .header {
     position: fixed;
     /* correcto */
@@ -15,43 +21,90 @@
     z-index: 999;
 }
 
+/* Contenedor de los links */
 .header section {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
+/* Nav interno */
 .header section nav {
     display: flex;
     align-items: center;
     gap: 30px;
     font-size: 1.3rem;
     margin-right: 50px;
-    color: #fff;
 }
+
+/* Cada link individual */
+.header section nav a {
+    position: relative;
+    /* necesario para el ::after */
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 5px 0;
+    /* separa la línea del texto */
+}
+
+/* Línea que se desliza debajo de cada link */
+.header section nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    /* justo debajo del texto */
+    width: 0;
+    /* empieza desde cero */
+    height: 2px;
+    /* grosor de la línea */
+    background-color: #fff;
+    /* color de la línea */
+    transition: width 0.3s ease;
+    /* animación suave */
+}
+
+/* Hover: la línea se expande a todo el ancho del link */
+.header section nav a:hover::after {
+    width: 100%;
+}
+
+/* Hover: opcional, cambio de color del texto */
+.header section nav a:hover {
+    color: #ccc;
+}
+
 
 .usermenu {
     position: absolute;
-    background-color: #D9D9D9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    right: 2%;
     top: 8vh;
-    border-radius: 9px;
+    right: 2%;
+    width: 200px; /* tamaño fijo */
+    background-color: #fff;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 10px;
     overflow: hidden;
-    border: 1px solid #000032;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* opcional para darle profundidad */
+    z-index: 1000;
 }
 
 .usermenu ul {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    color: #fff;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .usermenu ul li {
-    padding: 17px;
+    width: 100%;
+    padding: 12px 16px; /* reduce un poco para que quepa en tamaño fijo */
     cursor: pointer;
     color: #000032;
     transition: all 0.2s ease-in-out;
@@ -62,19 +115,33 @@
     color: #fff;
 }
 
+.usermenu ul li.cerrarSesionBtn {
+    background-color: #fff;
+    color: #d32f2f;
+}
+
+.usermenu ul li.cerrarSesionBtn:hover {
+    background-color: #d32f2f;
+    color: #fff;
+}
+
+
 /* LOGGED HOME STYLES */
 .loggedhome {
     width: 100%;
     min-height: 95vh;
+    /* altura de la ventana menos header */
     display: flex;
     flex-direction: column;
     justify-content: center;
+    /* antes era center */
     align-items: center;
     padding: 2rem;
     background: linear-gradient(135deg, #d9d9d9, #f5f5f5);
     color: #000;
     text-align: center;
 }
+
 
 .loggedhome h1 {
     font-size: 2.5rem;
@@ -158,8 +225,83 @@
     transform: scale(1.05);
 }
 
+.contactBtn {
+    display: none;
+    cursor: pointer;
+}
+
+.contactBtn:hover {
+    background-color: #055293;
+    color: #fff;
+}
+
+/* Navbar en móvil */
+.navbar {
+    position: fixed;
+    top: 90px;
+    /* debajo del header */
+    width: 100%;
+    background-color: #000032;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0; /* 20px arriba y abajo, 0 a los lados */
+    gap: 0;
+    /* no necesitamos gap, lo hacemos con pseudo-elemento */
+    z-index: 998;
+    border-top: 1px solid #ccc;
+}
+
+.navbar a {
+    color: #fff;
+    width: 50%;
+    /* cada link ocupa la mitad */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    text-decoration: none;
+    font-weight: 500;
+    /* espacio alrededor del link */
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+/* Línea divisoria justo en medio entre links */
+.navbar a+a::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    /* al principio del link */
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    /* centro exacto horizontal y vertical */
+    width: 1px;
+    /* grosor */
+    height: 150%;
+    /* altura de la línea */
+    background-color: #ccc;
+}
+
+.navbar a:hover {
+    color: #ccc;
+}
+
+.telephoneSvg {
+    display: none;
+}
+
+.contactBtn p {
+    display: flex;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+    .mainContent {
+        margin-top: 155px;
+        /* espacio para el header y navbar */
+    }
+
     .loggedhome h1 {
         font-size: 2rem;
     }
@@ -194,4 +336,38 @@
         position: absolute;
         right: 2%;
     }
+
+    .contactBtn {
+        position: absolute;
+        left: 2%;
+        display: block;
+        padding: 13px 20px;
+        border-radius: 6px;
+        background-color: #fff;
+        color: #000;
+        font-weight: bold;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease, transform 0.2s ease;
+    }
+
+    .navbar {
+        display: flex;
+    }
+}
+
+@media (max-width: 590px) {
+    .contactBtn {
+        border-radius: 50%;
+        padding: 15px;
+    }
+
+    .telephoneSvg {
+        display: flex;
+    }
+
+    .contactBtn p {
+        display: none;
+    }
+
 }

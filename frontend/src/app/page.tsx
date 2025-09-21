@@ -1,19 +1,16 @@
-'use client';
+// app/page.tsx
+"use client";
 import GuestHome from './components/Home/GuestHome';
-import LoadingSpinner from './components/LoadingSpinner';
-import { useAuthContext } from './context/AuthContext';
-import LoggedLayout from './components/LoggedHome/LoggedLayout';
 import LoggedHome from './components/LoggedHome/LoggedHome';
-import { API_URL } from './utils/api_url';
+import { useAuthContext } from './context/AuthContext';
 
 export default function Home() {
-    const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated } = useAuthContext();
 
-    console.log("API_URL:", API_URL);
-
-    if (isAuthenticated === null) return <LoadingSpinner />;
-
-    return isAuthenticated
-        ? <LoggedLayout><LoggedHome /></LoggedLayout>
-        : <GuestHome />;
+  // Opcional: puedes mostrar distinto contenido según esté logueado
+  return (
+    <>
+      {isAuthenticated ? <LoggedHome /> : <GuestHome />}
+    </>
+  );
 }
