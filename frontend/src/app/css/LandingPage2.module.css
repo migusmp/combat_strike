@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 4rem 8%;
-    min-height: 90vh;
+    min-height: 91vh;
     background-color: #000;
     /* fondo negro limpio */
     color: #fff;
@@ -98,25 +98,25 @@
 /*}*/
 
 .title {
-  font-size: 4.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
+    font-size: 4.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
 
-  background: linear-gradient(90deg,
-      #d9d9d9,
-      #5e96be,
-      #055293,
-      #8aa6be,
-      #d9d9d9);
-  background-size: 300% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+    background: linear-gradient(90deg,
+            #d9d9d9,
+            #5e96be,
+            #055293,
+            #8aa6be,
+            #d9d9d9);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 
-  animation: shine 6s linear infinite;
-  
-  /* text-shadow: 0 0 15px rgba(94, 150, 190, 0.4),
+    animation: shine 6s linear infinite;
+
+    /* text-shadow: 0 0 15px rgba(94, 150, 190, 0.4),
                0 0 30px rgba(5, 82, 147, 0.3); */
 }
 
@@ -141,6 +141,213 @@
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+/* ESTILOS DE SECCIÓN DE DESCRIPCION DE ENTRENADOR */
+/* ======================= */
+/* TRAINER SECTION */
+/* ======================= */
+.trainerSection {
+    padding: 2rem 8%;
+    /* menos altura */
+    display: flex;
+    align-items: flex-start;
+    /* alineados arriba */
+    gap: 30px;
+    /* separación entre imagen y texto */
+    background-color: #000032;
+    overflow: hidden;
+    /* oculta lo que se salga al animar */
+}
+
+.trainerSection div {
+    flex: 1;
+    width: 50%;
+}
+
+/* Imagen entrenador */
+.imageTrainer {
+    max-width: 400px;
+    height: auto;
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(8px);
+    transition: all 1s ease-out;
+}
+
+/* Texto entrenador */
+.trainerText {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(8px);
+    transition: all 1s ease-out;
+}
+
+.trainerText h2 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 3rem;
+}
+
+/* Animación visible */
+.trainerSectionVisible .imageTrainer {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition-delay: 0.2s;
+}
+
+.trainerSectionVisible .trainerText {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition-delay: 0.6s;
+}
+
+/* ======================= */
+/* ASSISTANT SECTION */
+/* ======================= */
+.assistantSection {
+    padding: 2rem 8%;
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+    background-color: #0a0a2f;
+    overflow: hidden;
+    /* Esto hace que la imagen vaya a la derecha */
+    flex-direction: row-reverse;
+}
+
+.assistantSection .imageAssistantWrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    /* fuerza que la imagen se alinee a la derecha dentro del div */
+}
+
+.assistantSection .assistantText {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.imageAssistant {
+    max-width: 400px;
+    height: auto;
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(8px);
+    transition: all 1s ease-out;
+}
+
+/* Texto ayudante */
+.assistantText {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(8px);
+    transition: all 1s ease-out;
+}
+
+.assistantText h2 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 3rem;
+}
+
+/* Animación visible */
+.assistantVisible .imageAssistant {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition-delay: 0.2s;
+}
+
+.assistantVisible .assistantText {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition-delay: 0.6s;
+}
+
+@media(max-width: 950px) {
+    .trainerSection {
+        padding: 1rem 4%;
+        /* menos padding en tablet */
+    }
+
+    .trainerSection h2 {
+        font-size: 2rem;
+    }
+
+    .imageTrainer {
+        max-width: 90%;
+        /* que ocupe todo el ancho de la pantalla */
+    }
+
+    .assistantSection {
+        padding: 1rem 4%;
+        /* menos padding en tablet */
+    }
+
+    .assistantSection h2 {
+        font-size: 2rem;
+    }
+
+
+    .imageAssistant {
+        max-width: 90%;
+        /* que ocupe todo el ancho de la pantalla */
+    }
+}
+
+/* Mobile: pantallas menores a 768px */
+@media (max-width: 768px) {
+    .assistantSection {
+        flex-direction: column;
+        /* texto encima, imagen debajo */
+        gap: 20px;
+        padding: 2rem 4%;
+        /* menos padding en mobile */
+    }
+
+    .assistantSection .imageAssistantWrapper,
+    .assistantSection .assistantText {
+        width: 100%;
+        flex: none;
+        /* eliminamos flex para que tomen todo el ancho */
+        justify-content: center;
+        /* centramos todo */
+        text-align: center;
+        /* centramos el texto */
+    }
+
+    .imageAssistant {
+        max-width: 90%;
+        /* que no ocupe todo el ancho de la pantalla */
+        margin: 0 auto;
+        /* centramos horizontalmente */
+    }
+
+    .trainerSection {
+        flex-direction: column;
+        /* también apilamos en vertical */
+        gap: 20px;
+        padding: 2rem 4%;
+    }
+
+    .trainerSection .imageTrainerWrapper,
+    .trainerSection .trainerText {
+        width: 100%;
+        flex: none;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .imageTrainer {
+        max-width: 90%;
+        margin: 0 auto;
     }
 }
 
@@ -221,10 +428,4 @@
         transform: translateY(-3px);
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
-}
-
-
-
-@media (max-width: 650px) {
-    .container {}
 }

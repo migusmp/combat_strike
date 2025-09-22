@@ -28,7 +28,7 @@ export default function HeaderPrueba() {
                 className={styles.header}
                 style={{
                     backgroundColor: darkBg
-                        ? "rgba(0, 0, 0, 0)"
+                        ? "rgba(0, 0, 0, 0.9)"
                         : "rgba(0, 0, 0, 1)", // transparente al inicio
                     backdropFilter: darkBg
                         ? "blur(8px) brightness(0.6)"

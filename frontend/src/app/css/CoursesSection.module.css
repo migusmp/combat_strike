@@ -1,0 +1,169 @@
+.coursesSection {
+    padding: 5rem 8%;
+    background-color: #000032;
+    color: #000032;
+    text-align: center;
+}
+
+.coursesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    justify-content: center;
+}
+
+.sectionTitle {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    font-weight: bold;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+/* Cuando se haga visible */
+.sectionTitleVisible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Tarjeta blanca con animación de aparición y hover */
+.courseCard {
+    background: #D9D9D9;
+    padding: 3rem;
+    border-radius: 25px;
+    width: 450px;
+    min-height: 400px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    color: #000032;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+/* Aparece suavemente al hacer scroll */
+.courseCardVisible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hover: tarjeta se levanta con sombra */
+.courseCard:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Título destacado */
+.courseTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #055293;
+    color: #000032;
+}
+
+.courseTopics {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.courseTopics li {
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 1rem;
+    color: #000032;
+}
+
+.courseTopics li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #055293;
+}
+
+/* Botón simple y elegante */
+.courseBtn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: #055293;
+    color: #D9D9D9;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.courseBtn:hover {
+    background-color: #03346d;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .coursesContainer {
+        gap: 2rem;
+    }
+
+    .courseCard {
+        width: 45%;
+        min-height: 380px;
+    }
+}
+
+@media (max-width: 768px) {
+    .coursesContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .courseCard {
+        width: 90%;
+        min-height: auto;
+    }
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 656px) {
+    .sectionTitle {
+        font-size: 2rem;
+        /* título más pequeño */
+        margin-bottom: 2rem;
+    }
+
+    .courseCard {
+        width: 90%;
+        /* ocupa casi todo el ancho */
+        padding: 2rem;
+        /* menos padding */
+        min-height: auto;
+        /* altura automática */
+    }
+
+    .courseTitle {
+        font-size: 1.5rem;
+        /* título de la tarjeta más pequeño */
+        margin-bottom: 1rem;
+    }
+
+    .courseTopics li {
+        font-size: 1rem;
+        /* texto de los párrafos más pequeño */
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .courseBtn {
+        padding: 0.7rem 1.5rem;
+        /* botón más compacto */
+        font-size: 0.9rem;
+    }
+}
