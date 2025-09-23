@@ -80,49 +80,68 @@ export default function CollaborationSection() {
 
     return (
         <section className={styles.collaborationSection}>
-            <h2
-                ref={titleRef}
-                className={`${styles.sectionTitle} ${titleVisible ? styles.sectionTitleVisible : ""}`}
-            >
-                Nuestra Colaboración
-            </h2>
-            <p
-                className={`${styles.sectionSubtitle} ${titleVisible ? styles.sectionSubtitleVisible : ""
-                    }`}
-            >
-                Presentamos los productos de{" "}
-                <a
-                    href="https://zulutactical.es/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.partnerLink}
+            <div className={styles.sectionHeader}>
+                <h2
+                    ref={titleRef}
+                    className={`${styles.sectionTitle} ${titleVisible ? styles.sectionTitleVisible : ""}`}
                 >
-                    Zulu Tactical
-                </a>{" "}
-                para tu defensa personal
-            </p>
-            <div className={styles.productsContainer}>
-                {products.map((product, index) => (
-                    <div
-                        key={index}
-                        ref={(el) => {
-                            if (el) cardRefs.current[index] = el;
-                        }}
-                        className={`${styles.productCard} ${visibleCards[index] ? styles.productCardVisible : ""}`}
+                    Nuestra Colaboración
+                </h2>
+                <p
+                    className={`${styles.sectionSubtitle} ${titleVisible ? styles.sectionSubtitleVisible : ""}`}
+                >
+                    Presentamos los productos de{" "}
+                    <a
+                        href="https://zulutactical.es/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.partnerLink}
                     >
-                        <img src={product.image} alt={product.title} className={styles.productImage} />
-                        <h3 className={styles.productTitle}>{product.title}</h3>
-                        {product.ageWarning && <p className={styles.ageWarning}>{product.ageWarning}</p>}
-                        <ul className={styles.productTopics}>
-                            {product.topics.map((topic, i) => (
-                                <li key={i}>{topic}</li>
-                            ))}
-                        </ul>
-                        <Link href={product.href} className={styles.productBtn}>
-                            Ver Producto
-                        </Link>
-                    </div>
-                ))}
+                        Zulu Tactical
+                    </a>{" "}
+                    para tu defensa personal
+                </p>
+            </div>
+
+            <div className={styles.collaborationContent}>
+                {/* IZQUIERDA */}
+                <div className={styles.partnerInfo}>
+                    <img
+                        src="/assets/zulu-tactical.png"
+                        alt="Logo Zulu Tactical"
+                        className={styles.partnerLogo}
+                    />
+                    <p>
+                        Zulu Tactical es una empresa especializada en productos de defensa personal
+                        y equipamiento táctico. Ofrecen soluciones seguras y legales para tu
+                        protección diaria, siempre cumpliendo con la normativa vigente.
+                    </p>
+                </div>
+
+                {/* DERECHA */}
+                <div className={styles.productsContainer}>
+                    {products.map((product, index) => (
+                        <div
+                            key={index}
+                            ref={(el) => {
+                                if (el) cardRefs.current[index] = el;
+                            }}
+                            className={`${styles.productCard} ${visibleCards[index] ? styles.productCardVisible : ""}`}
+                        >
+                            <img src={product.image} alt={product.title} className={styles.productImage} />
+                            <h3 className={styles.productTitle}>{product.title}</h3>
+                            {product.ageWarning && <p className={styles.ageWarning}>{product.ageWarning}</p>}
+                            <ul className={styles.productTopics}>
+                                {product.topics.map((topic, i) => (
+                                    <li key={i}>{topic}</li>
+                                ))}
+                            </ul>
+                            <Link href={product.href} className={styles.productBtn}>
+                                Ver Producto
+                            </Link>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <div className={styles.legalNotice}>

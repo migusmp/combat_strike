@@ -1,7 +1,9 @@
 .collaborationSection {
     padding: 5rem 8%;
-    background-color: #000032;
-    color: #fff;
+    background-color: #ffffff;
+    /* fondo blanco */
+    color: #1a1a1a;
+    /* texto general oscuro */
     text-align: center;
 }
 
@@ -13,7 +15,8 @@
     font-size: 3rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
-    color: #fff;
+    color: #1a1a1a;
+    /* título oscuro */
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.6s ease;
@@ -24,27 +27,14 @@
     transform: translateY(0);
 }
 
-
 .sectionSubtitle {
     font-size: 1.2rem;
-    color: #fff;
-    /* Texto en blanco */
+    color: #333333;
+    /* gris oscuro */
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.6s ease 0.2s;
     margin-bottom: 2rem;
-}
-
-.partnerLink {
-    color: #fff;
-    font-weight: bold;
-    text-decoration: underline;
-    transition: color 0.3s ease;
-}
-
-.partnerLink:hover {
-    color: #8aa6be;
-    /* azul grisáceo */
 }
 
 .sectionSubtitleVisible {
@@ -52,16 +42,57 @@
     transform: translateY(0);
 }
 
+.partnerLink {
+    color: #055293;
+    /* azul principal */
+    font-weight: bold;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.partnerLink:hover {
+    color: #03346d;
+    /* azul más oscuro en hover */
+}
+
+/* CONTENEDOR PRINCIPAL: IZQUIERDA + DERECHA */
+.collaborationContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4rem;
+    text-align: left;
+}
+
+/* IZQUIERDA */
+.partnerInfo {
+    flex: 1;
+    max-width: 40%;
+}
+
+.partnerLogo {
+    width: 200px;
+    margin-bottom: 1.5rem;
+}
+
+.partnerInfo p {
+    font-size: 1.1rem;
+    color: #333333;
+    line-height: 1.6;
+}
+
+/* DERECHA */
 .productsContainer {
+    flex: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 2.5rem;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .productCard {
-    background: #d9d9d9;
-    color: #000032;
+    background: #ffffff;
+    color: #1a1a1a;
     padding: 2.5rem;
     border-radius: 25px;
     width: 400px;
@@ -69,10 +100,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     transition: all 0.4s ease;
     opacity: 0;
     transform: translateY(30px);
+    border: 1px solid #e5e5e5;
 }
 
 .productCardVisible {
@@ -82,7 +114,7 @@
 
 .productCard:hover {
     transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .productImage {
@@ -97,12 +129,13 @@
     margin-bottom: 0.8rem;
     border-bottom: 2px solid #055293;
     padding-bottom: 0.3rem;
-    color: #000032;
-    /* Mantener contraste en el título de tarjeta */
+    color: #055293;
+    /* título con acento azul */
 }
 
 .ageWarning {
-    color: #055293;
+    color: #d9534f;
+    /* rojo para advertencia */
     font-weight: bold;
     margin-bottom: 1rem;
 }
@@ -111,8 +144,7 @@
     list-style: none;
     padding: 0;
     margin-bottom: 1.5rem;
-    color: #000032;
-    /* Texto de lista en negro para contraste */
+    color: #333333;
 }
 
 .productTopics li {
@@ -133,7 +165,7 @@
     display: inline-block;
     padding: 0.8rem 2rem;
     background-color: #055293;
-    color: #d9d9d9;
+    color: #ffffff;
     border-radius: 12px;
     text-decoration: none;
     font-weight: bold;
@@ -148,17 +180,36 @@
 
 .legalNotice {
     margin-top: 4rem;
-    /* Más separación del contenido */
     font-size: 0.9rem;
-    color: #8aa6be;
-    /* Azul grisáceo para advertencia */
+    color: #666666;
+    /* gris medio */
     text-align: center;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+/* RESPONSIVE */
+@media (max-width: 1200px) {
     .productCard {
         width: 45%;
+    }
+}
+
+@media (max-width: 1024px) {
+    .collaborationContent {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .partnerInfo {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .partnerLogo {
+        margin: 0 auto 1.5rem auto;
+    }
+
+    .productsContainer {
+        justify-content: center;
     }
 }
 
