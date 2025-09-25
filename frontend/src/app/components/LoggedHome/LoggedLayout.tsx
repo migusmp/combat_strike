@@ -56,7 +56,7 @@ export default function LoggedLayout({ children }: { children: React.ReactNode }
                     <nav>
                         <Link href="/">Inicio</Link>
                         <Link href="/cursos">Cursos</Link>
-                        <Link href="/shop">Tienda</Link>
+                        <Link href="/productos">Productos</Link>
                         <Link href="/contact">Contáctanos</Link>
                     </nav>
 
@@ -88,7 +88,7 @@ export default function LoggedLayout({ children }: { children: React.ReactNode }
             </header>
             <nav className={styles.navbar}>
                 <Link href="/cursos">Cursos</Link>
-                <Link href="/shop">Tienda</Link>
+                <Link href="/productos">Productos</Link>
             </nav>
 
             <main className={styles.mainContent}>

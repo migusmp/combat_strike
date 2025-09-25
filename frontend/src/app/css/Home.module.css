@@ -626,46 +626,128 @@ html {
 }
 
 /* FOOTER SECTION CSS */
+/* =============================
+   FOOTER BASE
+============================= */
 .footer {
-    background: #0a3770;
+    background-color: #000032;
     color: #fff;
-    padding: 30px 0 20px 0;
-    text-align: center;
-    width: 100%;
-    margin-top: 40px;
+    padding: 1.5rem 4%;
+    /* menos padding */
 }
 
 .footerContent {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 1rem;
+    /* menos gap */
+    flex-wrap: wrap;
 }
 
+/* =============================
+   MARCA / COPYRIGHT / CONTACTO
+============================= */
+.footerBrand {
+    flex: 1 1 auto;
+    /* flex más flexible */
+    min-width: 180px;
+    /* para que no se haga demasiado pequeño */
+}
+
+.footerLogo {
+    font-size: 1.4rem;
+    /* un poco más pequeño */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.footerContact {
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.footerMotto {
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #aaa;
+}
+
+/* =============================
+   NAVEGACIÓN
+============================= */
 .footerNav {
+    flex: 1 1 auto;
     display: flex;
-    gap: 24px;
     justify-content: center;
-    margin-top: 8px;
+    flex-wrap: wrap;
+    gap: 1rem;
+    /* menos gap */
+    margin-top: 0.3rem;
 }
 
 .footerNav a {
-    color: #fff;
+    color: #bbb;
+    font-size: 1.1rem;
     text-decoration: none;
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 1rem;
-    transition: color 0.2s;
+    transition: color 0.2s ease;
 }
 
 .footerNav a:hover {
-    color: #bfc0c7;
+    color: #fff;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-    .footerNav {
+/* =============================
+   REDES SOCIALES
+============================= */
+.footerSocial {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+    /* menos gap */
+    margin-top: 0.3rem;
+}
+
+.footerSocial a {
+    color: #bbb;
+    transition: color 0.2s ease;
+}
+
+.footerSocial a:hover {
+    color: #fff;
+}
+
+/* =============================
+   RESPONSIVE
+============================= */
+@media (max-width: 1024px) {
+    .footerContent {
         flex-direction: column;
-        gap: 8px;
+        align-items: center;
+        text-align: center;
+        gap: 0.8rem;
+        /* menos espacio entre bloques */
+    }
+
+    .footerNav {
+        justify-content: center;
+        margin: 0.5rem 0;
+        /* menos margen */
+    }
+
+    .footerSocial {
+        justify-content: center;
+        margin: 0.5rem 0;
+        /* menos margen */
+    }
+
+    .footerBrand {
+        margin-bottom: 0.5rem;
+        /* menos margen */
     }
 }
 

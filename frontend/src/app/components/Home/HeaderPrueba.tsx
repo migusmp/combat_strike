@@ -64,7 +64,7 @@ export default function HeaderPrueba() {
                     <nav>
                         <Link href="/">Inicio</Link>
                         <Link href="/cursos">Cursos</Link>
-                        <Link href="/shop">Tienda</Link>
+                        <Link href="/productos">Productos</Link>
                         <Link href="/contact">Contáctanos</Link>
                     </nav>
                     <svg
@@ -103,7 +103,7 @@ export default function HeaderPrueba() {
             <section className={styles.headerMobile}>
                 <nav>
                     <Link href="/cursos">Cursos</Link>
-                    <Link href="/shop">Tienda</Link>
+                    <Link href="/productos">Productos</Link>
                 </nav>
             </section>
         </>

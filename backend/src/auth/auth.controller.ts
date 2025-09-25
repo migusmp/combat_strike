@@ -18,7 +18,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
@@ -98,5 +98,19 @@ export class AuthController {
   ) {
     await this.authService.resetPassword(token, password);
     return { message: 'Contraseña restablecida correctamente.' };
+  }
+
+  @Post('logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const token = req.cookies['auth'];
+
+    if (!token) {
+      throw new UnauthorizedException('No hay sesión activa');
+    }
+
+    // Borramos la cookie 'auth'
+    res.clearCookie('auth', { path: '/' });
+
+    return { message: 'Usuario desconectado correctamente' };
   }
 }

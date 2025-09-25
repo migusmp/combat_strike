@@ -1,17 +1,30 @@
 // components/UserMenu.tsx
 import { forwardRef } from "react";
 import styles from "../css/LoggedHome.module.css";
+import { API_URL } from "@/app/utils/api_url";
 
 const UserMenu = forwardRef<HTMLDivElement>((props, ref) => {
-  return (
-    <section ref={ref} className={styles.usermenu}>
-      <ul>
-        <li>Cuenta</li>
-        <li>Mis Cursos</li>
-        <li className={styles.cerrarSesionBtn}>Cerrar sesión</li>
-      </ul>
-    </section>
-  );
+
+    const handleClickLogout = async () => {
+        const res = await fetch(`${API_URL}/auth/logout`, {
+            method: "POST",
+            credentials: "include"
+        })
+
+        if (res.ok) {
+            window.location.href = "/";
+        }
+    }
+
+    return (
+        <section ref={ref} className={styles.usermenu}>
+            <ul>
+                <li>Cuenta</li>
+                <li>Mis Cursos</li>
+                <li className={styles.cerrarSesionBtn} onClick={handleClickLogout}>Cerrar sesión</li>
+            </ul>
+        </section>
+    );
 });
 
 // Esto soluciona el warning de ESLint

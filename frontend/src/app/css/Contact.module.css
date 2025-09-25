@@ -1,0 +1,94 @@
+/* Contact.module.css */
+/* Contact.module.css */
+
+body {
+    background-color: #ffffff;
+    /* Fondo blanco */
+}
+
+.contactContainer {
+    max-width: 600px;
+    min-height: 91vh;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Arial', sans-serif;
+    /* Azul muy claro de fondo del formulario */
+    color: #0a1a4f;
+    /* Azul oscuro para texto */
+}
+
+.contactContainer h1 {
+    margin-top: 4rem;
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #0a1a4f;
+    /* Azul oscuro */
+}
+
+.contactContainer p {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #3a4b9c;
+    /* Azul medio */
+}
+
+.contactForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contactForm input,
+.contactForm textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #7a8ccf;
+    /* Azul suave para el borde */
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #e6edff;
+    /* Azul muy claro para inputs */
+    color: #0a1a4f;
+    /* Azul oscuro para texto */
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.contactForm input::placeholder,
+.contactForm textarea::placeholder {
+    color: #7a8ccf;
+    /* Azul medio para placeholder */
+}
+
+.contactForm input:focus,
+.contactForm textarea:focus {
+    border-color: #1c3bbf;
+    /* Azul intenso al focus */
+    box-shadow: 0 0 5px rgba(28, 59, 191, 0.5);
+    outline: none;
+}
+
+.contactForm button {
+    padding: 0.75rem 1rem;
+    background-color: #1c3bbf;
+    /* Azul intenso para el botón */
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.contactForm button:hover {
+    background-color: #0a1a4f;
+    /* Azul más oscuro al hover */
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .contactContainer {
+        padding: 1rem;
+    }
+}

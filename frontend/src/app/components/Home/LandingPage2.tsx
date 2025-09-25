@@ -5,6 +5,7 @@ import styles from "../../css/LandingPage2.module.css";
 import Link from "next/link";
 import CoursesSection from "./CoursesSection";
 import CollaborationSection from "./CollaborationSection";
+import Footer from "./Footer";
 
 export default function LandingPage2() {
     const trainerRef = useRef<HTMLDivElement>(null);
@@ -43,7 +44,7 @@ export default function LandingPage2() {
                     <h1 className={styles.title}>COMBAT STRIKE</h1>
                     <p className={styles.description}>
                         DL Combat Strike es una marca de deportes de contacto enfocada en la
-                        seguridad personal y basada en técnicas de krav maga israelí. Cuya
+                        seguridad personal y basada en técnicas de krav maga. Cuya
                         misión es permitir que las personas tengan la oportunidad de saber
                         defenderse y tener conocimientos básicos de defensa basada en
                         situaciones reales. La marca atrae a una comunidad única llena de
@@ -111,6 +112,7 @@ export default function LandingPage2() {
             </section>
             <CoursesSection />
             <CollaborationSection />
+            <Footer />
         </>
     );
 }
