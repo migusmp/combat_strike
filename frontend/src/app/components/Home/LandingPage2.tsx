@@ -56,11 +56,12 @@ export default function LandingPage2() {
                 </div>
                 <div className={styles.imageContainer}>
                     <Image
-                        src="/assets/logo-blanco-sin-texto.png"
+                        src="/assets/logo-blanco-sin-texto.webp"
                         width={600}
                         height={600}
                         alt="DL Combat Strike logo"
                         className={styles.image}
+                        priority={true}
                     />
                 </div>
             </section>

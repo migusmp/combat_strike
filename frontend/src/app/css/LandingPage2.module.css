@@ -358,8 +358,9 @@
         justify-content: center;
         text-align: center;
         padding: 3rem 1.5rem;
-        background: url("/assets/logo-blanco-sin-texto.png") center no-repeat;
-        background-size: 170%;
+        background: url("/assets/logo-blanco-sin-texto.webp") center no-repeat;
+        background-size: cover;
+
         /* hace la imagen más pequeña */
         position: relative;
     }

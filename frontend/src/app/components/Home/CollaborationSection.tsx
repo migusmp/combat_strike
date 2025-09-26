@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "../../css/CollaborationSection.module.css";
 import { useEffect, useRef, useState } from "react";
 
@@ -106,11 +107,14 @@ export default function CollaborationSection() {
             <div className={styles.collaborationContent}>
                 {/* IZQUIERDA */}
                 <div className={styles.partnerInfo}>
-                    <img
+                    <Image
                         src="/assets/zulu-tactical.png"
                         alt="Logo Zulu Tactical"
+                        width={250}
+                        height={250}
                         className={styles.partnerLogo}
                     />
+
                     <p>
                         Zulu Tactical es una empresa especializada en productos de defensa personal
                         y equipamiento táctico. Ofrecen soluciones seguras y legales para tu
