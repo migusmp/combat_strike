@@ -50,6 +50,10 @@ export default function LandingPage2() {
                         situaciones reales. La marca atrae a una comunidad única llena de
                         actitud de quienes buscan aprender y convertirse en luchadores.
                     </p>
+                    <div className={styles.btnContainer}>
+                        <Link href="/register" className={styles.btnUnirse}>Únete ahora</Link>
+                        <Link href="/cursos" className={styles.btnExplorarCursos}>Explorar Cursos</Link>
+                    </div>
                     <Link href="/login" className={styles.ctaBtn}>
                         Empieza aquí
                     </Link>

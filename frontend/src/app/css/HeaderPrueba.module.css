@@ -75,8 +75,8 @@
 /* botones */
 /* Botón Iniciar sesión */
 .loginBtn {
-    background: linear-gradient(135deg, #ffffff, #e6e6e6);
-    color: #000;
+    background: #055293;
+    color: #fff;
     padding: 13px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -109,18 +109,17 @@
     color: #fff;
     padding: 12px 20px;
     border-radius: 6px;
-    border: 2px solid #55aaff;
+    border: 2px solid #fff;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s ease, transform 0.2s ease;
 }
 
 .registerBtn:hover {
-    background: #055293;
-    border-color: #055293;
-    color: #fff;
+    background: #fff;
+    border-color: #fff;
+    color: #000;
     transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
 }
 
 .userIcon {

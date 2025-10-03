@@ -12,7 +12,7 @@ export default function Footer() {
                     <p className={styles.footerContact}>📧 contacto@dlcombatstrike.com</p>
                     {/* FRASE / ESLOGAN */}
                     <p className={styles.footerMotto}>
-                        'La defensa personal es el arte de proteger lo que más importa.'
+                        La defensa personal es el arte de proteger lo que más importa.
                     </p>
                 </div>
 

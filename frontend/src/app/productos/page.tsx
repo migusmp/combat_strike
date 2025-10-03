@@ -71,7 +71,7 @@ export default function ShopPage() {
                             className={`${styles.productCard} ${loaded ? styles.fadeInUp : ""}`}
                             style={{ animationDelay: `${index * 0.2}s` }}
                         >
-                            <img src={product.image} alt={product.title} className={styles.productImage} />
+                            <Image width={100} height={100} src={product.image} alt={product.title} className={styles.productImage} />
                             <h3 className={styles.productTitle}>{product.title}</h3>
                             {product.ageWarning && <p className={styles.ageWarning}>{product.ageWarning}</p>}
                             <ul className={styles.productTopics}>

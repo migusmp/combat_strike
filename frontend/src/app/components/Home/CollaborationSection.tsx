@@ -132,7 +132,7 @@ export default function CollaborationSection() {
                             }}
                             className={`${styles.productCard} ${visibleCards[index] ? styles.productCardVisible : ""}`}
                         >
-                            <img src={product.image} alt={product.title} className={styles.productImage} />
+                            <Image src={product.image} width={0} height={0} alt={product.title} className={styles.productImage} />
                             <h3 className={styles.productTitle}>{product.title}</h3>
                             {product.ageWarning && <p className={styles.ageWarning}>{product.ageWarning}</p>}
                             <ul className={styles.productTopics}>

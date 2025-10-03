@@ -1,130 +1,116 @@
 /* Cursos.module.css */
 .container {
-    background-color: #fff;
+    background-color: #000032;
     min-height: 91vh;
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: #D9D9D9;
+}
+
+.coursesSection {
+    width: 100%;
+    max-width: 1200px;
+}
+
+.sectionTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #8AA6BE;
 }
 
 .coursesGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
 }
 
 .courseCard {
-    background-color: #fff;
-    border: 2px solid #055293;
-    border-radius: 12px;
+    background-color: #055293;
+    border-radius: 1rem;
     padding: 1.5rem;
-    text-align: left;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-/* Hover limpio y moderno */
-.courseCard:hover {
-    transform: translateY(-6px);
-    box-shadow: 0px 8px 20px rgba(0, 51, 102, 0.25);
-    border-color: #007bff;
-    /* azul más vivo */
-}
-
-/* Contenido del curso alineado a la izquierda */
-.courseContent {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-/* Botón centrado y elegante */
-.buttonWrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: auto;
-}
-
-/* Estado inicial de las tarjetas */
-.courseCard {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     opacity: 0;
     transform: translateY(20px);
 }
 
-/* Animación de fade-in */
+.courseCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(90, 150, 190, 0.6);
+}
+
 .fadeInUp {
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-
-.courseBtn {
-    display: inline-block;
-    padding: 0.9rem 2rem;
-    font-weight: bold;
-    background-color: #055293;
-    color: #fff;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: background-color 0.25s ease, transform 0.2s ease;
+.courseContent {
+    flex: 1;
 }
 
-/* Hover del botón */
-.courseBtn:hover {
-    background-color: #0055aa;
-    transform: scale(1.05);
-}
-
-.sectionTitle {
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 3rem;
-    color: #000032;
-    font-weight: bold;
-}
-
-/* Títulos, descripción y lista */
 .courseTitle {
     font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #000032;
     font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #D9D9D9;
 }
 
 .courseDescription {
     font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: #1a1a1a;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    color: #D9D9D9;
+    opacity: 0.85;
 }
 
 .courseTopics {
-    list-style: disc inside;
-    color: #1a1a1a;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
 }
 
 .courseTopic {
-    margin: 0.5rem 0;
-    font-size: 1rem;
+    background-color: #5E96BE;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: #000032;
+    font-weight: 500;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .coursesGrid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.buttonWrapper {
+    text-align: center;
 }
 
+.courseBtn {
+    display: inline-block;
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(90deg, #8AA6BE, #5E96BE);
+    color: #000032;
+    font-weight: bold;
+    border-radius: 0.8rem;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.courseBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(90, 150, 190, 0.6);
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .coursesGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .courseCard {
-        padding: 1rem;
+    .sectionTitle {
+        font-size: 2rem;
     }
 
     .courseTitle {
@@ -134,19 +120,18 @@
     .courseDescription {
         font-size: 0.95rem;
     }
-
-    .courseTopic {
-        font-size: 0.95rem;
-    }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 2rem 1rem;
+    }
+
     .coursesGrid {
-        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
     .courseBtn {
         width: 100%;
-        text-align: center;
     }
 }

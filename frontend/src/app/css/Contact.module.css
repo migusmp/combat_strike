@@ -17,6 +17,20 @@ body {
     /* Azul oscuro para texto */
 }
 
+.contactContainer ul {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    list-style: none;
+    margin-top: 3rem;
+    align-items: center;
+}
+
+.contactContainer ul li {
+    cursor: pointer;
+}
+
+
 .contactContainer h1 {
     margin-top: 4rem;
     text-align: center;
