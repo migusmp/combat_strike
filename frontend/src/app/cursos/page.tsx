@@ -1,70 +1,87 @@
-"use client"
-import { useEffect, useState } from "react";
-import Link from 'next/link';
+"use client";
+
+import { useState } from "react";
+import CourseCard from '../components/Home/CourseCard';
 import Footer from '../components/Home/Footer';
-import styles from '../css/Cursos.module.css'
+import styles from '../css/Cursos.module.css';
+import { CategoryMenu } from "../components/Home/CategoryMenu";
 
 export default function CursosPage() {
-    const [loaded, setLoaded] = useState(false);
-
-    useEffect(() => {
-        // Activa la animación después de montar el componente
-        setLoaded(true);
-    }, []);
-
     const courses = [
         {
-            title: "CURSO CON SPRAYS",
-            description: "Aprende a utilizar sprays de defensa personal en diferentes situaciones.",
+            id: "sprays",
+            photo: "/assets/foto-curso-gas-pimienta.png",
+            title: "Curso con Spray",
             topics: ["TIPOS DE SPRAY", "USO DEL SPRAY", "SITUACIONES SPRAY"],
+            price: "59,99€",
+            category: "Sprays",
         },
         {
-            title: "VIDEOS SITUACIONES COTIDIANAS SIN MATERIALES",
-            description: "Técnicas de defensa personal sin necesidad de equipamiento, ideales para la vida diaria.",
-            topics: ["Aprende técnicas sin necesidad de material", "Defensa en situaciones reales"],
+            id: "krav-maga",
+            photo: "/assets/foto-curso-krav-maga.png",
+            title: "Krav Maga básico",
+            topics: ["Técnicas de defensa básica", "Situaciones cotidianas"],
+            price: "39,99€",
+            category: "Krav Maga",
         },
         {
-            title: "CURSO CON SPRAYS",
-            description: "Aprende a utilizar sprays de defensa personal en diferentes situaciones.",
-            topics: ["TIPOS DE SPRAY", "USO DEL SPRAY", "SITUACIONES SPRAY"],
+            id: "krav-maga-avanzado",
+            photo: "/assets/foto-curso-krav-maga-avanzado.png",
+            title: "Krav Maga avanzado",
+            topics: ["Técnicas de defensa avanzada", "Uso de armas improvisadas"],
+            price: "49,99€",
+            category: "Krav Maga",
         },
         {
-            title: "VIDEOS SITUACIONES COTIDIANAS SIN MATERIALES",
-            description: "Técnicas de defensa personal sin necesidad de equipamiento, ideales para la vida diaria.",
-            topics: ["Aprende técnicas sin necesidad de material", "Defensa en situaciones reales"],
+            id: "krav-maga-sda",
+            photo: "/assets/foto-curso-krav-maga.png",
+            title: "Krav Maga básico",
+            topics: ["Técnicas de defensa básica", "Situaciones cotidianas"],
+            price: "39,99€",
+            category: "Krav Maga",
+        },
+        {
+            id: "krav-maga-ds",
+            photo: "/assets/foto-curso-krav-maga-avanzado.png",
+            title: "Krav Maga avanzado",
+            topics: ["Técnicas de defensa avanzada", "Uso de armas improvisadas"],
+            price: "49,99€",
+            category: "Krav Maga",
         },
     ];
+
+    // Extraer categorías únicas
+    const categories = ["Todos", ...Array.from(new Set(courses.map(c => c.category)))];
+    const [selectedCategory, setSelectedCategory] = useState("Todos");
+
+    // Filtrar cursos por categoría seleccionada
+    const filteredCourses = selectedCategory === "Todos"
+        ? courses
+        : courses.filter(c => c.category === selectedCategory);
 
     return (
         <>
             <div className={styles.container}>
                 <article className={styles.coursesSection}>
-                    <h2 className={styles.sectionTitle}>Nuestros Cursos</h2>
+                    {/* <h2 className={styles.sectionTitle}>Nuestros Cursos</h2> */}
+
+                    {/* Menú de categorías */}
+                    <CategoryMenu
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        onSelect={setSelectedCategory}
+                    />
+
                     <div className={styles.coursesGrid}>
-                        {courses.map((course, index) => (
-                            <div
-                                key={index}
-                                className={`${styles.courseCard} ${loaded ? styles.fadeInUp : ""}`}
-                            >
-                                <div className={styles.courseContent}>
-                                    <h3 className={styles.courseTitle}>{course.title}</h3>
-                                    <p className={styles.courseDescription}>
-                                        {course.description || "Aprende todo sobre este curso y domina las técnicas más importantes."}
-                                    </p>
-                                    <ul className={styles.courseTopics}>
-                                        {course.topics.map((topic, i) => (
-                                            <li key={i} className={styles.courseTopic}>
-                                                {topic}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div className={styles.buttonWrapper}>
-                                    <Link href="/login" className={styles.courseBtn}>
-                                        Ver más
-                                    </Link>
-                                </div>
-                            </div>
+                        {filteredCourses.map((course) => (
+                            <CourseCard
+                                key={course.id}
+                                id={course.id}
+                                photo={course.photo}
+                                title={course.title}
+                                topics={course.topics}
+                                price={course.price}
+                            />
                         ))}
                     </div>
                 </article>

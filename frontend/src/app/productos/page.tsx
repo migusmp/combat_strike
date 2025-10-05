@@ -61,7 +61,7 @@ export default function ShopPage() {
         <>
             <div className={styles.container}>
                 <div className={styles.logoWrapper}>
-                    <Image src="/assets/zulu-tactical.png" alt="Zulu Tactical Logo" width={250} height={250} />
+                    <Image src="/assets/zulu-tactical.webp" alt="Zulu Tactical Logo" width={250} height={250} />
                 </div>
 
                 <div className={styles.productsGrid}>

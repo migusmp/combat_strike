@@ -8,10 +8,7 @@ import { MailService } from '../mail/mail.service';
 import { PasswordResetToken } from './entities/forgotPasswordToken.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User,
-    VerificationToken,
-    PasswordResetToken
-  ])
+  imports: [TypeOrmModule.forFeature([User,VerificationToken,PasswordResetToken])
   ],
   controllers: [AuthController],
   providers: [AuthService, MailService],

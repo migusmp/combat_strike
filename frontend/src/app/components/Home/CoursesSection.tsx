@@ -1,100 +1,59 @@
 "use client";
-// import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
 import styles from "../../css/CoursesSection.module.css";
-import { useEffect, useRef, useState } from "react";
+import CourseCard from "./CourseCard";
+import { CategoryMenu } from "./CategoryMenu";
 
 export default function CoursesSection() {
     const courses = [
         {
-            title: "CURSO CON SPRAYS",
+            id: "sprays",
+            photo: "/assets/foto-curso-gas-pimienta.png",
+            title: "Curso con Spray",
             topics: ["TIPOS DE SPRAY", "USO DEL SPRAY", "SITUACIONES SPRAY"],
+            category: "Sprays",
+            price: "59,99€",
         },
         {
-            title: "VIDEOS SITUACIONES COTIDIANAS SIN MATERIALES",
+            id: "krav-maga",
+            photo: "/assets/foto-curso-krav-maga.png",
+            title: "Como manejarse en situaciones cotidianas sin materiales",
             topics: ["Aprende técnicas sin necesidad de material", "Defensa en situaciones reales"],
+            category: "Krav Maga",
+            price: "39,99€",
         },
+        {
+            id: "krav-maga",
+            photo: "/assets/foto-curso-krav-maga-avanzado.png",
+            title: "Defensa personal avanzada",
+            topics: ["Técnicas de defensa", "Uso de armas improvisadas"],
+            category: "Krav Maga",
+            price: "49,99€",
+        }
     ];
 
-    // Ref y estado para el título
-    const titleRef = useRef<HTMLHeadingElement>(null);
-    const [titleVisible, setTitleVisible] = useState(false);
+    const categories = ["Todos", ...Array.from(new Set(courses.map(c => c.category)))];
+    const [selectedCategory, setSelectedCategory] = useState("Todos");
 
-    // Refs y estados para cada tarjeta
-    const cardRefs = useRef<(HTMLDivElement)[]>([]);
-    const [visibleCards, setVisibleCards] = useState<boolean[]>(courses.map(() => false));
-
-    useEffect(() => {
-        // Observer para el título
-        const titleObserver = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setTitleVisible(true);
-                    titleObserver.unobserve(entry.target);
-                }
-            },
-            { threshold: 0.5 }
-        );
-        if (titleRef.current) titleObserver.observe(titleRef.current);
-
-        // Observer para las tarjetas
-        const cardObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    const index = cardRefs.current.indexOf(entry.target as HTMLDivElement);
-                    if (entry.isIntersecting && index !== -1) {
-                        setVisibleCards((prev) => {
-                            const updated = [...prev];
-                            updated[index] = true;
-                            return updated;
-                        });
-                        cardObserver.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.5 }
-        );
-
-        cardRefs.current.forEach((card) => {
-            if (card) cardObserver.observe(card);
-        });
-
-        return () => {
-            titleObserver.disconnect();
-            cardObserver.disconnect();
-        };
-    }, []);
+    const filteredCourses = selectedCategory === "Todos"
+        ? courses
+        : courses.filter(c => c.category === selectedCategory);
 
     return (
         <section className={styles.coursesSection}>
-            <h2
-                ref={titleRef}
-                className={`${styles.sectionTitle} ${titleVisible ? styles.sectionTitleVisible : ""}`}
-            >
-                Nuestros Cursos
-            </h2>
+            <h2 className={styles.sectionTitle}>Nuestros Cursos</h2>
+
+            <CategoryMenu
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelect={setSelectedCategory}
+            />
+
             <div className={styles.coursesContainer}>
-                {courses.map((course, index) => (
-                    <div
-                        key={index}
-                        ref={(el) => {
-                            if (el) cardRefs.current[index] = el;
-                        }}
-                        className={`${styles.courseCard} ${visibleCards[index] ? styles.courseCardVisible : ""}`}
-                    >
-                        <h3 className={styles.courseTitle}>{course.title}</h3>
-                        <ul className={styles.courseTopics}>
-                            {course.topics.map((topic, i) => (
-                                <li key={i}>{topic}</li>
-                            ))}
-                        </ul>
-                        <Link href="/login" className={styles.courseBtn}>
-                            Ver más
-                        </Link>
-                    </div>
+                {filteredCourses.map((course, index) => (
+                    <CourseCard id={course.id} key={index} title={course.title} topics={course.topics} price={course.price} photo={course.photo}/>
                 ))}
             </div>
         </section>
     );
 }
-

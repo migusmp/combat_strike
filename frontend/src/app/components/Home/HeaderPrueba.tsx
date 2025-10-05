@@ -55,7 +55,7 @@ export default function HeaderPrueba() {
                 <Image
                     width={70}
                     height={70}
-                    src="/assets/logo-blanco-sin-texto.png"
+                    src="/assets/logo-blanco-sin-texto-small.webp"
                     alt="logo"
                     style={{ cursor: "pointer" }}
                     onClick={() => router.push("/")}

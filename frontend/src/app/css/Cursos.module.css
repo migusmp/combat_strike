@@ -1,6 +1,6 @@
 /* Cursos.module.css */
 .container {
-    background-color: #000032;
+    background-color: #fff;
     min-height: 91vh;
     padding: 3rem 2rem;
     display: flex;
@@ -27,6 +27,33 @@
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
 }
+
+.categoryMenu {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.categoryButton {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #5E96BE;
+    color: #fff;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.categoryButton:hover {
+    background-color: #055293;
+}
+
+.activeCategory {
+    background-color: #03346d;
+}
+
 
 .courseCard {
     background-color: #055293;
@@ -55,6 +82,22 @@
 .courseContent {
     flex: 1;
 }
+
+.coursePhoto {
+  width: 100%;
+  border-radius: 0.8rem;
+  margin-bottom: 1rem;
+  object-fit: cover;
+  height: 180px;
+}
+
+.coursePrice {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #055293;
+  margin-top: auto;
+}
+
 
 .courseTitle {
     font-size: 1.5rem;
