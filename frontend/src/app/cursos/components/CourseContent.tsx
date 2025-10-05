@@ -9,7 +9,8 @@ interface CourseContentProps {
 
 export default function CourseContent({ courseId }: CourseContentProps) {
     const course = courses.find(c => c.id === courseId);
-    const [openSections, setOpenSections] = useState<boolean[]>([]);
+    const [openSections, setOpenSections] = useState<boolean[]>(Array(course?.content.length || 0).fill(false));
+
 
     if (!course) return <p>Curso no encontrado</p>;
 
