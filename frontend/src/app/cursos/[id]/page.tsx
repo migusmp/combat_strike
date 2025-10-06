@@ -4,21 +4,39 @@ import styles from '../css/Course.module.css'
 import Footer from "@/app/components/Home/Footer";
 import Image from "next/image";
 import CourseContent from "../components/CourseContent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { use } from "react";
 import ShareModal from "../components/ShareModal";
-import { API_URL } from "@/app/utils/api_url";
 
 interface CoursePageProps {
     params: Promise<{ id: string }>;
 }
-
 
 export default function CoursePage({ params }: CoursePageProps) {
     const { id } = use(params);
     const course = courses.find((c) => c.id === id);
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [showShare, setShowShare] = useState(false);
+    const [isSticky, setIsSticky] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            if (scrollY > 300) { // píxeles a partir de los cuales se vuelve sticky
+                setIsSticky(true);
+            } else {
+                setIsSticky(false);
+            }
+        };
+
+        // Comprobar al montar el componente (página recargada)
+        handleScroll();
+
+        // Escuchar scroll
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+
+    }, []);
 
     if (!course) return <h1>Curso no encontrado</h1>;
 
@@ -50,7 +68,7 @@ export default function CoursePage({ params }: CoursePageProps) {
                             </svg>Español [automático]</p>}
                         </section>
                     </div>
-                    <div className={styles.courseVideoIntroduction}>
+                    <div className={`${styles.courseVideoIntroduction} ${isSticky ? styles.stickyVideo : ''}`}>
                         <div className={styles.imageWrapper}>
                             <Image
                                 src={course.image}

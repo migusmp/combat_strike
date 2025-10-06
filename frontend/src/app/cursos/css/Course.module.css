@@ -60,7 +60,9 @@
     width: 350px;
     height: auto;
     background-color: #ffffff;
-    position: relative;
+    /* position: sticky; */
+    /* top: 60px; */
+    /* z-index: 10; */
     /* contenedor de todo */
     box-shadow: 0 8px 20px rgba(0, 0, 50, 0.2);
     border-radius: 3px;
@@ -70,6 +72,18 @@
     flex-direction: column;
     /* para que el contenido adicional vaya debajo */
     align-items: center;
+    /* transition: all 0.3s ease; */
+}
+
+.stickyVideo {
+    position: fixed;
+    top: 10vh;
+    right: 3%;
+    /* ahora es relativo, no fijo */
+    width: 90%;
+    max-width: 350px;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .imageWrapper {
@@ -369,6 +383,7 @@
     color: #6c6c6c;
     font-size: 0.85rem;
 }
+
 
 /* COURSE REQUIREMENTS CSS */
 .courseRequirements {
