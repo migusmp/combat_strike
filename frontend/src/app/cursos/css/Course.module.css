@@ -58,7 +58,7 @@
 
 .courseVideoIntroduction {
     width: 350px;
-    height: 80vh;
+    height: auto;
     background-color: #ffffff;
     position: relative;
     /* contenedor de todo */
@@ -167,56 +167,57 @@
 }
 
 .buyCourseButton:hover {
-    background-color: #0173d0;;
+    background-color: #0173d0;
+    ;
 }
 
 .courseExtraContent {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
 }
 
 .buyCourseButton {
-  margin-top: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  background-color: #055293;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
+    margin-top: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background-color: #055293;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
 }
 
 .buyCourseButton:hover {
-  background-color: #03396b;
+    background-color: #03396b;
 }
 
 .courseIncludes {
-  margin-top: 0.5rem;
-  width: 100%;
-  padding: 1rem 1.2rem;
-  border-radius: 12px;
+    margin-top: 0.5rem;
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
 }
 
 .courseIncludes h3 {
-  margin-bottom: 0.8rem;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #000032;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #000032;
 }
 
 .courseIncludes ul {
-  list-style: disc;
-  padding-left: 1.5rem;
+    list-style: disc;
+    padding-left: 1.5rem;
 }
 
 .courseIncludes li {
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
 }
 
 .shareCourseBtn {
@@ -225,11 +226,12 @@
     justify-content: center;
     gap: 0.5rem;
     margin-top: 1rem;
+    margin-bottom: 1.5rem;
     border: 1px solid #055293;
     padding: 0.5rem 1rem;
     border-radius: 24px;
     cursor: pointer;
-    font-size: 0.9rem; 
+    font-size: 0.9rem;
     color: #055293;
     font-weight: bold;
     transition: all 0.2s ease;
@@ -242,183 +244,206 @@
 
 /* WHAT YOU WILL LEARN SECTION */
 .whatYouWillLearnSection {
-  width: 570px; /* mismo ancho que courseHeader */
-  margin-top: 2rem; /* espacio debajo de coursePresentation */
-  margin-right: 24rem; /* iguala el padding del coursePresentation */
-  border: 1px solid #b4b4b4;
-  padding: 1rem;
+    width: 570px;
+    /* mismo ancho que courseHeader */
+    margin-top: 2rem;
+    /* espacio debajo de coursePresentation */
+    margin-right: 24rem;
+    /* iguala el padding del coursePresentation */
+    border: 1px solid #b4b4b4;
+    padding: 1rem;
 }
 
 .whatYouWillLearnSection h1 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #000032;
-  margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
 }
 
 /* Grid de dos columnas para la lista */
 .whatYouWillLearnSection ul {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
-  gap: 0.5rem 2rem; /* fila y columna */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* dos columnas iguales */
+    gap: 0.5rem 2rem;
+    /* fila y columna */
 }
 
 .whatYouWillLearnSection ul li {
-  display: flex;             /* usa flex para alinear icono y texto */
-  align-items: center;       /* centra verticalmente el check con el texto */
-  gap: 0.5rem;               /* espacio entre icono y texto */
-  font-size: 0.9rem;
-  color: #6c6c6c;
+    display: flex;
+    /* usa flex para alinear icono y texto */
+    align-items: center;
+    /* centra verticalmente el check con el texto */
+    gap: 0.5rem;
+    /* espacio entre icono y texto */
+    font-size: 0.9rem;
+    color: #6c6c6c;
 }
 
 .whatYouWillLearnSection ul li svg {
-  vertical-align: middle;    /* asegura que el SVG se alinee con el texto */
-  flex-shrink: 0;            /* evita que el SVG se reduzca si la línea se ajusta */
+    vertical-align: middle;
+    /* asegura que el SVG se alinee con el texto */
+    flex-shrink: 0;
+    /* evita que el SVG se reduzca si la línea se ajusta */
 }
 
 /* COURSE CONTENT CSS */
 .courseContentSection {
-  width: 570px;
-  margin-top: 1.5rem;
-  margin-right: 24rem; /* alinea con courseHeader */
-  /* border: 1px solid #c8c8c8; */
-  padding: 1rem;
-  border-radius: 8px;
-  color: #000; /* texto principal en negro */
+    width: 570px;
+    margin-top: 1.5rem;
+    margin-right: 24rem;
+    /* alinea con courseHeader */
+    /* border: 1px solid #c8c8c8; */
+    padding: 1rem;
+    border-radius: 8px;
+    color: #000;
+    /* texto principal en negro */
 }
 
 .courseContentSection h2 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #000032;
-  margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
 }
 
 .courseSection {
-  margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .sectionHeader {
-  width: 100%;
-  background: #f0f0f0;
-  border: none;
-  padding: 0.6rem 1rem;
-  text-align: left;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
-  border-radius: 5px;
+    width: 100%;
+    background: #f0f0f0;
+    border: none;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
 .chevron {
-  font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 .sectionClasses {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-  padding-left: 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 1rem;
 }
 
 /* color: "#7f7f7fff", fontSize: "0.9rem" */
 
 .sectionClasses.open {
-  max-height: 500px; /* ajusta según el contenido */
+    max-height: 500px;
+    /* ajusta según el contenido */
 }
 
 .sectionClasses ul {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0;
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0;
 }
 
 .sectionClasses li {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e0e0e0;
-  color: #7f7f7fff;
-  font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e0e0e0;
+    color: #7f7f7fff;
+    font-size: 0.9rem;
 }
 
 .className {
-  font-weight: 500;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 .classDuration {
-  color: #6c6c6c;
-  font-size: 0.85rem;
+    color: #6c6c6c;
+    font-size: 0.85rem;
 }
 
 /* COURSE REQUIREMENTS CSS */
 .courseRequirements {
-  width: 570px;
-  margin-right: 24rem; /* alinea con courseHeader */
-  padding: 1rem;
-  border-radius: 8px;
-  color: #000; /* texto en negro */
+    width: 570px;
+    margin-right: 24rem;
+    /* alinea con courseHeader */
+    padding: 1rem;
+    border-radius: 8px;
+    color: #000;
+    /* texto en negro */
 }
 
 .courseRequirements h2 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #000032;
-  margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
 }
 
 .courseRequirements ul {
-  list-style: disc; /* pone el punto delante de cada elemento */
-  padding-left: 1.2rem; /* un poco de espacio para el punto */
-  margin: 0.5rem 0;
-  font-size: 0.9rem; /* mismo tamaño que sectionClasses li */
-  color: #000; /* texto en negro */
+    list-style: disc;
+    /* pone el punto delante de cada elemento */
+    padding-left: 1.2rem;
+    /* un poco de espacio para el punto */
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    /* mismo tamaño que sectionClasses li */
+    color: #000;
+    /* texto en negro */
 }
 
 .courseRequirements li {
-  margin-bottom: 0.4rem;
+    margin-bottom: 0.4rem;
 }
 
 /* COURSE DESCRIPTION CSS */
 .courseDescription {
-  width: 570px;
-  margin-right: 24rem; /* igual que courseRequirements */
-  padding: 1rem;
-  border-radius: 8px;
-  color: #000; /* texto en negro */
-  margin-bottom: 4rem;
+    width: 570px;
+    margin-right: 24rem;
+    /* igual que courseRequirements */
+    padding: 1rem;
+    border-radius: 8px;
+    color: #000;
+    /* texto en negro */
+    margin-bottom: 4rem;
 }
 
 .courseDescription h2 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #000032;
-  margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
 }
 
 .courseDescription p {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #000;
-  margin: 0.5rem 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #000;
+    margin: 0.5rem 0;
 }
 
 .toggleDescriptionBtn {
-  background: none;
-  border: none;
-  color: #055293; /* azul moderno */
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: color 0.3s ease;
+    background: none;
+    border: none;
+    color: #055293;
+    /* azul moderno */
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s ease;
 }
 
 .toggleDescriptionBtn:hover {
-  color: #5e96be; /* azul más claro al pasar el ratón */
+    color: #5e96be;
+    /* azul más claro al pasar el ratón */
 }
