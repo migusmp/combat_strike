@@ -60,6 +60,15 @@ export const courses = [
                     { title: "Simulación 2: transporte público", duration: { hours: 0, minutes: 50 } }
                 ]
             }
+        ],
+        rating: 4.6,
+        reviews: 120,
+        userReviews: [
+            { name: "Ana García", rating: 5, comment: "Excelente curso, muy completo y práctico." },
+            { name: "Luis Pérez", rating: 4, comment: "Me gustó mucho, pero algunos ejercicios son difíciles sin guía." },
+            { name: "Marta López", rating: 5, comment: "Muy recomendado para principiantes y avanzados." },
+            { name: "Carlos Ruiz", rating: 4, comment: "" },
+            { name: "Elena Torres", rating: 3, comment: "Buen contenido, pero esperaba más ejemplos de situaciones reales." }
         ]
     },
     {
@@ -121,6 +130,14 @@ export const courses = [
                     { title: "Almacenamiento y transporte seguro", duration: { hours: 0, minutes: 20 } }
                 ]
             }
+        ],
+        rating: 4.2,
+        reviews: 45,
+        userReviews: [
+            { name: "Raúl Fernández", rating: 5, comment: "Muy útil para aprender a usar sprays de forma segura." },
+            { name: "Sofía Martínez", rating: 4, comment: "El curso es claro, pero algunos apartados son cortos." },
+            { name: "Miguel Sánchez", rating: 4, comment: "" },
+            { name: "Lucía Gómez", rating: 3, comment: "Faltan más ejemplos prácticos." }
         ]
     }
 ];

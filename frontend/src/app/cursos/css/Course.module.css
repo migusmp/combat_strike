@@ -45,7 +45,7 @@
 .courseHeader section {
     display: flex;
     gap: 0.5rem;
-    margin-top: 7rem;
+    margin-top: 6rem;
 }
 
 .courseHeader section p {
@@ -428,7 +428,6 @@
     border-radius: 8px;
     color: #000;
     /* texto en negro */
-    margin-bottom: 4rem;
 }
 
 .courseDescription h2 {
@@ -461,4 +460,32 @@
 .toggleDescriptionBtn:hover {
     color: #5e96be;
     /* azul más claro al pasar el ratón */
+}
+
+/* COURSE REVIEWS SECTION */
+.courseReviews {
+    width: 570px;
+    margin-right: 22rem;
+    margin-bottom: 4rem;
+    margin-top: 1rem;
+}
+
+.courseReviews h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
+}
+
+.reviewsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.reviewCard {
+    background: #1e1e1e;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
