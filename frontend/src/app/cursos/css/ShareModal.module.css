@@ -100,17 +100,6 @@
     background-color: #ddd;
 }
 
-.closeBtn {
-    background: transparent;
-    border: none;
-    color: #696969;
-    font-size: 2rem;
-    position: absolute;
-    top: 0px;
-    right: 12px;
-    cursor: pointer;
-}
-
 @keyframes fadeIn {
     from {
         opacity: 0;
