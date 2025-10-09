@@ -35,7 +35,7 @@ export default function ResponsiveCourseLayout({ course }: ResponsiveCourseLayou
 
     // Aquí ponemos el breakpoint 1253px
     if (windowWidth <= 1000) {
-        return <LargeScreenCourseLayout course={course} isSticky={isSticky} setShowShare={setShowShare} />;
+        return <LargeScreenCourseLayout course={course} isSticky={isSticky} setShowShare={setShowShare} showShare={showShare} />;
     } else {
         return <DesktopCourseLayout course={course} showShare={showShare} isSticky={isSticky} setShowShare={setShowShare} />;
     }

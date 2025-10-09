@@ -127,3 +127,31 @@
         transform: scale(1);
     }
 }
+
+@media(max-width: 970px) {
+    .modal {
+        width: 80%;
+    }
+}
+
+@media(max-width: 532px) {
+    .modal {
+        width: 95%;
+    }
+}
+
+@media(max-width: 382px) {
+    .modal {
+        padding: 1rem;
+    }
+
+    .linkBox {
+        gap: 0.2rem;
+    }
+
+    .linkBox input {
+        padding: 0.3rem;
+        width: 50%;
+    }
+
+}

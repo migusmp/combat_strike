@@ -8,8 +8,8 @@
     padding-top: 3.5rem;
 }
 
-.container section {
-    width: 70%;
+.sectionMain {
+    width: 80%;
     /* padding: 1rem; */
     display: flex;
     flex-direction: column;
@@ -83,4 +83,218 @@
     /* esto centra el texto */
     width: 100%;
     /* ocupa todo el ancho del contenedor */
+}
+
+/* <----------------- LO QUE APRENDERÁS SECTION -------------------> */
+
+.whatYouWillLearnSection {
+    width: 100%;
+    /* ancho completo de la ventana */
+    max-width: 1200px;
+    /* opcional para no exceder cierto ancho */
+    margin: 1rem auto;
+    /* vertical y centrado horizontal */
+    border: 1px solid #b4b4b4;
+    padding: 1rem;
+}
+
+.whatYouWillLearnSection h1 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
+}
+
+/* Grid de dos columnas para la lista */
+.whatYouWillLearnSection ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* dos columnas iguales */
+    gap: 0.5rem 2rem;
+    /* fila y columna */
+}
+
+.whatYouWillLearnSection ul li {
+    display: flex;
+    /* usa flex para alinear icono y texto */
+    align-items: center;
+    /* centra verticalmente el check con el texto */
+    gap: 0.5rem;
+    /* espacio entre icono y texto */
+    font-size: 0.9rem;
+    color: #6c6c6c;
+}
+
+.whatYouWillLearnSection ul li svg {
+    vertical-align: middle;
+    /* asegura que el SVG se alinee con el texto */
+    flex-shrink: 0;
+    /* evita que el SVG se reduzca si la línea se ajusta */
+}
+
+.shareCourseBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem auto auto;
+    /* top auto bottom auto -> centrado horizontal */
+    border: 1px solid #055293;
+    padding: 0.5rem 1rem;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #055293;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.shareCourseBtn:hover {
+    background-color: #055293;
+    color: #fff;
+}
+
+.courseIncludes {
+    color: #333333;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    margin-top: 1rem;
+}
+
+.courseIncludes h1 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
+}
+
+.courseIncludes ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 2rem;
+    grid-auto-rows: minmax(1.5rem, auto);
+    /* altura mínima uniforme */
+}
+
+.courseIncludes ul li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 0.9rem;
+    color: #212121;
+}
+
+/* COURSE CONTENT CSS */
+.courseContentSection {
+    width: 100%;
+    margin-top: 1.5rem;
+    margin-right: 24rem;
+    /* alinea con courseHeader */
+    /* border: 1px solid #c8c8c8; */
+    padding: 1rem;
+    border-radius: 8px;
+    color: #000;
+    /* texto principal en negro */
+}
+
+.courseContentSection h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
+}
+
+.courseSection {
+    margin-bottom: 0.5rem;
+}
+
+.sectionHeader {
+    width: 100%;
+    background: #f0f0f0;
+    border: none;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.chevron {
+    font-size: 0.9rem;
+}
+
+.sectionClasses {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 1rem;
+}
+
+/* color: "#7f7f7fff", fontSize: "0.9rem" */
+
+.sectionClasses.open {
+    max-height: 500px;
+    /* ajusta según el contenido */
+}
+
+.sectionClasses ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0;
+}
+
+.sectionClasses li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e0e0e0;
+    color: #7f7f7fff;
+    font-size: 0.9rem;
+}
+
+.className {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.classDuration {
+    color: #6c6c6c;
+    font-size: 0.85rem;
+}
+
+.totalDuration {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+@media(max-width: 685px) {
+    .sectionMain {
+        width: 85%;
+        margin-top: 2rem;
+    }
+}
+
+@media(max-width: 657px) {
+    .totalDuration {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media(max-width: 457px) {
+    .whatYouWillLearnSection ul {
+        grid-template-columns: 1fr;
+    }
+
+    .courseIncludes ul {
+        grid-template-columns: 1fr;
+    }
+
 }

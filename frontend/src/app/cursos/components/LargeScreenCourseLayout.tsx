@@ -3,19 +3,61 @@ import stylesLarge from '../css/CourseLarger.module.css'
 import styles from '../css/Course.module.css'
 import Image from "next/image";
 import Footer from "@/app/components/Home/Footer";
+import ShareModal from "./ShareModal";
+import { courses } from "@/lib/mockData";
+import { useState } from "react";
+
 
 interface DesktopCourseLayoutProps {
     course: Course; // Aquí podrías usar tu tipo Course
     isSticky: boolean;
+    showShare: boolean;
     setShowShare: (val: boolean) => void;
 }
 
-export default function LargeScreenCourseLayout({ course, isSticky, setShowShare }: DesktopCourseLayoutProps) {
+export default function LargeScreenCourseLayout({ course, isSticky, setShowShare, showShare }: DesktopCourseLayoutProps) {
+    const courseSelected = courses.find(c => c.id === course.id);
+    const [openSections, setOpenSections] = useState<boolean[]>(Array(courseSelected?.content.length || 0).fill(false));
+
+
+    if (!courseSelected) return <p>Curso no encontrado</p>;
+
+    // Cálculo de resumen
+    const totalSections = courseSelected.content.length;
+    const totalClasses = courseSelected.content.reduce((sum, section) => sum + section.classes.length, 0);
+    const totalDuration = courseSelected.content.reduce(
+        (acc, section) => {
+            section.classes.forEach(cls => {
+                acc.hours += cls.duration.hours;
+                acc.minutes += cls.duration.minutes;
+            });
+            return acc;
+        },
+        { hours: 0, minutes: 0 }
+    );
+
+    totalDuration.hours += Math.floor(totalDuration.minutes / 60);
+    totalDuration.minutes = totalDuration.minutes % 60;
+
+    const toggleSection = (index: number) => {
+        setOpenSections(prev => {
+            const newState = [...prev];
+            newState[index] = !newState[index];
+            return newState;
+        });
+    };
+
+    const toggleAllSections = () => {
+        const allOpen = openSections.every(Boolean);
+        setOpenSections(Array(totalSections).fill(!allOpen));
+    };
+
+
     return (
         <>
 
             <main className={stylesLarge.container}>
-                <section>
+                <section className={stylesLarge.sectionMain}>
                     <div className={styles.imageWrapper}>
                         <Image
                             src={course.image}
@@ -98,6 +140,114 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                         <button className={stylesLarge.buyCourseButton}>Comprar ahora</button>
                         <p className={stylesLarge.accessLifetime}>Acceso de por vida</p>
                     </div>
+
+                    <button
+                        className={stylesLarge.shareCourseBtn}
+                        onClick={() => setShowShare(true)}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            className="bi bi-share-fill"
+                            viewBox="0 0 16 16"
+                        >
+                            <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5" />
+                        </svg>
+                        Compartir
+                    </button>
+
+
+                    {showShare && (
+                        <ShareModal
+                            url={`${process.env.NEXT_PUBLIC_URL}/cursos/${course.id}`}
+                            onClose={() => setShowShare(false)}
+                        />
+                    )}
+
+
+                    <section className={stylesLarge.whatYouWillLearnSection}>
+                        <h1>Lo que aprenderás</h1>
+                        <ul>
+                            {course.whatYouWillLearn.map((point, idx) => (
+                                <li key={idx}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        fill="currentColor"
+                                        className="bi bi-check2"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0" />
+                                    </svg>{" "}
+                                    {point}
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    <section className={stylesLarge.courseIncludes}>
+                        <h1>Este curso incluye:</h1>
+                        <ul>
+                            {course.includes.map((item, idx) => (
+                                <li key={idx}>{item}</li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    <section className={stylesLarge.courseContentSection}>
+                        <h2>Contenido del curso</h2>
+
+                        <div className={stylesLarge.totalDuration}>
+                            <p style={{ color: "#7f7f7fff", fontSize: "0.9rem" }}>
+                                {totalSections} secciones • {totalClasses} clases • {totalDuration.hours} h {totalDuration.minutes} min de duración total
+                            </p>
+                            <button
+                                onClick={toggleAllSections}
+                                style={{ cursor: "pointer", background: "#055293", color: "#fff", border: "none", borderRadius: "5px", padding: "0.3rem 0.6rem", fontSize: "0.85rem" }}
+                            >
+                                {openSections.every(Boolean) ? "Contraer todas" : "Ampliar todas"}
+                            </button>
+                        </div>
+
+                        {courseSelected.content.map((section, idx) => (
+                            <div key={idx} className={styles.courseSection}>
+                                <button
+                                    className={styles.sectionHeader}
+                                    onClick={() => toggleSection(idx)}
+                                >
+                                    {section.sectionTitle}
+                                    <span className={styles.chevron}>
+                                        {openSections[idx] ? "▲" : "▼"}
+                                    </span>
+                                </button>
+                                <div
+                                    className={`${styles.sectionClasses} ${openSections[idx] ? styles.open : ""}`}
+                                >
+                                    <ul>
+                                        {section.classes.map((cls, cidx) => (
+                                            <li key={cidx}>
+                                                <span className={styles.className}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-play-btn" viewBox="0 0 16 16">
+                                                        <path d="M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z" />
+                                                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z" />
+                                                    </svg>
+                                                    {cls.title}
+                                                </span>
+                                                <span className={styles.classDuration}>
+                                                    {cls.duration.hours > 0 ? `${cls.duration.hours} h ` : ""}
+                                                    {cls.duration.minutes} min
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        ))}
+                    </section>
+
 
                 </section>
 
