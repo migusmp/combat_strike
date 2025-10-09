@@ -15,4 +15,3 @@ export default function CoursePage({ params }: CoursePageProps) {
 
     return <ResponsiveCourseLayout course={course} />;
 }
-

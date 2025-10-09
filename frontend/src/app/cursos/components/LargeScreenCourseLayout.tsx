@@ -252,6 +252,33 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                 </section>
 
             </main>
+            {/* Barra fija inferior */}
+            <div className={stylesLarge.fixedBottomBar}>
+                <div className={stylesLarge.leftSide}>
+                    <h2 className={stylesLarge.courseName}>{course.title}</h2>
+                    <div className={stylesLarge.courseRating}>
+                        {Array.from({ length: 5 }, (_, i) => (
+                            <svg
+                                key={i}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill={i + 1 <= Math.round(course.rating) ? "gold" : "lightgray"}
+                                viewBox="0 0 16 16"
+                            >
+                                <path d="M3.612 15.443c-.396.198-.86-.106-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.186-4.327c.197-.39.73-.39.927 0l2.186 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.114.486-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                            </svg>
+                        ))}
+                        <span>{course.rating.toFixed(1)} ({course.reviews} valoraciones)</span>
+                    </div>
+                </div>
+
+                <div className={stylesLarge.rightSide}>
+                    <p className={stylesLarge.coursePrice}>{course.price}€</p>
+                    <button className={stylesLarge.buyCourseButton}>Comprar ahora</button>
+                </div>
+            </div>
+
             <Footer />
         </>
     );

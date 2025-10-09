@@ -191,7 +191,6 @@
     margin-right: 24rem;
     /* alinea con courseHeader */
     /* border: 1px solid #c8c8c8; */
-    padding: 1rem;
     border-radius: 8px;
     color: #000;
     /* texto principal en negro */
@@ -273,6 +272,71 @@
     margin-bottom: 1rem;
 }
 
+/* ESTILOS DEL FOOTER DEL CURSO FIJO */
+.fixedBottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0e0d0d;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  z-index: 1;
+}
+
+.leftSide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.courseName {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.courseRating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.coursePrice {
+  display: flex;              /* activa flexbox */
+  align-items: center;        /* alinea verticalmente */
+  gap: 0.25rem;               /* pequeño espacio entre número y € */
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.buyCourseButton {
+  background: #055293;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.buyCourseButton:hover {
+  background: #033d6e;
+}
+
+
 @media(max-width: 685px) {
     .sectionMain {
         width: 85%;
@@ -287,6 +351,45 @@
         gap: 0.5rem;
     }
 }
+
+@media (max-width: 615px) {
+  .fixedBottomBar {
+    background: #fff;
+    justify-content: flex-start; /* alineamos al inicio */
+    padding: 0.5rem 2rem;
+    gap: 1rem;
+
+    /* sombra más suave */
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .leftSide {
+    display: none; /* ocultamos nombre y valoraciones */
+  }
+
+  .rightSide {
+    flex: 1; /* ocupa todo el ancho disponible */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .coursePrice {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #000;
+    white-space: nowrap; /* evita que el € baje de línea */
+  }
+
+  .buyCourseButton {
+    flex: 1; /* botón se expande */
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    background: #055293;
+    text-align: center;
+  }
+}
+
 
 @media(max-width: 457px) {
     .whatYouWillLearnSection ul {
