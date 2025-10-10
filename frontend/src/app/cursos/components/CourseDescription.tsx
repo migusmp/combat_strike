@@ -1,26 +1,30 @@
 "use client";
 import { useState } from "react";
 import styles from "../css/Course.module.css";
+import stylesLarge from '../css/CourseLarger.module.css'
 
 interface CourseDescriptionProps {
     text: string;
+    isReducedScreen?: boolean;
     maxLength?: number; // opcional, por defecto 250
 }
 
-export default function CourseDescription({ text, maxLength = 250 }: CourseDescriptionProps) {
+export default function CourseDescription({ text, maxLength = 250, isReducedScreen }: CourseDescriptionProps) {
     const [showFullDesc, setShowFullDesc] = useState(false);
 
     const shouldTruncate = text.length > maxLength;
     const displayedText = showFullDesc ? text : text.slice(0, maxLength) + (shouldTruncate ? "..." : "");
 
+    const styleUsed = isReducedScreen ? stylesLarge : styles;
+
     return (
-        <section className={styles.courseDescription}>
+        <section className={styleUsed.courseDescription}>
             <h2>Descripción</h2>
             <p>{displayedText}</p>
 
             {shouldTruncate && (
                 <button
-                    className={styles.toggleDescriptionBtn}
+                    className={styleUsed.toggleDescriptionBtn}
                     onClick={() => setShowFullDesc(!showFullDesc)}
                 >
                     {showFullDesc ? (

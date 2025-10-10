@@ -274,68 +274,193 @@
 
 /* ESTILOS DEL FOOTER DEL CURSO FIJO */
 .fixedBottomBar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #0e0d0d;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0e0d0d;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.3);
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    z-index: 1;
 }
 
 .leftSide {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
 .courseName {
-  font-size: 1rem;
-  font-weight: bold;
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .courseRating {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.85rem;
-  color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    color: #fff;
 }
 
 .rightSide {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .coursePrice {
-  display: flex;              /* activa flexbox */
-  align-items: center;        /* alinea verticalmente */
-  gap: 0.25rem;               /* pequeño espacio entre número y € */
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
+    display: flex;
+    /* activa flexbox */
+    align-items: center;
+    /* alinea verticalmente */
+    gap: 0.25rem;
+    /* pequeño espacio entre número y € */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
 }
 
 .buyCourseButton {
-  background: #055293;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 0.95rem;
+    background: #055293;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.95rem;
 }
 
 .buyCourseButton:hover {
-  background: #033d6e;
+    background: #033d6e;
 }
 
+/* REQUISITOS SECTION */
+.courseRequirements {
+    margin-top: 1.5rem;
+    width: 100%;
+    /* alinea con courseHeader */
+    border-radius: 8px;
+    color: #000;
+    /* texto en negro */
+}
+
+.courseRequirements h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+}
+
+.courseRequirements ul {
+    list-style: disc;
+    /* pone el punto delante de cada elemento */
+    padding-left: 1.2rem;
+    /* un poco de espacio para el punto */
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    /* mismo tamaño que sectionClasses li */
+    color: #000;
+    /* texto en negro */
+}
+
+.courseRequirements li {
+    margin-bottom: 0.4rem;
+}
+
+/* DESCRIPTION SECTION CSS */
+.courseDescription {
+    width: 100%;
+    /* igual que courseRequirements */
+    border-radius: 8px;
+    color: #000;
+    /* texto en negro */
+    margin-top: 1.5rem;
+}
+
+.courseDescription h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+}
+
+.courseDescription p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #000;
+    margin: 0.5rem 0;
+}
+
+.toggleDescriptionBtn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #055293;
+    /* azul moderno */
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.toggleDescriptionBtn:hover {
+    color: #5e96be;
+    /* azul más claro al pasar el ratón */
+}
+
+/* COURSE REVIEWS SECTION */
+.courseReviews {
+    width: 100%;
+    margin-bottom: 4rem;
+    margin-top: 1rem;
+}
+
+.courseReviews h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #000032;
+    margin-bottom: 1rem;
+}
+
+.reviewsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.reviewCard {
+    border-top: 1px solid #ADADAD;
+    padding: 1rem;
+}
+
+/* Botón Ver más */
+.showMoreBtn {
+    display: block;
+    margin: 1.5rem auto 0;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 2rem;
+    background: #0070f3;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.showMoreBtn:hover {
+    background: #0059c9;
+    transform: translateY(-2px);
+}
+
+.showMoreBtn:active {
+    transform: scale(0.97);
+}
 
 @media(max-width: 685px) {
     .sectionMain {
@@ -352,42 +477,47 @@
     }
 }
 
-@media (max-width: 615px) {
-  .fixedBottomBar {
-    background: #fff;
-    justify-content: flex-start; /* alineamos al inicio */
-    padding: 0.5rem 2rem;
-    gap: 1rem;
+@media (max-width: 635px) {
+    .fixedBottomBar {
+        background: #fff;
+        justify-content: flex-start;
+        /* alineamos al inicio */
+        padding: 0.5rem 2rem;
+        gap: 1rem;
 
-    /* sombra más suave */
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
-  }
+        /* sombra más suave */
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+    }
 
-  .leftSide {
-    display: none; /* ocultamos nombre y valoraciones */
-  }
+    .leftSide {
+        display: none;
+        /* ocultamos nombre y valoraciones */
+    }
 
-  .rightSide {
-    flex: 1; /* ocupa todo el ancho disponible */
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+    .rightSide {
+        flex: 1;
+        /* ocupa todo el ancho disponible */
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 
-  .coursePrice {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #000;
-    white-space: nowrap; /* evita que el € baje de línea */
-  }
+    .coursePrice {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #000;
+        white-space: nowrap;
+        /* evita que el € baje de línea */
+    }
 
-  .buyCourseButton {
-    flex: 1; /* botón se expande */
-    font-size: 1rem;
-    padding: 1rem 2rem;
-    background: #055293;
-    text-align: center;
-  }
+    .buyCourseButton {
+        flex: 1;
+        /* botón se expande */
+        font-size: 1rem;
+        padding: 1rem 2rem;
+        background: #055293;
+        text-align: center;
+    }
 }
 
 

@@ -6,6 +6,9 @@ import Footer from "@/app/components/Home/Footer";
 import ShareModal from "./ShareModal";
 import { courses } from "@/lib/mockData";
 import { useState } from "react";
+import CourseRequirements from "./CourseRequirements";
+import CourseDescription from "./CourseDescription";
+import CourseReviews from "./CourseReviews";
 
 
 interface DesktopCourseLayoutProps {
@@ -247,8 +250,9 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                             </div>
                         ))}
                     </section>
-
-
+                    <CourseRequirements requirements={course.requirements} isReducedScreen={true} />
+                    <CourseDescription text={course.longDescription} maxLength={250} isReducedScreen={true} />
+                    <CourseReviews userReviews={course.userReviews} isReducedScreen={true} />
                 </section>
 
             </main>

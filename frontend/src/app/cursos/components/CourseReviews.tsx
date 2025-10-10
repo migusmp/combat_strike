@@ -1,24 +1,34 @@
 "use client";
+import { useState } from "react";
 import styles from "../css/Course.module.css";
+import stylesLarge from "../css/CourseLarger.module.css";
 
 export interface UserReview {
     name: string;
-    comment: string; // antes era `text`
-    rating: number;  // 1 a 5
+    comment: string;
+    rating: number; // 1 a 5
 }
 
 interface CourseReviewsProps {
     userReviews: UserReview[];
-    max?: number; // cuántas mostrar, por defecto 4
+    isReducedScreen?: boolean;
+    max?: number; // cuántas mostrar inicialmente, por defecto 4
 }
 
-export default function CourseReviews({ userReviews = [], max = 4 }: CourseReviewsProps) {
+export default function CourseReviews({ userReviews = [], max = 4, isReducedScreen }: CourseReviewsProps) {
+    const style = isReducedScreen ? stylesLarge : styles;
+    const [visibleCount, setVisibleCount] = useState(max);
+
+    const handleShowMore = () => {
+        setVisibleCount(prev => Math.min(prev + max, userReviews.length));
+    };
+
     return (
-        <section className={styles.courseReviews}>
+        <section className={style.courseReviews}>
             <h2>Valoraciones</h2>
-            <div className={styles.reviewsGrid}>
-                {userReviews.slice(0, max).map((review, idx) => (
-                    <div key={idx} className={styles.reviewCard}>
+            <div className={style.reviewsGrid}>
+                {userReviews.slice(0, visibleCount).map((review, idx) => (
+                    <div key={idx} className={style.reviewCard}>
                         <p style={{ fontWeight: "bold", color: "#000" }}>{review.name}</p>
                         <p style={{ fontSize: "0.9rem", color: "#888" }}>{review.comment}</p>
                         <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.5rem" }}>
@@ -38,6 +48,16 @@ export default function CourseReviews({ userReviews = [], max = 4 }: CourseRevie
                     </div>
                 ))}
             </div>
+
+            {/* Botón Ver más */}
+            {visibleCount < userReviews.length && (
+                <button
+                    onClick={handleShowMore}
+                    className={style.showMoreBtn}
+                >
+                    Ver más
+                </button>
+            )}
         </section>
     );
 }

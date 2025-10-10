@@ -319,7 +319,6 @@
     font-size: 1.4rem;
     font-weight: bold;
     color: #000032;
-    margin-bottom: 1rem;
 }
 
 .courseSection {
@@ -400,7 +399,6 @@
     font-size: 1.4rem;
     font-weight: bold;
     color: #000032;
-    margin-bottom: 1rem;
 }
 
 .courseRequirements ul {
@@ -434,7 +432,6 @@
     font-size: 1.4rem;
     font-weight: bold;
     color: #000032;
-    margin-bottom: 1rem;
 }
 
 .courseDescription p {
@@ -484,8 +481,29 @@
 }
 
 .reviewCard {
-    border: 1px solid #1e1e1e;
+    border-top: 1px solid #ADADAD;
     padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.showMoreBtn {
+    display: block;
+    margin: 1.5rem auto 0;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 2rem;
+    background: #0070f3;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.showMoreBtn:hover {
+    background: #0059c9;
+    transform: translateY(-2px);
+}
+
+.showMoreBtn:active {
+    transform: scale(0.97);
 }

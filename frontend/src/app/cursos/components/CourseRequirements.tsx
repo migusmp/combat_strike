@@ -1,12 +1,15 @@
 import styles from '../css/Course.module.css';
+import stylesLarge from '../css/CourseLarger.module.css'
 
 interface CourseRequirementsProps {
+    isReducedScreen?: boolean
     requirements: string[];
 }
 
-function CourseRequirements({ requirements }: CourseRequirementsProps) {
+function CourseRequirements({ requirements, isReducedScreen }: CourseRequirementsProps) {
+    const style = isReducedScreen ? stylesLarge : styles
     return (
-        <section className={styles.courseRequirements}>
+        <section className={style.courseRequirements}>
             <h2>Requisitos</h2>
             <ul>
                 {requirements.map((req, idx) => (
