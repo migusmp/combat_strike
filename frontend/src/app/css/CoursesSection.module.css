@@ -1,10 +1,13 @@
 .coursesSection {
     padding: 3rem 8%;
-    background-color: #ffffff; /* fondo blanco */
-    color: #000032; /* texto general azul oscuro */
+    background-color: #ffffff;
+    /* fondo blanco */
+    color: #000032;
+    /* texto general azul oscuro */
     text-align: left;
     height: auto;
-    border-bottom: 2px solid #ddd; /* línea sutil al final */
+    border-bottom: 2px solid #ddd;
+    /* línea sutil al final */
 }
 
 .coursesContainer {
@@ -15,23 +18,24 @@
 }
 
 .sectionTitle {
-  font-size: 3rem;
-  margin-bottom: 2rem;
-  font-weight: bold;
-  color: #000032;
-  position: relative;
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    font-weight: bold;
+    color: #000032;
+    position: relative;
 }
 
 .sectionTitle::after {
-  content: "";
-  display: block;
-  width: 120%;
-  height: 2px;
-  background-color: #055293;
-  margin-top: 0.5rem;
-  border-radius: 2px;
-  position: relative;
-  left: -10%;    /* la corrección para centrarla */
+    content: "";
+    display: block;
+    width: 120%;
+    height: 2px;
+    background-color: #055293;
+    margin-top: 0.5rem;
+    border-radius: 2px;
+    position: relative;
+    left: -10%;
+    /* la corrección para centrarla */
 }
 
 
@@ -39,10 +43,12 @@
 
 /* Tarjeta blanca sin animación ni hover */
 .courseCard {
-    background: #fff; /* un gris muy claro para contraste */
-    border: 1px solid #ddd; /* borde sutil */
+    background: #fff;
+  border-radius: 1rem;
+    /* un gris muy claro para contraste */
+    border: 1px solid #ddd;
+    /* borde sutil */
     padding: 1rem;
-    border-radius: 12px;
     width: 350px;
     min-height: auto;
     text-align: left;
@@ -50,6 +56,9 @@
     flex-direction: column;
     justify-content: space-between;
     color: #000032;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
 
@@ -61,10 +70,11 @@
 .courseTitle {
     font-size: 1rem;
     font-weight: 700;
-    margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #055293; /* línea azul */
-    color: #000032;
+    border-bottom: 2px solid #055293;
+    /* línea azul */
+    color: #03346d;
+    margin-bottom: 0.55rem;
 }
 
 .courseTopics li {
@@ -84,25 +94,26 @@
 }
 
 .coursePrice {
-  margin-top: auto; /* empuja el precio hacia abajo */
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #000;
-  text-align: left;
+    color: #055293;
+    background: #e8f1fa;
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
 }
 
 .courseImage {
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  border-radius: 10px;
-  margin-bottom: 1rem;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 0.55rem;
 }
 
 .courseImage .image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 

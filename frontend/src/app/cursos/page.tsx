@@ -5,6 +5,7 @@ import CourseCard from '../components/Home/CourseCard';
 import Footer from '../components/Home/Footer';
 import styles from '../css/Cursos.module.css';
 import { CategoryMenu } from "../components/Home/CategoryMenu";
+import Carrusel from "./components/Carrusel";
 
 export default function CursosPage() {
     const courses = [
@@ -64,9 +65,10 @@ export default function CursosPage() {
             <div className={styles.container}>
                 <article className={styles.coursesSection}>
                     {/* <h2 className={styles.sectionTitle}>Nuestros Cursos</h2> */}
+                    <h1 style={{ fontSize: "2rem", fontWeight: "bold" , marginBottom: "1rem"}}>Cursos de Defensa Personal</h1>
 
                     {/* Menú de categorías */}
-                    <CategoryMenu
+                    {/* <CategoryMenu
                         categories={categories}
                         selectedCategory={selectedCategory}
                         onSelect={setSelectedCategory}
@@ -83,7 +85,9 @@ export default function CursosPage() {
                                 price={course.price}
                             />
                         ))}
-                    </div>
+                    </div> */}
+
+                    <Carrusel />
                 </article>
             </div>
             <Footer />

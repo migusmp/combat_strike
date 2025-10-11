@@ -45,7 +45,7 @@
 .courseHeader section {
     display: flex;
     gap: 0.5rem;
-    margin-top: 6rem;
+    margin-top: 4rem;
 }
 
 .courseHeader section p {
@@ -490,7 +490,7 @@
     margin-top: 1.5rem;
     border: none;
     color: #0059c9;
-    border: 1px solid #0070f3;
+    border: 2px solid #0070f3;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;

@@ -1,12 +1,13 @@
 /* Cursos.module.css */
 .container {
+    /* background: linear-gradient(180deg, #e8edf3, #dbe4ed); */
     background-color: #fff;
+  color: #1a1a1a;
     min-height: 91vh;
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #D9D9D9;
 }
 
 .coursesSection {
@@ -22,38 +23,13 @@
     color: #8AA6BE;
 }
 
+/* === FLEXBOX EN LUGAR DE GRID === */
 .coursesGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 }
-
-.categoryMenu {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
-.categoryButton {
-    padding: 0.5rem 1rem;
-    border: none;
-    background-color: #5E96BE;
-    color: #fff;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.categoryButton:hover {
-    background-color: #055293;
-}
-
-.activeCategory {
-    background-color: #03346d;
-}
-
 
 .courseCard {
     background-color: #055293;
@@ -63,6 +39,9 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: calc(33.333% - 2rem); /* 3 columnas en pantallas grandes */
+    min-width: 280px;
+    max-width: 360px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     opacity: 0;
     transform: translateY(20px);
@@ -90,14 +69,6 @@
     object-fit: cover;
     height: 180px;
 }
-
-.coursePrice {
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #055293;
-    margin-top: auto;
-}
-
 
 .courseTitle {
     font-size: 1.5rem;
@@ -130,6 +101,13 @@
     font-weight: 500;
 }
 
+.coursePrice {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #055293;
+    margin-top: auto;
+}
+
 .buttonWrapper {
     text-align: center;
 }
@@ -150,10 +128,50 @@
     box-shadow: 0 5px 15px rgba(90, 150, 190, 0.6);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* === MENÚ DE CATEGORÍAS === */
+.categoryMenu {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.categoryButton {
+  background: linear-gradient(135deg, #5E96BE, #8AA6BE);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 1.5rem;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+
+.categoryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(94, 150, 190, 0.4);
+}
+
+.activeCategory {
+  background: linear-gradient(135deg, #03346d, #055293);
+  border: 1px solid #022c5a;
+  box-shadow: 0 4px 12px rgba(3, 52, 109, 0.4);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 992px) {
+    .courseCard {
+        width: calc(50% - 2rem); /* 2 columnas */
+    }
+}
+
+@media (max-width: 600px) {
     .sectionTitle {
         font-size: 2rem;
+    }
+
+    .courseCard {
+        width: 100%; /* 1 columna */
     }
 
     .courseTitle {
@@ -163,24 +181,12 @@
     .courseDescription {
         font-size: 0.95rem;
     }
-}
-
-@media (max-width: 685px) {
-    .coursesSection {
-        margin-top: 3rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 2rem 1rem;
-    }
-
-    .coursesGrid {
-        gap: 1.5rem;
-    }
 
     .courseBtn {
         width: 100%;
+    }
+
+    .container {
+        padding: 2rem 1rem;
     }
 }

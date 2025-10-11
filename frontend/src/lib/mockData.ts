@@ -140,5 +140,130 @@ export const courses = [
             { name: "Lucía Gómez", rating: 3, comment: "Faltan más ejemplos prácticos." },
             { name: "Paco Martínez", rating: 5, comment: "Muy buen curso." }
         ]
+    },
+    {
+        id: "defensa-femenina",
+        title: "Defensa Personal Femenina: Seguridad y Confianza",
+        description: "Aprende técnicas de defensa personal adaptadas para mujeres en diferentes situaciones",
+        longDescription: `Este curso está diseñado específicamente para mujeres que desean aprender a protegerse en situaciones cotidianas y de riesgo. 
+A través de técnicas prácticas de Krav Maga y estrategias de autoprotección, mejorarás tu confianza y seguridad personal.`,
+        image: "/assets/defensa-personal-femenina.jpg",
+        price: "54,99",
+        topics: ["Técnicas de defensa", "Krav Maga", "Autoprotección", "Simulaciones"],
+        updated_at: "2024-08-10",
+        created_at: "2024-08-01",
+        isSubtitled: true,
+        language: "Español",
+        includes: [
+            "8 horas de video a tu ritmo",
+            "Acceso de por vida al contenido",
+            "Ejercicios prácticos paso a paso",
+            "Material descargable en PDF",
+            "Certificado de finalización",
+            "Consejos para aumentar tu seguridad diaria"
+        ],
+        requirements: [
+            "Ropa cómoda para entrenar",
+            "Espacio libre para moverse",
+            "Disposición para practicar técnicas de defensa personal"
+        ],
+        whatYouWillLearn: [
+            "Cómo reaccionar ante ataques comunes",
+            "Técnicas básicas y avanzadas de Krav Maga adaptadas",
+            "Autoprotección en la vida diaria",
+            "Desarrollar confianza y control corporal",
+            "Simulaciones de escenarios reales"
+        ],
+        content: [
+            {
+                sectionTitle: "Fundamentos",
+                classes: [
+                    { title: "Introducción a la defensa femenina", duration: { hours: 0, minutes: 30 } },
+                    { title: "Postura y movimiento básico", duration: { hours: 0, minutes: 45 } },
+                    { title: "Golpes y bloqueos básicos", duration: { hours: 1, minutes: 0 } }
+                ]
+            },
+            {
+                sectionTitle: "Técnicas de defensa",
+                classes: [
+                    { title: "Defensa contra agarres", duration: { hours: 1, minutes: 15 } },
+                    { title: "Defensa contra ataques con puños", duration: { hours: 1, minutes: 30 } },
+                    { title: "Defensa contra ataques con objetos", duration: { hours: 1, minutes: 0 } }
+                ]
+            },
+            {
+                sectionTitle: "Simulaciones y práctica",
+                classes: [
+                    { title: "Situaciones cotidianas", duration: { hours: 1, minutes: 0 } },
+                    { title: "Escenarios públicos y transporte", duration: { hours: 0, minutes: 50 } }
+                ]
+            }
+        ],
+        rating: 4.7,
+        reviews: 98,
+        userReviews: [
+            { name: "Laura Gómez", rating: 5, comment: "Muy completo y adaptado para mujeres. Me siento más segura." },
+            { name: "Isabel Martínez", rating: 4, comment: "Explicaciones claras y ejercicios prácticos." },
+            { name: "Sofía Ruiz", rating: 5, comment: "Excelente curso, lo recomiendo totalmente." }
+        ]
+    },
+    {
+        id: "krav-maga-avanzado",
+        title: "Krav Maga Avanzado: Técnicas de Defensa Real",
+        description: "Curso avanzado de Krav Maga para situaciones de alto riesgo",
+        longDescription: `Este curso está orientado a personas que ya tienen conocimientos básicos de Krav Maga y quieren profundizar en técnicas avanzadas de defensa personal. 
+Aprenderás estrategias para enfrentar ataques complejos y situaciones peligrosas con seguridad y eficacia.`,
+        image: "/assets/foto-curso-krav-maga-avanzado.png",
+        price: "64,99",
+        topics: ["Krav Maga avanzado", "Defensa personal", "Tácticas de seguridad"],
+        updated_at: "2024-09-05",
+        created_at: "2024-09-01",
+        isSubtitled: true,
+        language: "Español",
+        includes: [
+            "12 horas de video a tu ritmo",
+            "Acceso de por vida al contenido",
+            "Ejercicios avanzados paso a paso",
+            "Material descargable en PDF",
+            "Certificado de finalización",
+            "Consejos tácticos para situaciones reales"
+        ],
+        requirements: [
+            "Conocimientos básicos de Krav Maga",
+            "Ropa cómoda para entrenar",
+            "Espacio libre para practicar técnicas avanzadas"
+        ],
+        whatYouWillLearn: [
+            "Técnicas avanzadas de Krav Maga",
+            "Defensa contra múltiples atacantes",
+            "Uso de objetos como defensa",
+            "Simulaciones de ataques complejos",
+            "Mejorar velocidad y reacción bajo presión"
+        ],
+        content: [
+            {
+                sectionTitle: "Técnicas avanzadas",
+                classes: [
+                    { title: "Ataques combinados y defensa", duration: { hours: 1, minutes: 0 } },
+                    { title: "Defensa en el suelo", duration: { hours: 1, minutes: 30 } },
+                    { title: "Defensa contra armas", duration: { hours: 1, minutes: 15 } }
+                ]
+            },
+            {
+                sectionTitle: "Simulaciones",
+                classes: [
+                    { title: "Ataques múltiples", duration: { hours: 1, minutes: 0 } },
+                    { title: "Escenarios reales", duration: { hours: 1, minutes: 0 } }
+                ]
+            }
+        ],
+        rating: 4.8,
+        reviews: 65,
+        userReviews: [
+            { name: "David López", rating: 5, comment: "Curso muy completo para avanzar en Krav Maga." },
+            { name: "Carla Fernández", rating: 4, comment: "Técnicas claras y útiles." },
+            { name: "Javier Morales", rating: 5, comment: "Simulaciones muy realistas y prácticas." }
+        ]
     }
+
 ];
