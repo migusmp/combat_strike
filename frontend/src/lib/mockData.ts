@@ -137,7 +137,8 @@ export const courses = [
             { name: "Raúl Fernández", rating: 5, comment: "Muy útil para aprender a usar sprays de forma segura." },
             { name: "Sofía Martínez", rating: 4, comment: "El curso es claro, pero algunos apartados son cortos." },
             { name: "Miguel Sánchez", rating: 4, comment: "" },
-            { name: "Lucía Gómez", rating: 3, comment: "Faltan más ejemplos prácticos." }
+            { name: "Lucía Gómez", rating: 3, comment: "Faltan más ejemplos prácticos." },
+            { name: "Paco Martínez", rating: 5, comment: "Muy buen curso." }
         ]
     }
 ];

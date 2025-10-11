@@ -84,18 +84,18 @@
 }
 
 .coursePhoto {
-  width: 100%;
-  border-radius: 0.8rem;
-  margin-bottom: 1rem;
-  object-fit: cover;
-  height: 180px;
+    width: 100%;
+    border-radius: 0.8rem;
+    margin-bottom: 1rem;
+    object-fit: cover;
+    height: 180px;
 }
 
 .coursePrice {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #055293;
-  margin-top: auto;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #055293;
+    margin-top: auto;
 }
 
 
@@ -162,6 +162,12 @@
 
     .courseDescription {
         font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 685px) {
+    .coursesSection {
+        margin-top: 3rem;
     }
 }
 

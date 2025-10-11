@@ -23,6 +23,10 @@ export default function CourseReviews({ userReviews = [], max = 4, isReducedScre
         setVisibleCount(prev => Math.min(prev + max, userReviews.length));
     };
 
+    const handleShowLess = () => {
+        setVisibleCount(max);
+    };
+
     return (
         <section className={style.courseReviews}>
             <h2>Valoraciones</h2>
@@ -49,16 +53,24 @@ export default function CourseReviews({ userReviews = [], max = 4, isReducedScre
                 ))}
             </div>
 
-            {/* Botón Ver más */}
-            {visibleCount < userReviews.length && (
+            {/* Botón Ver más / Ver menos */}
+            {visibleCount < userReviews.length ? (
                 <button
                     onClick={handleShowMore}
                     className={style.showMoreBtn}
                 >
-                    Ver más
+                    Mostrar todas las reseñas
                 </button>
+            ) : (
+                userReviews.length > max && (
+                    <button
+                        onClick={handleShowLess}
+                        className={style.showMoreBtn}
+                    >
+                        Ver menos
+                    </button>
+                )
             )}
         </section>
     );
 }
-
