@@ -16,6 +16,8 @@ export const courses = [
         created_at: "2023-10-01",
         isSubtitled: true,
         language: "Español",
+        isNew: true,
+        category: "Defensa Personal",
         includes: [
             "10 horas de video a tu ritmo",
             "Acceso de por vida al contenido",
@@ -61,7 +63,7 @@ export const courses = [
                 ]
             }
         ],
-        rating: 4.6,
+        rating: 4.4,
         reviews: 120,
         userReviews: [
             { name: "Ana García", rating: 5, comment: "Excelente curso, muy completo y práctico." },
@@ -87,6 +89,8 @@ export const courses = [
         created_at: "2023-10-01",
         isSubtitled: true,
         language: "Español",
+        isNew: true,
+        category: "Sprays",
         includes: [
             "3 horas de video explicativo",
             "Acceso de por vida al contenido",
@@ -154,6 +158,8 @@ A través de técnicas prácticas de Krav Maga y estrategias de autoprotección,
         created_at: "2024-08-01",
         isSubtitled: true,
         language: "Español",
+        isNew: true,
+        category: "Defensa Personal",
         includes: [
             "8 horas de video a tu ritmo",
             "Acceso de por vida al contenido",
@@ -220,6 +226,8 @@ Aprenderás estrategias para enfrentar ataques complejos y situaciones peligrosa
         created_at: "2024-09-01",
         isSubtitled: true,
         language: "Español",
+        isNew: true,
+        category: "Defensa Personal",
         includes: [
             "12 horas de video a tu ritmo",
             "Acceso de por vida al contenido",

@@ -10,7 +10,6 @@ export default function Carrusel() {
 
     const tabs = ["Recomendado", "Krav Maga", "Sprays"];
 
-    // Función para filtrar los cursos según la tab
     const getCoursesByTab = (tab: string): Course[] => {
         switch (tab) {
             case "Recomendado":
@@ -26,14 +25,20 @@ export default function Carrusel() {
 
     const courses = getCoursesByTab(activeTab);
 
+    // Filtramos los cursos nuevos
+    const newCourses = allCourses.filter(c => c.isNew);
+
+    const personalDefenseCourses = allCourses.filter(c => c.category === "Defensa Personal");
+    const sprayCourses = allCourses.filter(c => c.category === "Sprays");
+
     return (
         <div className={styles.carruselContainer}>
+            {/* Menú de Tabs */}
             <div className={styles.menuContainer}>
                 {tabs.map(tab => (
                     <button
                         key={tab}
-                        className={`${styles.tabButton} ${activeTab === tab ? styles.active : ""
-                            }`}
+                        className={`${styles.tabButton} ${activeTab === tab ? styles.active : ""}`}
                         onClick={() => setActiveTab(tab)}
                     >
                         {tab}
@@ -41,6 +46,7 @@ export default function Carrusel() {
                 ))}
             </div>
 
+            {/* Cursos según la Tab */}
             <div className={styles.coursesGrid}>
                 {courses.map((course) => (
                     <Link
@@ -56,9 +62,59 @@ export default function Carrusel() {
                         <h3 className={styles.courseTitle}>{course.title}</h3>
                         <p className={styles.courseAuthor}>{course.description}</p>
                         <p className={styles.coursePrice}>{course.price} €</p>
+                        
                     </Link>
                 ))}
             </div>
+            {/* CURSOS DE KRAV MAGA */}
+            {personalDefenseCourses.length > 0 && (
+                <div className={styles.newCoursesSection}>
+                    <h2 className={styles.sectionTitle}>Defensa Personal</h2>
+                    <div className={styles.coursesGrid}>
+                        {personalDefenseCourses.map((course) => (
+                            <Link
+                                key={course.id}
+                                href={`/cursos/${course.id}`}
+                                className={styles.courseCard}
+                            >
+                                <img
+                                    src={course.image}
+                                    alt={course.title}
+                                    className={styles.courseImage}
+                                />
+                                <h3 className={styles.courseTitle}>{course.title}</h3>
+                                <p className={styles.courseAuthor}>{course.description}</p>
+                                <p className={styles.coursePrice}>{course.price} €</p>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* NUEVOS CURSOS */}
+            {sprayCourses.length > 0 && (
+                <div className={styles.newCoursesSection}>
+                    <h2 className={styles.sectionTitle}>Sprays</h2>
+                    <div className={styles.coursesGrid}>
+                        {sprayCourses.map((course) => (
+                            <Link
+                                key={course.id}
+                                href={`/cursos/${course.id}`}
+                                className={styles.courseCard}
+                            >
+                                <img
+                                    src={course.image}
+                                    alt={course.title}
+                                    className={styles.courseImage}
+                                />
+                                <h3 className={styles.courseTitle}>{course.title}</h3>
+                                <p className={styles.courseAuthor}>{course.description}</p>
+                                <p className={styles.coursePrice}>{course.price} €</p>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
