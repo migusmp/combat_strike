@@ -1,0 +1,84 @@
+/* COMBAT STRIKE PRODUCT CARD CSS */
+.productCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* reparte el contenido */
+    background-color: #fff;
+    border-radius: 5px;
+    gap: 0.7rem;
+    padding: 1rem;
+    width: 300px;
+    height: 400px;
+    /* ✅ todas las tarjetas tendrán la misma altura */
+    color: #000;
+    box-sizing: border-box;
+    text-align: center;
+    overflow: hidden;
+    /* evita desbordes */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efecto hover sutil */
+.productCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.productImage {
+    width: 170px;
+    height: 170px;
+    /* ✅ misma altura de imagen */
+    object-fit: contain;
+    /* evita deformaciones */
+    border-radius: 5px;
+}
+
+.productTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    min-height: 2.5rem;
+    /* mantiene espacio uniforme */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.productName {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    color: #cfba7c;
+    min-height: 1.5rem;
+    /* para alinear los nombres */
+}
+
+.productBtn {
+    text-align: center;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    background-color: #cfba7c;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.productBtn:hover {
+    background-color: #bca766;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: #cfba7c;
+    border-radius: 2px;
+}

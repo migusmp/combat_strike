@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Footer from "../components/Home/Footer";
 import styles from "../css/Productos.module.css";
 import Image from "next/image";
+// import CardStyle from "./components/CardStyle";
+import CombatStrikeProductCard from "./components/CombatStrikeProductCard";
 
-interface Product {
+export interface Product {
     title: string;
     image: string;
     name: string;
@@ -25,37 +26,38 @@ export default function ShopPage() {
     const products: Product[] = [
         {
             title: "Spray de Defensa Personal",
-            image: "/ruta/spray1.jpg",
+            image: "/assets/spray-pimienta-2.png",
             topics: ["Alcance: 3 metros", "Fácil de usar", "Normativa: Cumple con legislación vigente"],
-            name: "Spray de Defensa Personal",
+            name: "Spray de defensa",
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
         {
             title: "Spray de Gas Pimienta",
-            image: "/ruta/spray2.jpg",
+            image: "/assets/spray-pimienta-1.png",
             topics: ["Alcance: 4 metros", "Resistente al viento", "Normativa: Cumple con legislación vigente"],
-            name: "Spray de Defensa Personal",
+            name: "Spray de defensa",
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
         {
             title: "Spray de Defensa Personal",
-            image: "/ruta/spray1.jpg",
-            name: "Spray de Defensa Personal",
+            image: "/assets/spray-pimienta-2.png",
+            name: "Spray de defensa",
             topics: ["Alcance: 3 metros", "Fácil de usar", "Normativa: Cumple con legislación vigente"],
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
         {
             title: "Spray de Gas Pimienta",
-            image: "/ruta/spray2.jpg",
-            name: "Spray de Defensa Personal",
+            image: "/assets/spray-pimienta-1.png",
+            name: "Spray de defensa",
             topics: ["Alcance: 4 metros", "Resistente al viento", "Normativa: Cumple con legislación vigente"],
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
     ];
+    // <CardStyle product={product} key={index} loaded={loaded} index={index} />
 
     return (
         <>
@@ -66,23 +68,7 @@ export default function ShopPage() {
 
                 <div className={styles.productsGrid}>
                     {products.map((product, index) => (
-                        <div
-                            key={index}
-                            className={`${styles.productCard} ${loaded ? styles.fadeInUp : ""}`}
-                            style={{ animationDelay: `${index * 0.2}s` }}
-                        >
-                            <Image width={100} height={100} src={product.image} alt={product.title} className={styles.productImage} />
-                            <h3 className={styles.productTitle}>{product.title}</h3>
-                            {product.ageWarning && <p className={styles.ageWarning}>{product.ageWarning}</p>}
-                            <ul className={styles.productTopics}>
-                                {product.topics.map((topic, i) => (
-                                    <li key={i}>{topic}</li>
-                                ))}
-                            </ul>
-                            <Link href={product.href} className={styles.productBtn}>
-                                Ver Producto
-                            </Link>
-                        </div>
+                        <CombatStrikeProductCard key={index} product={product} index={index} loaded={loaded} />
                     ))}
                 </div>
             </div>
