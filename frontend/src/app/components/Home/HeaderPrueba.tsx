@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "../../css/HeaderPrueba.module.css";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function HeaderPrueba() {
     const [loginMenu, setLoginMenu] = useState(false);
     const [darkBg, setDarkBg] = useState(false); // estado para background
     const router = useRouter();
+    const pathname = usePathname();
 
     const toggleLoginMenu = () => setLoginMenu(!loginMenu);
 
@@ -21,6 +22,10 @@ export default function HeaderPrueba() {
         handleScroll(); // inicializa al cargar la página
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const getLinkClass = (href: string) => {
+        return pathname === href ? styles.active : "";
+    };
 
     return (
         <>
@@ -62,10 +67,10 @@ export default function HeaderPrueba() {
                 />
                 <div className={styles.buttons}>
                     <nav>
-                        <Link href="/">Inicio</Link>
-                        <Link href="/cursos">Cursos</Link>
-                        <Link href="/productos">Productos</Link>
-                        <Link href="/contact">Contáctanos</Link>
+                        <Link href="/" className={getLinkClass("/")}>Inicio</Link>
+                        <Link href="/cursos" className={getLinkClass("/cursos")}>Cursos</Link>
+                        <Link href="/productos" className={getLinkClass("/productos")}>Productos</Link>
+                        <Link href="/contact" className={getLinkClass("/contact")}>Contáctanos</Link>
                     </nav>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

@@ -26,7 +26,8 @@
     gap: 50px;
 }
 
-.buttons nav a {
+.buttons nav a,
+.headerMobile nav a {
     position: relative;
     color: #fff;
     text-decoration: none;
@@ -55,12 +56,16 @@
 
 /* ruta activa */
 .active {
-    color: #55aaff;
-    font-weight: bold;
+    color: #55aaff !important;
 }
 
 .active::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
     width: 100%;
+    height: 2px;
     background: #55aaff;
 }
 
