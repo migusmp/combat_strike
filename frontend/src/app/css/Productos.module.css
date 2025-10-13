@@ -2,18 +2,36 @@
 .container {
     width: 100%;
     margin: 0 auto;
-    padding: 1rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     font-family: 'Arial', sans-serif;
     background-color: #fff;
     min-height: 100vh;
+    color: #000;
 }
 
 /* Logo Zulu Tactical */
-.logoWrapper {
+.presentation {
     margin-bottom: 2rem;
+    display: flex;
+    width: 100%;
+}
+
+.presentation div {
+    width: 50%;
+}
+.presentation div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+}
+.presentation div:first-child h1 {
+    font-size: 3rem;
+    color: #000;
+    font-weight: bold;
 }
 
 /* Título de la página */
@@ -133,29 +151,151 @@
     text-align: center;
 }
 
+.hero {
+    height: auto;
+    display: flex;
+    width: 100%;
+    border-bottom: 2px solid #ddd;
+}
 
-/* Responsive */
+.hero div {
+    width: 50%;
+    height: 50vh;
+}
+
+/* Lado izquierdo (texto) */
+.hero div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+.heroLogo {
+    margin-bottom: 1rem;
+}
+
+.heroLeft h1 {
+    font-size: 3rem;
+    color: #000;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.heroLeft p {
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.5;
+    margin-top: 0.5rem;
+}
+
+.heroLeft span {
+    font-weight: bold;
+    color: #055293;
+}
+
+.heroBtn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #055293;
+    color: #ffffff;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    text-align: center;
+    align-self: flex-start;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.heroBtn:hover {
+    background-color: #04457b;
+    transform: translateY(-2px);
+}
+
+.heroRight {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #055293;
+    margin-bottom: 0.5rem;
+}
+
+/* 🔹 Tablets (≤ 992px) */
+@media (max-width: 992px) {
+    .hero div {
+        height: auto;
+    }
+
+    .heroLeft h1 {
+        font-size: 2.5rem;
+    }
+
+    .heroLeft p {
+        font-size: 1.1rem;
+    }
+
+    .hero div:first-child {
+        padding-left: 2rem;
+    }
+}
+
+/* 🔹 Móviles grandes (≤ 768px) */
 @media (max-width: 768px) {
-    .productsGrid {
-        /* mínimo 2 productos por fila en tablets */
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero div {
+        width: 100%;
+        height: auto;
+    }
+
+    .hero div:first-child {
+        align-items: center;
+        padding: 2rem 1rem;
+    }
+
+    .heroRight {
+        margin-top: 1rem;
+    }
+
+    .heroLeft h1 {
+        font-size: 2rem;
+    }
+
+    .heroLeft p {
+        font-size: 1rem;
+        max-width: 90%;
+    }
+
+    .heroBtn {
+        align-self: center;
     }
 }
 
-@media (max-width: 685px) {
-    .container {
-        padding-top: 4.2 rem;
-    }
-}
-
+/* 🔹 Móviles pequeños (≤ 480px) */
 @media (max-width: 480px) {
-    .productsGrid {
-        /* 1 producto por fila en móviles */
-        grid-template-columns: 1fr;
+    .heroLeft h1 {
+        font-size: 1.7rem;
     }
 
-    .productCard {
-        max-width: 100%;
-        padding: 1.5rem;
+    .heroLeft p {
+        font-size: 0.95rem;
+    }
+
+    .heroBtn {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
     }
 }

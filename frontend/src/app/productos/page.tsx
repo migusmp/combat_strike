@@ -26,7 +26,7 @@ export default function ShopPage() {
     const products: Product[] = [
         {
             title: "Spray de Defensa Personal",
-            image: "/assets/spray-pimienta-2.png",
+            image: "/assets/spray-pimienta-2.webp",
             topics: ["Alcance: 3 metros", "Fácil de usar", "Normativa: Cumple con legislación vigente"],
             name: "Spray de defensa",
             ageWarning: "Solo para mayores de 18 años",
@@ -34,7 +34,7 @@ export default function ShopPage() {
         },
         {
             title: "Spray de Gas Pimienta",
-            image: "/assets/spray-pimienta-1.png",
+            image: "/assets/spray-pimienta-1.webp",
             topics: ["Alcance: 4 metros", "Resistente al viento", "Normativa: Cumple con legislación vigente"],
             name: "Spray de defensa",
             ageWarning: "Solo para mayores de 18 años",
@@ -58,20 +58,47 @@ export default function ShopPage() {
         },
     ];
     // <CardStyle product={product} key={index} loaded={loaded} index={index} />
+    // <div className={styles.productsGrid}>
+    //                 {products.map((product, index) => (
+    //                     <CombatStrikeProductCard key={index} product={product} index={index} loaded={loaded} />
+    //                 ))}
+    //             </div>
 
     return (
         <>
             <div className={styles.container}>
-                <div className={styles.logoWrapper}>
-                    <Image src="/assets/zulu-tactical.webp" alt="Zulu Tactical Logo" width={250} height={250} />
-                </div>
+                <section className={styles.hero}>
+                    <div className={styles.heroLeft}>
+                        <Image
+                            src="/assets/zulu-tactical.webp"
+                            alt="Zulu Tactical Logo"
+                            width={300}
+                            height={300}
+                            className={styles.heroLogo}
+                        />
+                        <h1>Colaboración con <span>Zulu Tactical</span></h1>
+                        <h3 className={styles.subtitle}>Innovación y defensa personal de élite</h3>
+                        <p>Nos unimos a Zulu Tactical para ofrecerte productos de defensa personal con la máxima calidad y fiabilidad.</p>
+                    </div>
+                    <div className={styles.heroRight}>
+                        
+                        <a href="#productos" className={styles.heroBtn}>
+                            Ver productos
+                        </a>
+                    </div>
+                </section>
 
-                <div className={styles.productsGrid}>
-                    {products.map((product, index) => (
-                        <CombatStrikeProductCard key={index} product={product} index={index} loaded={loaded} />
-                    ))}
-                </div>
+                <section id="productos" className={styles.productsPresentation}>
+                    <h2>Productos Zulu Tactical</h2>
+                    {/* Aquí tu grid de productos */}
+                    <div className={styles.productsGrid}>
+                        {products.map((product, index) => (
+                            <CombatStrikeProductCard key={index} product={product} index={index} loaded={loaded} />
+                        ))}
+                    </div>
+                </section>
             </div>
+
             <Footer />
         </>
     );
