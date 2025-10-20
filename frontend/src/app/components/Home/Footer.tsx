@@ -17,14 +17,13 @@ export default function Footer() {
                 </div>
 
                 {/* NAVEGACIÓN */}
-                <nav className={styles.footerNav}>
+                <nav aria-label="Navegación del pie de página" className={styles.footerNav}>
                     <a href="#about">Sobre nosotros</a>
                     <a href="#cursos">Cursos</a>
                     <a href="#tienda">Tienda</a>
                     <a href="#valores">Valores</a>
                     <a href="#contact">Contacto</a>
                 </nav>
-
                 {/* REDES SOCIALES */}
                 <div className={styles.footerSocial}>
                     {/* Instagram */}

@@ -1,13 +1,16 @@
 "use client";
 import HeaderPrueba from "./HeaderPrueba";
 
-export default function NotLoggedLayout({ children }: { children: React.ReactNode }) {
+export default function NotLoggedLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     return (
-        <>
-            <HeaderPrueba /> 
-            <main style={{ marginTop: "85px" }}>
-                {children}
-            </main>
-        </>
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+            <HeaderPrueba />
+            <main style={{ marginTop: "85px", flex: 1 }}>{children}</main>
+        </div>
     );
 }
+

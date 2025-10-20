@@ -1,4 +1,6 @@
-/* Contenedor principal */
+/* ============================
+   CONTENEDOR PRINCIPAL
+============================ */
 .container {
     width: 100%;
     margin: 0 auto;
@@ -8,61 +10,178 @@
     font-family: 'Arial', sans-serif;
     background-color: #fff;
     min-height: 100vh;
+    padding: 2rem 1rem;
     color: #000;
 }
 
-/* Logo Zulu Tactical */
-.presentation {
-    margin-bottom: 2rem;
+/* ============================
+   HERO
+============================ */
+.hero {
     display: flex;
+    flex-wrap: wrap;
     width: 100%;
+    border-bottom: 2px solid #ddd;
+    overflow: hidden;
+    padding: 2rem 0;
 }
 
-.presentation div {
-    width: 50%;
+.heroLeft,
+.heroRight {
+    flex: 1 1 400px;
+    padding: 1rem 2rem;
 }
-.presentation div:first-child {
+
+.heroLeft {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
+    /* alineado a la izquierda en desktop */
+    text-align: left;
     gap: 1rem;
 }
-.presentation div:first-child h1 {
+
+.heroLeft h1 {
     font-size: 3rem;
-    color: #000;
     font-weight: bold;
+    color: #000;
+    line-height: 1.2;
 }
 
-/* Título de la página */
-.pageTitle {
-    font-size: 2rem;
+.heroLeft h1 span {
+    color: #055293;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #055293;
+    margin-bottom: 1rem;
+}
+
+.heroLeft p {
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+.heroBtn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #055293;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
     font-weight: bold;
-    color: #003366;
-    margin-bottom: 3rem;
+    margin-top: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+    align-self: center;
+}
+
+.heroBtn:hover {
+    background-color: #04457b;
+    transform: translateY(-2px);
+}
+
+.heroRight {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.heroBtn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #055293;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+    align-self: center;
+    /* botón centrado incluso en desktop */
+}
+
+.visitStore {
+    padding: 0.8rem 2rem;
+    border: 1px solid #055293;
+    color: #055293;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+    align-self: center;
+    cursor: pointer;
+    /* botón centrado incluso en desktop */
+}
+
+.visitStore:hover {
+    background-color: #E8F4FC;
+}
+
+.heroLogo {
+    display: block;
+    max-width: 260px;
+    width: 80%;
+    height: auto;
+}
+
+/* ============================
+   BOTONES ZULU
+============================ */
+.botonesZulu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.botonesZulu a {
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+/* ============================
+   PRESENTACIÓN PRODUCTOS
+============================ */
+.productsPresentation {
+    margin: 3rem 0 2rem;
+    width: 100%;
     text-align: center;
 }
 
-/* Grid de productos */
-/* Contenedor del grid de productos */
+.productsPresentation h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #000;
+}
+
+/* ============================
+   GRID DE PRODUCTOS
+============================ */
 .productsGrid {
     display: grid;
-    /* mínimo 2 productos por fila, máximo que quepan automáticamente */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
     width: 100%;
     justify-items: center;
 }
 
-/* Tarjeta de producto */
+/* ============================
+   TARJETA DE PRODUCTO
+============================ */
 .productCard {
     background: #ffffff;
     color: #1a1a1a;
-    padding: 2.5rem;
-    border-radius: 25px;
+    padding: 2rem;
+    border-radius: 20px;
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -72,22 +191,20 @@
     border: 1px solid #e5e5e5;
 }
 
-/* Hover */
 .productCard:hover {
-    transform: translateY(-10px) scale(1.02);
+    transform: translateY(-5px) scale(1.02);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* Imagen del producto */
 .productImage {
-    width: 40%;
+    width: 100%;
     border-radius: 15px;
     margin-bottom: 1rem;
+    object-fit: cover;
 }
 
-/* Título azul del producto */
 .productTitle {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 0.8rem;
     border-bottom: 2px solid #055293;
@@ -95,14 +212,12 @@
     color: #055293;
 }
 
-/* Advertencia mayores de 18 años */
 .ageWarning {
     color: #d9534f;
     font-weight: bold;
     margin-bottom: 1rem;
 }
 
-/* Lista de características */
 .productTopics {
     list-style: none;
     padding: 0;
@@ -114,7 +229,7 @@
     margin-bottom: 0.5rem;
     font-size: 1rem;
     position: relative;
-    padding-left: 1rem;
+    padding-left: 1.2rem;
 }
 
 .productTopics li::before {
@@ -124,12 +239,11 @@
     color: #055293;
 }
 
-/* Botón centrado al fondo de la tarjeta */
 .productBtn {
     display: inline-block;
     padding: 0.8rem 2rem;
     background-color: #055293;
-    color: #ffffff;
+    color: #fff;
     border-radius: 12px;
     text-decoration: none;
     font-weight: bold;
@@ -143,7 +257,6 @@
     transform: translateY(-2px);
 }
 
-/* Legal notice */
 .legalNotice {
     margin-top: 4rem;
     font-size: 0.9rem;
@@ -151,91 +264,95 @@
     text-align: center;
 }
 
-.hero {
-    height: auto;
+/* ============================
+   QUIÉNES SOMOS
+============================ */
+.aboutSection {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
     width: 100%;
-    border-bottom: 2px solid #ddd;
+    padding: 4rem 5%;
+    background-color: #f7f9fc;
+    border-top: 2px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
 }
 
-.hero div {
-    width: 50%;
-    height: 50vh;
+.aboutText {
+    flex: 1 1 300px;
 }
 
-/* Lado izquierdo (texto) */
-.hero div:first-child {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    text-align: left;
-    padding-left: 3rem;
-    padding-right: 3rem;
-}
-
-.heroLogo {
+.aboutText h2 {
+    font-size: 2rem;
+    color: #055293;
     margin-bottom: 1rem;
 }
 
-.heroLeft h1 {
-    font-size: 3rem;
-    color: #000;
-    font-weight: bold;
-    line-height: 1.2;
-}
-
-.heroLeft p {
-    font-size: 1.2rem;
+.aboutText p {
     color: #333;
-    line-height: 1.5;
-    margin-top: 0.5rem;
+    line-height: 1.6;
+    font-size: 1.1rem;
 }
 
-.heroLeft span {
-    font-weight: bold;
-    color: #055293;
+.aboutImage {
+    flex: 1 1 300px;
+    display: flex;
+    justify-content: center;
 }
 
-.heroBtn {
-    display: inline-block;
+.aboutPhoto {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================
+   CTA FINAL
+============================ */
+.ctaSection {
+    background-color: #0d1b2a;
+    color: #fff;
+    text-align: center;
+    padding: 4rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.ctaSection h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.ctaSection p {
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    color: #dbe4ee;
+    line-height: 1.6;
+}
+
+.ctaSection a {
+    background-color: #e63946;
+    color: #fff;
     padding: 0.8rem 2rem;
-    background-color: #055293;
-    color: #ffffff;
     border-radius: 12px;
     text-decoration: none;
     font-weight: bold;
-    margin-top: 1rem;
-    text-align: center;
-    align-self: flex-start;
-    transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.heroBtn:hover {
-    background-color: #04457b;
-    transform: translateY(-2px);
+.ctaSection a:hover {
+    background-color: #b92c36;
 }
 
-.heroRight {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
+/* ============================
+   MEDIA QUERIES
+============================ */
 
-.subtitle {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #055293;
-    margin-bottom: 0.5rem;
-}
-
-/* 🔹 Tablets (≤ 992px) */
+/* Tablets (≤ 992px) */
 @media (max-width: 992px) {
-    .hero div {
-        height: auto;
-    }
-
     .heroLeft h1 {
         font-size: 2.5rem;
     }
@@ -244,30 +361,33 @@
         font-size: 1.1rem;
     }
 
-    .hero div:first-child {
-        padding-left: 2rem;
+    .aboutSection {
+        padding: 3rem 3%;
     }
 }
 
-/* 🔹 Móviles grandes (≤ 768px) */
+@media (max-width: 832px) {
+    .heroRight {
+        display: none;
+    }
+}
+
+/* Móviles grandes (≤ 768px) */
 @media (max-width: 768px) {
     .hero {
         flex-direction: column;
         text-align: center;
     }
 
-    .hero div {
-        width: 100%;
-        height: auto;
-    }
-
-    .hero div:first-child {
-        align-items: center;
-        padding: 2rem 1rem;
-    }
-
+    .heroLeft,
     .heroRight {
-        margin-top: 1rem;
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .heroLeft {
+        align-items: center;
+        text-align: center;
     }
 
     .heroLeft h1 {
@@ -276,15 +396,25 @@
 
     .heroLeft p {
         font-size: 1rem;
-        max-width: 90%;
     }
 
     .heroBtn {
         align-self: center;
     }
+
+    .productsGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 }
 
-/* 🔹 Móviles pequeños (≤ 480px) */
+@media (max-width: 685px) {
+    .aboutSection {
+        display: none;
+    }
+}
+
+/* Móviles pequeños (≤ 480px) */
 @media (max-width: 480px) {
     .heroLeft h1 {
         font-size: 1.7rem;
@@ -297,5 +427,10 @@
     .heroBtn {
         padding: 0.7rem 1.5rem;
         font-size: 0.9rem;
+    }
+
+    .productCard {
+        padding: 1.5rem;
+        max-width: 300px;
     }
 }

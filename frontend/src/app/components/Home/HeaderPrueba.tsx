@@ -66,7 +66,7 @@ export default function HeaderPrueba() {
                     onClick={() => router.push("/")}
                 />
                 <div className={styles.buttons}>
-                    <nav>
+                    <nav aria-label="Navegación principal">
                         <Link href="/" className={getLinkClass("/")}>Inicio</Link>
                         <Link href="/cursos" className={getLinkClass("/cursos")}>Cursos</Link>
                         <Link href="/productos" className={getLinkClass("/productos")}>Productos</Link>

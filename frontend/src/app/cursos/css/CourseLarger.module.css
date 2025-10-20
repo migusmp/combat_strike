@@ -5,7 +5,7 @@
     flex-direction: column;
     align-items: center;
     background-color: #f9f9f9;
-    padding-top: 2rem;
+    padding-top: 4rem;
 }
 
 .sectionMain {
@@ -378,7 +378,6 @@
     border-radius: 8px;
     color: #000;
     /* texto en negro */
-    margin-top: 1.5rem;
 }
 
 .courseDescription h2 {

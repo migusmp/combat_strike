@@ -1,4 +1,5 @@
 import styles from "../css/Carrusel.module.css";
+import Image from 'next/image';
 import { useState } from "react";
 import { courses as allCourses } from "../../../lib/mockData";
 import Link from "next/link";
@@ -46,6 +47,13 @@ export default function Carrusel() {
                 ))}
             </div>
 
+            {/* ✅ Encabezado para el bloque principal */}
+            <h2 className={styles.sectionTitle}>
+                {activeTab === "Recomendado" && "Cursos recomendados"}
+                {activeTab === "Krav Maga" && "Cursos de Krav Maga"}
+                {activeTab === "Sprays" && "Cursos de Sprays"}
+            </h2>
+
             {/* Cursos según la Tab */}
             <div className={styles.coursesGrid}>
                 {courses.map((course) => (
@@ -54,7 +62,9 @@ export default function Carrusel() {
                         href={`/cursos/${course.id}`}
                         className={styles.courseCard}
                     >
-                        <img
+                        <Image
+                            width={200}
+                            height={200}
                             src={course.image}
                             alt={course.title}
                             className={styles.courseImage}
@@ -62,10 +72,10 @@ export default function Carrusel() {
                         <h3 className={styles.courseTitle}>{course.title}</h3>
                         <p className={styles.courseAuthor}>{course.description}</p>
                         <p className={styles.coursePrice}>{course.price} €</p>
-                        
                     </Link>
                 ))}
             </div>
+
             {/* CURSOS DE KRAV MAGA */}
             {personalDefenseCourses.length > 0 && (
                 <div className={styles.newCoursesSection}>
@@ -77,7 +87,9 @@ export default function Carrusel() {
                                 href={`/cursos/${course.id}`}
                                 className={styles.courseCard}
                             >
-                                <img
+                                <Image
+                                    width={200}
+                                    height={200}
                                     src={course.image}
                                     alt={course.title}
                                     className={styles.courseImage}
@@ -102,7 +114,9 @@ export default function Carrusel() {
                                 href={`/cursos/${course.id}`}
                                 className={styles.courseCard}
                             >
-                                <img
+                                <Image
+                                    width={200}
+                                    height={200}
                                     src={course.image}
                                     alt={course.title}
                                     className={styles.courseImage}
