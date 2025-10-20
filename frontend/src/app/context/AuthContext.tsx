@@ -3,39 +3,43 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { API_URL } from '../utils/api_url';
 
 interface AuthContextType {
-  isAuthenticated: boolean | null;
-  setAuthenticated: (val: boolean) => void;
+    isAuthenticated: boolean;
+    checkingAuth: boolean;
+    setAuthenticated: (val: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: null,
-  setAuthenticated: () => {},
+    isAuthenticated: false,
+    checkingAuth: true,
+    setAuthenticated: () => { },
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setAuthenticated] = useState<boolean | null>(null);
+    const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+    const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
 
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const res = await fetch(`${API_URL}/auth/validate`, {
-          credentials: 'include', // para enviar la cookie httpOnly
-        });
-        console.log("RESPUESTA DEL SERVIDOR: ",res);
-        setAuthenticated(res.ok);
-      } catch {
-        setAuthenticated(false);
-      }
-    }
+    useEffect(() => {
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_URL}/auth/validate`, {
+                    credentials: 'include',
+                });
+                setAuthenticated(res.ok);
+            } catch {
+                setAuthenticated(false);
+            } finally {
+                setCheckingAuth(false);
+            }
+        }
 
-    checkAuth();
-  }, []);
+        checkAuth();
+    }, []);
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, setAuthenticated }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, setAuthenticated, checkingAuth }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuthContext = () => useContext(AuthContext);

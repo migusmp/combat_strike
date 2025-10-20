@@ -1,4 +1,5 @@
 "use client";
+import { useAuthContext } from "@/app/context/AuthContext";
 import HeaderPrueba from "./HeaderPrueba";
 
 export default function NotLoggedLayout({
@@ -6,9 +7,11 @@ export default function NotLoggedLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const { isAuthenticated } = useAuthContext();
+
     return (
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-            <HeaderPrueba />
+            <HeaderPrueba isLogged={isAuthenticated} />
             <main style={{ marginTop: "85px", flex: 1 }}>{children}</main>
         </div>
     );

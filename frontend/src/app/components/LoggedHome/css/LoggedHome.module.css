@@ -81,14 +81,16 @@
     position: absolute;
     top: 8vh;
     right: 2%;
-    width: 200px; /* tamaño fijo */
+    width: 200px;
+    /* tamaño fijo */
     background-color: #fff;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* opcional para darle profundidad */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* opcional para darle profundidad */
     z-index: 1000;
 }
 
@@ -104,15 +106,16 @@
 
 .usermenu ul li {
     width: 100%;
-    padding: 12px 16px; /* reduce un poco para que quepa en tamaño fijo */
+    padding: 12px 16px;
+    /* reduce un poco para que quepa en tamaño fijo */
     cursor: pointer;
     color: #000032;
     transition: all 0.2s ease-in-out;
 }
 
 .usermenu ul li:hover {
-    background-color: #000032;
-    color: #fff;
+    background-color: #EDEBEB;
+    color: #000;
 }
 
 .usermenu ul li.cerrarSesionBtn {
@@ -245,7 +248,8 @@
     display: none;
     justify-content: center;
     align-items: center;
-    padding: 20px 0; /* 20px arriba y abajo, 0 a los lados */
+    padding: 20px 0;
+    /* 20px arriba y abajo, 0 a los lados */
     gap: 0;
     /* no necesitamos gap, lo hacemos con pseudo-elemento */
     z-index: 998;

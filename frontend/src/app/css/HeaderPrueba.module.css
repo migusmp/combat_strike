@@ -17,6 +17,12 @@
     gap: 7px;
 }
 
+.icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .buttons nav {
     display: flex;
     align-items: center;
@@ -216,6 +222,16 @@
 @media (max-width: 685px) {
     .buttons nav {
         display: none;
+    }
+
+    .icons {
+        position: absolute;
+        right: 2%;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 1rem;
+        align-items: center;
     }
 
     .userIcon {
