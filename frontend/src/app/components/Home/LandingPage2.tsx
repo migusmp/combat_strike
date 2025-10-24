@@ -85,11 +85,21 @@ export default function LandingPage2() {
                     />
                 </div>
                 <div className={styles.trainerText}>
-                    <h2>NOMBRE DE COACH</h2>
-                    <p>Recorrido y experiencia</p>
-                    <p>
-                        Lorem Ipsum es simplemente el texto de relleno de las imprentas...
-                    </p>
+                    <h2>DAMIÁN GUTIÉRREZ ROLDÁN</h2>
+                    <p>Soy <strong>Instructor Nacional en Defensa Personal Femenina (Nivel 1)</strong> desde el año 2018.
+                        A lo largo de mi trayectoria profesional he dedicado mi trabajo a la formación en
+                        seguridad personal y técnicas de autoprotección, colaborando en diferentes ámbitos
+                        tanto civiles como institucionales.
+                        He tenido el privilegio de impartir formación especializada a la Policía Local de
+                        Albacete, avalado por el <strong>certificado en Defensa Personal Policial (Nivel 2)</strong>. Además,
+                        soy <strong>cinturón negro 2º Dan</strong> y poseo el <strong>certificado de Director de Seguridad</strong> expedido
+                        por la Universidad de Ávila, lo que refuerza mi perfil técnico y mi compromiso con la
+                        enseñanza responsable de la defensa personal.
+                        Desde el año 2019, desarrollo mi labor como instructor de boxeo y Krav Maga
+                        impartiendo clases tanto a adultos como a jóvenes. Mi objetivo como profesional
+                        es promover la formación integral en defensa personal, fomentando valores como
+                        la disciplina, la seguridad y el autocontrol, pilares fundamentales para el desarrollo
+                        físico y mental de cada alumno.</p>
                 </div>
             </section>
 
@@ -108,10 +118,18 @@ export default function LandingPage2() {
                     />
                 </div>
                 <div className={styles.assistantText}>
-                    <h2>NOMBRE DE AYUDANTE</h2>
-                    <p>Recorrido y experiencia</p>
+                    <h2>LLANOS MARTÍNEZ TORRES</h2>
                     <p>
-                        Lorem Ipsum es simplemente el texto de relleno de las imprentas...
+                        Desde el año 2021 colaboro como <strong>ayudante de Damián, desempeñando
+                            funciones de apoyo tanto en la enseñanza como en la preparación técnica. </strong>
+                        Comencé a practicar boxeo y Krav Maga a los 14 años, disciplinas que
+                        con el tiempo se han convertido en una auténtica pasión y en parte
+                        esencial de mi desarrollo personal y profesional.
+                        Actualmente, me encuentro <strong>federada como cinturón negro de Krav
+                            Maga</strong> y continúo ampliando mis conocimientos y competencias. Mi
+                        próximo objetivo es obtener la certificación oficial como instructora
+                        de defensa personal femenina, con el propósito de transmitir a otras
+                        mujeres las herramientas necesarias para fortalecer su seguridad, confianza y autonomía.
                     </p>
                 </div>
             </section>

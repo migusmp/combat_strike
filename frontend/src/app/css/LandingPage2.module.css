@@ -151,20 +151,11 @@
 /* ======================= */
 .trainerSection {
     padding: 2rem 8%;
-    /* menos altura */
     display: flex;
-    align-items: flex-start;
-    /* alineados arriba */
-    gap: 30px;
-    /* separación entre imagen y texto */
+    justify-content: center;
+    align-items: center;
     background-color: #000032;
     overflow: hidden;
-    /* oculta lo que se salga al animar */
-}
-
-.trainerSection div {
-    flex: 1;
-    width: 50%;
 }
 
 /* Imagen entrenador */
@@ -179,7 +170,11 @@
 
 /* Texto entrenador */
 .trainerText {
+    padding-left: 4rem;
     opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
     transform: translateY(40px);
     filter: blur(8px);
     transition: all 1s ease-out;
@@ -189,6 +184,11 @@
     text-align: center;
     font-weight: bold;
     font-size: 3rem;
+}
+
+.trainerText p {
+    text-align: justify;
+    font-size: 1.6rem;
 }
 
 /* Animación visible */
@@ -212,8 +212,8 @@
 .assistantSection {
     padding: 2rem 8%;
     display: flex;
-    align-items: flex-start;
-    gap: 30px;
+    justify-content: center;
+    align-items: center;
     background-color: #0a0a2f;
     overflow: hidden;
     /* Esto hace que la imagen vaya a la derecha */
@@ -221,14 +221,12 @@
 }
 
 .assistantSection .imageAssistantWrapper {
-    flex: 1;
     display: flex;
     justify-content: flex-end;
     /* fuerza que la imagen se alinee a la derecha dentro del div */
 }
 
 .assistantSection .assistantText {
-    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -245,6 +243,7 @@
 
 /* Texto ayudante */
 .assistantText {
+    padding-right: 4rem;
     opacity: 0;
     transform: translateY(40px);
     filter: blur(8px);
@@ -252,9 +251,15 @@
 }
 
 .assistantText h2 {
+    margin-bottom: 1.5rem;
     text-align: center;
     font-weight: bold;
     font-size: 3rem;
+}
+
+.assistantText p {
+    text-align: justify;
+    font-size: 1.6rem;
 }
 
 /* Animación visible */
@@ -272,19 +277,10 @@
     transition-delay: 0.5s;
 }
 
-@media(max-width: 950px) {
+@media (max-width: 1456px) {
     .trainerSection {
         padding: 1rem 4%;
         /* menos padding en tablet */
-    }
-
-    .trainerSection h2 {
-        font-size: 2rem;
-    }
-
-    .imageTrainer {
-        max-width: 90%;
-        /* que ocupe todo el ancho de la pantalla */
     }
 
     .assistantSection {
@@ -292,16 +288,134 @@
         /* menos padding en tablet */
     }
 
+    .trainerSection p {
+        font-size: 1.4rem;
+    }
+
+    .assistantSection p {
+        font-size: 1.4rem;
+    }
+
+}
+
+@media (max-width: 1262px) {
+    .trainerSection {
+        padding: 1rem 3%;
+    }
+
+    .assistantSection {
+        padding: 1rem 3%;
+    }
+
+    .trainerText {
+        padding-left: 2rem;
+    }
+
+    .assistantText {
+        padding-right: 2rem;
+    }
+
+    .assistantText {
+        padding-left: 2rem;
+    }
+
+
+    .trainerSection h2 {
+        font-size: 2.5rem;
+    }
+
+    .trainerSection p {
+        font-size: 1.2rem;
+    }
+
+    .assistantSection h2 {
+        font-size: 2.5rem;
+    }
+
+    .assistantSection p {
+        font-size: 1.2rem;
+    }
+
+}
+
+@media (max-width: 1077px) {
+
+    .trainerSection h2 {
+        font-size: 2rem;
+    }
+
+    .trainerSection p {
+        font-size: 1.1rem;
+    }
+
     .assistantSection h2 {
         font-size: 2rem;
     }
 
+    .assistantSection p {
+        font-size: 1.1rem;
+    }
+
+
+}
+
+@media (max-width: 953px) {
+    .trainerSection h2 {
+        font-size: 1.8rem;
+    }
+
+    .trainerText {
+        gap: 1rem;
+    }
+
+    .assistantSection h2 {
+        font-size: 1.8rem;
+        margin-bottom: 0rem;
+    }
+
+    .assistantText {
+        gap: 1rem;
+    }
+
+}
+
+@media (max-width: 904px) {
+    .imageTrainer {
+        max-width: 335px;
+    }
+
+    .trainerText {
+        gap: 0.2rem;
+    }
 
     .imageAssistant {
-        max-width: 90%;
-        /* que ocupe todo el ancho de la pantalla */
+        max-width: 335px;
+    }
+
+    .assistantText {
+        gap: 0.2rem;
+    }
+
+}
+
+@media (max-width: 835px) {
+    .imageTrainer {
+        max-width: 300px;
+    }
+
+    .trainerSection p {
+        font-size: 1rem;
+    }
+
+    .imageAssistant {
+        max-width: 300px;
+    }
+
+    .assistantSection p {
+        font-size: 1rem;
     }
 }
+
 
 /* @media (max-width: 810px) { */
 /*     .title { */
@@ -366,6 +480,20 @@
     .imageTrainer {
         max-width: 90%;
         margin: 0 auto;
+    }
+
+    .trainerSection h2 {
+        margin-top: 1rem;
+
+    }
+
+    .trainerText {
+        padding: 0;
+        gap: 1rem;
+    }
+
+    .trainerSection p {
+        font-size: 1.2rem;
     }
 }
 
