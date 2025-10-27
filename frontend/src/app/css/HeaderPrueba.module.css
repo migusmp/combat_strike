@@ -14,13 +14,16 @@
 
 .buttons {
     display: flex;
-    gap: 7px;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
 }
 
 .icons {
     display: flex;
     align-items: center;
     gap: 15px;
+    position: relative;
 }
 
 .buttons nav {
@@ -97,16 +100,6 @@
     transition: all 0.3s ease, transform 0.2s ease;
 }
 
-.contactBtn {
-    display: none;
-    cursor: pointer;
-}
-
-.contactBtn:hover {
-    background-color: #055293;
-    color: #fff;
-}
-
 .loginBtn:hover {
     background: linear-gradient(135deg, #111, #333);
     color: #fff;
@@ -135,7 +128,6 @@
 
 .userIcon {
     display: none;
-    /* oculto inicialmente */
 }
 
 
@@ -200,7 +192,121 @@
     transform: translateY(-2px) scale(1.03);
 }
 
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 35px;
+    height: 25px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    z-index: 1001;
+}
+
+.bar {
+    height: 3px;
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    transition: 0.4s;
+}
+
+.bar1 {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.bar2 {
+    opacity: 0;
+}
+
+.bar3 {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.mobileMenu {
+    position: fixed;
+    top: 85px;
+    right: 0;
+    width: 250px;
+    height: calc(100vh - 85px);
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 2rem;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.mobileMenu.open {
+    transform: translateX(0);
+}
+
+.mobileMenu nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mobileLink {
+    padding: 0.8rem 0;
+    width: 100%;
+    text-align: left;
+    font-size: 1.1rem;
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.mobileLink:hover {
+    color: #55aaff;
+}
+
+.loginBtnMobile {
+    width: 100%;
+    padding: 13px 20px;
+    background: #055293;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease, transform 0.2s ease;
+}
+
+.loginBtnMobile:hover {
+    background: linear-gradient(135deg, #111, #333);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.registerBtnMobile {
+    width: 100%;
+    padding: 13px 20px;
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease, transform 0.2s ease;
+}
+
+.registerBtnMobile:hover {
+    background: #fff;
+    color: #000;
+    transform: translateY(-2px) scale(1.03);
+}
+
 @media (max-width: 985px) {
+    .desktopNav {
+        display: none;
+    }
+
     .buttons nav {
         font-size: 1.3rem;
         margin-right: 50px;
@@ -220,18 +326,24 @@
 }
 
 @media (max-width: 685px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .mobileMenu {
+        display: flex;
+    }
+
     .buttons nav {
         display: none;
     }
 
-    .icons {
-        position: absolute;
-        right: 2%;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        gap: 1rem;
-        align-items: center;
+    .userIcon {
+        display: none;
+    }
+
+    .icons div {
+        display: none;
     }
 
     .userIcon {
@@ -240,97 +352,10 @@
         top: 50%;
         transform: translateY(-50%);
     }
-
-    .header {
-        justify-content: center;
-    }
-
-    .contactBtn {
-        position: absolute;
-        left: 2%;
-        display: block;
-        padding: 13px 20px;
-        border-radius: 6px;
-        background-color: #fff;
-        color: #000;
-        font-weight: bold;
-        border: none;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease, transform 0.2s ease;
-    }
-
-    /* Añadir menú abajo */
-    .headerMobile {
-        position: fixed;
-        display: flex !important;
-        /* fuerza a que aparezca */
-        justify-content: center;
-        gap: 20px;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-        color: #fff;
-        top: 85px;
-        backdrop-filter: blur(8px);
-        /* lo bajas 85px más */
-        padding: 10px 0;
-        z-index: 998;
-        border-top: 1px solid #CCC;
-        /* border-bottom: 1px solid #CCC; */
-    }
-
-    .headerMobile nav {
-        display: flex;
-        width: 100%;
-        justify-content: center;
-        /* centra todo el nav */
-        align-items: center;
-    }
-
-    .headerMobile nav a {
-        flex: 1;
-        /* cada enlace ocupa la misma proporción */
-        text-align: center;
-        font-size: 1.1rem;
-        color: #fff;
-        border-right: 1px solid #ccc;
-        padding: 5px 0;
-        font-weight: bold;
-        /* opcional, para dar altura al borde */
-    }
-
-    .headerMobile nav a:last-child {
-        border-right: none;
-        /* quitar borde del último */
-    }
-
-    .headerMobile nav a::after {
-        content: "";
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: #055293;
-        transition: width 0.3s ease;
-    }
-
-    .headerMobile nav a:hover {
-        color: #55aaff;
-    }
 }
 
 @media (max-width: 450px) {
-    .contactText {
-        display: none;
-    }
-
     .telephoneSvg {
         display: block;
-    }
-
-    .contactBtn {
-        left: 4%;
-        border-radius: 50%;
-        padding: 15px 15px;
     }
 }

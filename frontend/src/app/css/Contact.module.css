@@ -101,8 +101,8 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 685px) {
     .contactContainer {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 }

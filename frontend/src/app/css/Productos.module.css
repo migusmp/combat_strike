@@ -412,6 +412,10 @@
     .aboutSection {
         display: none;
     }
+
+    .hero {
+        padding: 0;
+    }
 }
 
 /* Móviles pequeños (≤ 480px) */

@@ -4,7 +4,6 @@
     background-color: #fff;
     color: #1a1a1a;
     min-height: 91vh;
-    padding: 0rem 0rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -275,16 +274,14 @@
     .categoryButton {
         flex: 0 0 auto;
     }
-    
+
 }
 
 @media (max-width: 685px) {
-    .container {
-        padding: 3rem 0.5rem;
-    }
     .coursesSection {
         max-width: 100%;
     }
+
     .introDiv {
         display: none;
     }

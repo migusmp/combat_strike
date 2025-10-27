@@ -15,6 +15,7 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
     const [loginMenu, setLoginMenu] = useState(false);
     const [darkBg, setDarkBg] = useState(false);
     const [menuUser, setUserMenu] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // 🟦 nuevo estado
     const menuRef = useRef<HTMLDivElement>(null);
     const iconRef = useRef<HTMLImageElement>(null);
     const router = useRouter();
@@ -22,6 +23,7 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
 
     const toggleLoginMenu = () => setLoginMenu(!loginMenu);
     const toggleUserDropdown = () => setUserMenu(!menuUser);
+    const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen); // 🟦
 
     // Cerrar menú de usuario al hacer click fuera
     useEffect(() => {
@@ -64,23 +66,6 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
                     transition: "background-color 0.3s ease, backdrop-filter 0.3s ease",
                 }}
             >
-                <Link href="/contact" className={styles.contactBtn}>
-                    <p className={styles.contactText}>Contáctanos</p>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        fill="currentColor"
-                        className={styles.telephoneSvg}
-                        viewBox="0 0 16 16"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"
-                        />
-                    </svg>
-                </Link>
-
                 <Image
                     width={70}
                     height={70}
@@ -91,7 +76,7 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
                 />
 
                 <div className={styles.buttons}>
-                    <nav aria-label="Navegación principal">
+                    <nav aria-label="Navegación principal" className={styles.desktopNav}>
                         <Link href="/" className={getLinkClass("/")}>Inicio</Link>
                         <Link href="/cursos" className={getLinkClass("/cursos")}>Cursos</Link>
                         <Link href="/productos" className={getLinkClass("/productos")}>Productos</Link>
@@ -99,37 +84,33 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
                     </nav>
 
                     {isLogged ? (
-                        <>
-                            <div className={styles.icons}>
-                                {/* 🔔 Notificaciones */}
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="33"
-                                    height="33"
-                                    fill="currentColor"
-                                    className={styles.bellIcon}
-                                    style={{ cursor: "pointer" }}
-                                    viewBox="0 0 16 16"
-                                >
-                                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
-                                </svg>
+                        <div className={styles.icons}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="33"
+                                height="33"
+                                fill="currentColor"
+                                className={styles.bellIcon}
+                                style={{ cursor: "pointer" }}
+                                viewBox="0 0 16 16"
+                            >
+                                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6" />
+                            </svg>
 
-                                {/* 👤 Imagen del usuario (reemplaza botones login/register en escritorio) */}
-                                <div className={styles.profileContainer}>
-                                    <Image
-                                        ref={iconRef}
-                                        src="/assets/user_logo.svg"
-                                        alt="imagen de usuario"
-                                        width={45}
-                                        height={45}
-                                        className={styles.userImage}
-                                        onClick={toggleUserDropdown}
-                                        style={{ cursor: "pointer", borderRadius: "50%" }}
-                                    />
-                                    {menuUser && <UserMenu ref={menuRef} />}
-                                </div>
+                            <div className={styles.profileContainer}>
+                                <Image
+                                    ref={iconRef}
+                                    src="/assets/user_logo.svg"
+                                    alt="imagen de usuario"
+                                    width={45}
+                                    height={45}
+                                    className={styles.userImage}
+                                    onClick={toggleUserDropdown}
+                                    style={{ cursor: "pointer", borderRadius: "50%" }}
+                                />
+                                {menuUser && <UserMenu ref={menuRef} />}
                             </div>
-                        </>
+                        </div>
                     ) : (
                         <>
                             <svg
@@ -158,7 +139,6 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
                                     </Link>
                                 </div>
                             )}
-
                             <Link href="/login">
                                 <button className={styles.loginBtn}>Iniciar sesión</button>
                             </Link>
@@ -167,15 +147,84 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
                             </Link>
                         </>
                     )}
+
+                    {/* 🟦 Botón hamburguesa (solo visible en móviles) */}
+                    <button
+                        className={styles.hamburger}
+                        onClick={toggleMobileMenu}
+                        aria-label="Abrir menú"
+                    >
+                        <span className={`${styles.bar} ${mobileMenuOpen ? styles.bar1 : ""}`}></span>
+                        <span className={`${styles.bar} ${mobileMenuOpen ? styles.bar2 : ""}`}></span>
+                        <span className={`${styles.bar} ${mobileMenuOpen ? styles.bar3 : ""}`}></span>
+                    </button>
                 </div>
             </header>
 
-            <section className={styles.headerMobile}>
+            {/* 🟦 Menú móvil */}
+            <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ""}`}>
                 <nav>
-                    <Link href="/cursos">Cursos</Link>
-                    <Link href="/productos">Productos</Link>
+                    <Link
+                        href="/"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={styles.mobileLink}
+                    >
+                        Inicio
+                    </Link>
+                    {isLogged && (
+                        <Link
+                            href="/profile"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={styles.mobileLink}
+                        >
+                            Perfil
+                        </Link>
+                    )}
+                    <Link
+                        href="/cursos"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={styles.mobileLink}
+                    >
+                        Cursos
+                    </Link>
+                    {isLogged && (
+                        <Link
+                            href="/my-courses"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={styles.mobileLink}
+                        >
+                            Mis cursos
+                        </Link>
+                    )}
+
+                    <Link
+                        href="/productos"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={styles.mobileLink}
+                    >
+                        Productos
+                    </Link>
+                    <Link
+                        href="/contact"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={styles.mobileLink}
+                    >
+                        Contáctanos
+                    </Link>
+
+                    {!isLogged && (
+                        <>
+                            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                                <button className={styles.loginBtnMobile}>Iniciar sesión</button>
+                            </Link>
+                            <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                                <button className={styles.registerBtnMobile}>Registrarse</button>
+                            </Link>
+                        </>
+                    )}
                 </nav>
-            </section>
+            </div>
+
         </>
     );
 }
