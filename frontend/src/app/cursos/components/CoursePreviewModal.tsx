@@ -1,61 +1,112 @@
 "use client";
+// 🔹 Indica a Next.js que este componente se ejecuta en el cliente (no en el servidor).
 
-import { useEffect } from "react";
-import styles from "../css/CoursePreviewModal.module.css";
+import { useEffect, useRef } from "react";
+import Hls from "hls.js"; // 📦 Librería para reproducir videos HLS (.m3u8) en navegadores que no lo soportan nativamente.
+import styles from "../css/CoursePreviewModal.module.css"; // 🎨 Importa los estilos del modal.
 
+
+// 🔹 Interfaz para los videos de ejemplo que se muestran en la lista.
 interface Video {
-    title: string;
-    duration: string;
+    title: string;   // Título del video
+    duration: string; // Duración del video (ej: "5:23")
 }
 
+// 🔹 Interfaz de las propiedades que recibe el componente
 interface CoursePreviewModalProps {
-    show: boolean;
-    onClose: () => void;
-    courseTitle: string;
-    videoSrc: string;
-    videos: Video[];
+    show: boolean;        // Controla si el modal se muestra o no
+    onClose: () => void;  // Función que se ejecuta al cerrar el modal
+    courseTitle: string;  // Título del curso
+    videoSrc: string;     // URL del video HLS (.m3u8)
+    videos: Video[];      // Lista de videos gratuitos
 }
+
+
+// 🧩 Componente principal
 export default function CoursePreviewModal({
     show,
     onClose,
     courseTitle,
-    videoSrc,
+    videoSrc, // URL al .m3u8
     videos,
 }: CoursePreviewModalProps) {
+    // 🎥 Crea una referencia al elemento <video> para manipularlo directamente.
+    const videoRef = useRef<HTMLVideoElement>(null);
+    // ⚙️ useEffect: se ejecuta cada vez que cambia "show" o "videoSrc"
     useEffect(() => {
-        if (show) document.body.style.overflow = "hidden";
-        else document.body.style.overflow = "";
-    }, [show]);
+        let hls: Hls | null = null; // Variable para guardar la instancia de Hls
 
-    if (!show) return null;
+        if (show) {
+            // 🔒 Bloquea el scroll de la página mientras el modal está abierto
+            document.body.style.overflow = "hidden";
 
+            // 🎬 Si el navegador soporta Hls.js (como Chrome, Firefox, Edge, etc.)
+            if (videoRef.current && Hls.isSupported()) {
+                hls = new Hls(); // Crea una nueva instancia del manejador HLS
+                hls.loadSource(videoSrc); // Carga la fuente del video (.m3u8)
+                hls.attachMedia(videoRef.current); // Conecta la instancia al <video>
+            }
+            // 🍏 Si el navegador es Safari (que soporta HLS de forma nativa)
+            else if (
+                videoRef.current &&
+                videoRef.current.canPlayType("application/vnd.apple.mpegurl")
+            ) {
+                // Asigna directamente la URL al <video> para reproducción nativa
+                videoRef.current.src = videoSrc;
+            }
+        }
+
+        // 🧹 Cleanup: se ejecuta cuando el modal se cierra o cambia el video
+        return () => {
+            // 🔓 Restaura el scroll del cuerpo de la página
+            document.body.style.overflow = "";
+
+            // 🧽 Si había una instancia de HLS, destrúyela para liberar memoria
+            try {
+                if (hls) {
+                    hls.destroy(); // Esto puede lanzar AbortError si había descargas activas
+                }
+            } catch (err: any) {
+                // 🚫 Ignora AbortError (es normal si el usuario cierra el modal durante la carga)
+                if (err.name !== "AbortError") {
+                    console.warn("Error al destruir HLS:", err);
+                }
+            }
+        };
+    }, [show, videoSrc]);
+    // 👆 Dependencias: se ejecuta cada vez que "show" o "videoSrc" cambian
+
+
+    // 🧱 Renderizado del modal
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
-                {/* Header */}
+
+                {/* 🏷️ Header del modal con el título y el botón de cierre */}
                 <div className={styles.modalHeader}>
                     <p className={styles.previewLabel}>Vista previa del curso</p>
                     <button onClick={onClose} className={styles.closeBtn}>×</button>
                 </div>
 
-                {/* Video principal */}
+                {/* 🎥 Contenedor principal del video */}
                 <div className={styles.videoWrapper}>
-                    <video controls className={styles.videoPlayer}>
-                        <source src={videoSrc} type="video/mp4" />
-                        Tu navegador no soporta el elemento de video.
-                    </video>
+                    <video
+                        controls
+                        ref={videoRef}
+                        className={styles.videoPlayer}
+                    />
                     <h3 className={styles.courseTitle}>{courseTitle}</h3>
                 </div>
 
-                {/* Lista de videos */}
+                {/* 🎞️ Lista de videos gratuitos que se muestran debajo */}
                 <div className={styles.videoList}>
                     <p className={styles.listHeader}>Videos de ejemplo gratuitos:</p>
                     <ul>
                         {videos.map((v, i) => (
                             <li key={i}>
                                 <div>
-                                    <h4>{v.title}</h4>
-                                    <span>{v.duration}</span>
+                                    <h4>{v.title}</h4>      {/* Título del video */}
+                                    <span>{v.duration}</span> {/* Duración */}
                                 </div>
                             </li>
                         ))}
@@ -65,4 +116,3 @@ export default function CoursePreviewModal({
         </div>
     );
 }
-
