@@ -2,6 +2,7 @@ import { ForbiddenException, HttpStatus, UnauthorizedException } from '@nestjs/c
 import { Test, TestingModule } from '@nestjs/testing';
 import { promises as fsp } from 'fs';
 import * as path from 'path';
+import { Response } from 'express';
 import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { FullCourseData } from './interfaces/courses.interfaces';
@@ -17,14 +18,36 @@ describe('CoursesController', () => {
     uploadCourse: jest.Mock;
   };
 
-  const responseMock = () => {
+  type MockResponse = Response & {
+    status: jest.Mock<any, any>;
+    json: jest.Mock<any, any>;
+    sendFile: jest.Mock<any, any>;
+  };
+
+  const responseMock = (): MockResponse => {
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
       sendFile: jest.fn(),
-    };
+    } as any;
     return res;
   };
+
+  const createFile = (
+    overrides: Partial<Express.Multer.File>,
+  ): Express.Multer.File =>
+    ({
+      fieldname: overrides.fieldname ?? 'file',
+      originalname: overrides.originalname ?? 'video.mp4',
+      encoding: overrides.encoding ?? '7bit',
+      mimetype: overrides.mimetype ?? 'video/mp4',
+      size: overrides.size ?? 10,
+      destination: overrides.destination ?? '/tmp',
+      filename: overrides.filename ?? 'video.mp4',
+      path: overrides.path ?? '/tmp/video.mp4',
+      buffer: overrides.buffer ?? Buffer.from([]),
+      stream: overrides.stream ?? ({} as any),
+    } as Express.Multer.File);
 
   const sampleCourse: FullCourseData = {
     title: 'Sample course',
@@ -78,7 +101,7 @@ describe('CoursesController', () => {
     const req = { user: { id: 42 } } as any;
     const res = responseMock();
 
-    await controller.getFullPlaylist('10', req, res);
+    await controller.getFullPlaylist('10', req, res as Response);
 
     const expectedPath = path.join(process.cwd(), 'videos', '10', 'full', 'full.m3u8');
     expect(serviceMock.userHasAccess).toHaveBeenCalledWith(42, '10');
@@ -91,7 +114,7 @@ describe('CoursesController', () => {
     const res = responseMock();
 
     await expect(
-      controller.getFullPlaylist('10', {} as any, res as any),
+      controller.getFullPlaylist('10', {} as any, res as Response),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
@@ -101,7 +124,7 @@ describe('CoursesController', () => {
     const res = responseMock();
 
     await expect(
-      controller.getFullPlaylist('10', req, res),
+      controller.getFullPlaylist('10', req, res as Response),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
@@ -110,11 +133,11 @@ describe('CoursesController', () => {
     const req = { user: { role: 'admin' } } as any;
     const res = responseMock();
     const files = {
-      fullVideo: [{ path: '/tmp/full.mp4' }],
-      previewVideo: [{ path: '/tmp/preview.mp4' }],
+      fullVideo: [createFile({ fieldname: 'fullVideo', path: '/tmp/full.mp4' })],
+      previewVideo: [createFile({ fieldname: 'previewVideo', path: '/tmp/preview.mp4' })],
     };
 
-    await controller.uploadCourse(files, JSON.stringify(sampleCourse), req, res as any);
+    await controller.uploadCourse(files, JSON.stringify(sampleCourse), req, res as Response);
 
     expect(serviceMock.uploadCourse).toHaveBeenCalledWith(
       sampleCourse,
@@ -130,10 +153,10 @@ describe('CoursesController', () => {
   it('denies manual upload to non-admin users', async () => {
     const req = { user: { role: 'student' } } as any;
     const res = responseMock();
-    const files = { fullVideo: [{ path: '/tmp/full.mp4' }] };
+    const files = { fullVideo: [createFile({ fieldname: 'fullVideo', path: '/tmp/full.mp4' })] };
 
     await expect(
-      controller.uploadCourse(files as any, JSON.stringify(sampleCourse), req, res as any),
+      controller.uploadCourse(files, JSON.stringify(sampleCourse), req, res as Response),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
@@ -141,10 +164,12 @@ describe('CoursesController', () => {
     serviceMock.uploadCourse.mockResolvedValue(undefined);
     const req = { user: { role: 'admin' } } as any;
     const res = responseMock();
-    const files = { previewVideo: [{ path: '/tmp/preview.mp4' }] };
+    const files = {
+      previewVideo: [createFile({ fieldname: 'previewVideo', path: '/tmp/preview.mp4' })],
+    };
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    await controller.uploadCourse(files as any, JSON.stringify(sampleCourse), req, res as any);
+    await controller.uploadCourse(files, JSON.stringify(sampleCourse), req, res as Response);
 
     expect(serviceMock.uploadCourse).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
@@ -158,7 +183,7 @@ describe('CoursesController', () => {
     const req = { user: { id: 1 } } as any;
     const res = responseMock();
 
-    await controller.getFullVideoPlaylist('2', 'intro', 'video1', req, res);
+    await controller.getFullVideoPlaylist('2', 'intro', 'video1', req, res as Response);
 
     const expectedPath = path.join(
       process.cwd(),
