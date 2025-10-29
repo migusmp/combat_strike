@@ -7,11 +7,18 @@ import {
   NotFoundException,
   UnauthorizedException,
   ForbiddenException,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+  HttpStatus,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import * as path from 'path';
 import { promises as fs } from 'fs';
 import { CoursesService } from './courses.service';
+import { FullCourseData } from './interfaces/courses.interfaces';
+import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('courses')
 export class CoursesController {
@@ -109,5 +116,45 @@ export class CoursesController {
       segmentPath,
       'Segmento completo no encontrado',
     );
+  }
+
+  @Post('upload-course')
+  @UseInterceptors(
+    FileInterceptor('video', {
+      storage: diskStorage({
+        destination: './uploads', // Carpeta temporal donde se guardará el mp4
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix + path.extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  async uploadCourse(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    // --- Validación de permisos ---
+    console.log('req.user', req.user);
+    if (!req.user || req.user.role !== 'admin') {
+      throw new UnauthorizedException('No autorizado');
+    }
+
+    try {
+      // Datos del curso (title, description, etc.)
+      const courseData: FullCourseData = req.body as FullCourseData;
+
+      // Subir curso + convertir a HLS
+      await this.coursesService.uploadCourse(courseData, file.path);
+
+      return res
+        .status(HttpStatus.CREATED)
+        .json({ message: 'Curso subido y procesado correctamente' });
+    } catch (err) {
+      console.error('Error al subir curso:', err);
+      return res.status(400).json({ message: err.message });
+    }
   }
 }

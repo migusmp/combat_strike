@@ -15,7 +15,9 @@ export class AuthCookieMiddleware implements NestMiddleware {
     if (!token) throw new UnauthorizedException('No autorizado');
 
     try {
-      const secret = process.env.JWT_SECRET || 'secret';
+      const secret = process.env.JWTSECRET;
+      if (!secret) throw new Error('JWTSECRET no definido');
+
       const payload = jwt.verify(token, secret);
       req.user = payload as User;
       next();

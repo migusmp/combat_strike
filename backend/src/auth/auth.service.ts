@@ -87,7 +87,9 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user)
-      throw new UnauthorizedException('No existe ninguna cuenta con este correo');
+      throw new UnauthorizedException(
+        'No existe ninguna cuenta con este correo',
+      );
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
@@ -103,8 +105,8 @@ export class AuthService {
 
     // Generamos JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET || 'secret',
+      { id: user.id, email: user.email, role: user.role },
+      String(process.env.JWTSECRET),
       { expiresIn: '1h' },
     );
 
@@ -154,7 +156,9 @@ export class AuthService {
     );
 
     // Guardar o actualizar token en la DB
-    let tokenRecord = await this.tokenRepository.findOne({ where: { user: { id: user.id } } });
+    let tokenRecord = await this.tokenRepository.findOne({
+      where: { user: { id: user.id } },
+    });
 
     if (tokenRecord) {
       tokenRecord.token = token;
