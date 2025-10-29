@@ -100,7 +100,7 @@ export default function CourseVideoIntroduction({
                     show={true}
                     onClose={handleClose}
                     courseTitle={course.title}
-                    videoSrc="/videos/curso-intro.mp4"
+                    videoSrc={`${process.env.NEXT_PUBLIC_API_URL}/courses/8/preview/playlist`}
                     videos={[
                         { title: "Introducción al curso", duration: "3:45" },
                         { title: "Técnicas de defensa iniciales", duration: "5:12" },

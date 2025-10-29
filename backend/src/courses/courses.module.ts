@@ -17,8 +17,17 @@ export class CoursesModule {
     consumer.apply(AuthCookieMiddleware).forRoutes(
       { path: 'courses/:courseId/full/playlist', method: RequestMethod.GET },
       { path: 'courses/upload-course', method: RequestMethod.POST },
+      { path: 'courses/upload-course-zip', method: RequestMethod.POST },
       {
         path: 'courses/:courseId/full/segment/:segment',
+        method: RequestMethod.GET,
+      },
+      {
+        path: 'courses/:courseId/full/:sectionId/:videoId/playlist',
+        method: RequestMethod.GET,
+      },
+      {
+        path: 'courses/:courseId/full/:sectionId/:videoId/segment/:segment',
         method: RequestMethod.GET,
       },
     );
