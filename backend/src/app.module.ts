@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
+import { CoursesModule } from './courses/courses.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { MailService } from './mail/mail.service';
         };
       },
     }),
-    AuthModule, // módulo de autenticación
+    AuthModule,
+    CoursesModule, // módulo de autenticación
   ],
   controllers: [AppController],
   providers: [AppService, MailService],

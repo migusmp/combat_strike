@@ -61,7 +61,7 @@
     background: #055293;
     color: #fff;
     border: none;
-    padding: 0.6rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -78,9 +78,6 @@
 
 .linkBox button.copied {
     background-color: #055293;
-    /* verde cuando copiado */
-    transform: scale(1.1);
-    /* animación ligera */
 }
 
 .socials {

@@ -321,6 +321,10 @@
 
     .userIcon {
         display: block;
+        position: absolute;
+        right: 3%;
+        top: 50%;
+        transform: translateY(-50%);
         cursor: pointer;
     }
 }
@@ -336,6 +340,12 @@
 
     .buttons nav {
         display: none;
+    }
+
+    .logoCombatStrike {
+        width: 55px;
+        height: 55px;
+
     }
 
     .userIcon {

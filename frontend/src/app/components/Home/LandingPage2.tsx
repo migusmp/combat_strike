@@ -10,6 +10,8 @@ import Footer from "./Footer";
 export default function LandingPage2() {
     const trainerRef = useRef<HTMLDivElement>(null);
     const assistantRef = useRef<HTMLDivElement>(null);
+    const [showTrainerMore, setShowTrainerMore] = useState(false);
+    const [showAssistantMore, setShowAssistantMore] = useState(false);
 
     const [trainerVisible, setTrainerVisible] = useState(false);
     const [assistantVisible, setAssistantVisible] = useState(false);
@@ -84,7 +86,7 @@ export default function LandingPage2() {
                         className={styles.imageTrainer}
                     />
                 </div>
-                <div className={styles.trainerText}>
+                <div className={`${styles.trainerText} ${showTrainerMore ? styles.expanded : ""}`}>
                     <h2>DAMIÁN GUTIÉRREZ ROLDÁN</h2>
                     <p>Soy <strong>Instructor Nacional en Defensa Personal Femenina (Nivel 1)</strong> desde el año 2018.
                         A lo largo de mi trayectoria profesional he dedicado mi trabajo a la formación en
@@ -100,6 +102,17 @@ export default function LandingPage2() {
                         es promover la formación integral en defensa personal, fomentando valores como
                         la disciplina, la seguridad y el autocontrol, pilares fundamentales para el desarrollo
                         físico y mental de cada alumno.</p>
+                    <button
+                        className={styles.showMoreBtn}
+                        onClick={() => setShowTrainerMore(prev => !prev)}
+                    >
+                        {showTrainerMore ? "Ver menos" : "Ver más"}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path fillRule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </button>
                 </div>
             </section>
 
@@ -117,7 +130,7 @@ export default function LandingPage2() {
                         className={styles.imageAssistant}
                     />
                 </div>
-                <div className={styles.assistantText}>
+                <div className={`${styles.assistantText} ${showAssistantMore ? styles.expanded : ""}`}>
                     <h2>LLANOS MARTÍNEZ TORRES</h2>
                     <p>
                         Desde el año 2021 colaboro como <strong>ayudante de Damián, desempeñando
@@ -131,6 +144,17 @@ export default function LandingPage2() {
                         de defensa personal femenina, con el propósito de transmitir a otras
                         mujeres las herramientas necesarias para fortalecer su seguridad, confianza y autonomía.
                     </p>
+                    <button
+                        className={styles.showMoreBtn}
+                        onClick={() => setShowAssistantMore(prev => !prev)}
+                    >
+                        {showAssistantMore ? "Ver menos" : "Ver más"}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path fillRule="evenodd"
+                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </button>
                 </div>
             </section>
             <CoursesSection />

@@ -311,6 +311,10 @@
         padding-left: 2rem;
     }
 
+    .trainerText {
+        padding-right: 2rem;
+    }
+
     .assistantText {
         padding-right: 2rem;
     }
@@ -435,63 +439,49 @@
 /* } */
 
 /* Mobile: pantallas menores a 768px */
+/* Mobile: pantallas menores a 768px */
 @media (max-width: 768px) {
-    .assistantSection {
+
+    .assistantSection,
+    .trainerSection {
         flex-direction: column;
-        /* texto encima, imagen debajo */
+        /* apilamos en vertical */
         gap: 20px;
         padding: 2rem 4%;
         /* menos padding en mobile */
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     .assistantSection .imageAssistantWrapper,
-    .assistantSection .assistantText {
-        width: 100%;
-        flex: none;
-        /* eliminamos flex para que tomen todo el ancho */
-        justify-content: center;
-        /* centramos todo */
-        text-align: center;
-        /* centramos el texto */
-    }
-
-    .imageAssistant {
-        max-width: 90%;
-        /* que no ocupe todo el ancho de la pantalla */
-        margin: 0 auto;
-        /* centramos horizontalmente */
-    }
-
-    .trainerSection {
-        flex-direction: column;
-        /* también apilamos en vertical */
-        gap: 20px;
-        padding: 2rem 4%;
-    }
-
     .trainerSection .imageTrainerWrapper,
+    .assistantSection .assistantText,
     .trainerSection .trainerText {
         width: 100%;
         flex: none;
-        text-align: center;
         justify-content: center;
+        text-align: center;
     }
 
+    .imageAssistant,
     .imageTrainer {
         max-width: 90%;
         margin: 0 auto;
     }
 
+    .assistantSection h2,
     .trainerSection h2 {
         margin-top: 1rem;
-
     }
 
+    .assistantText,
     .trainerText {
         padding: 0;
         gap: 1rem;
     }
 
+    .assistantSection p,
     .trainerSection p {
         font-size: 1.2rem;
     }
@@ -581,6 +571,50 @@
     .imageContainer {
         display: none;
         /* opcional: esconder la imagen en pantallas pequeñas */
+    }
+
+    .trainerText p,
+    .assistantText p {
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        /* muestra 5 líneas */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .showMoreBtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.5rem;
+        background: none;
+        border: none;
+        color: #5e96be;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .showMoreBtn:hover {
+        color: #8aa6be;
+    }
+
+    /* cuando el texto está expandido */
+    .expanded p {
+        -webkit-line-clamp: unset;
+        overflow: visible;
+    }
+
+    .showMoreBtn svg {
+        margin-left: 6px;
+        transition: transform 0.3s ease;
+    }
+
+    .expanded .showMoreBtn svg {
+        transform: rotate(180deg);
     }
 
 }

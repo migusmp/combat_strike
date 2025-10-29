@@ -9,6 +9,7 @@ import { useState } from "react";
 import CourseRequirements from "./CourseRequirements";
 import CourseDescription from "./CourseDescription";
 import CourseReviews from "./CourseReviews";
+import CoursePreviewModal from "./CoursePreviewModal";
 
 
 interface DesktopCourseLayoutProps {
@@ -21,6 +22,8 @@ interface DesktopCourseLayoutProps {
 export default function LargeScreenCourseLayout({ course, isSticky, setShowShare, showShare }: DesktopCourseLayoutProps) {
     const courseSelected = courses.find(c => c.id === course.id);
     const [openSections, setOpenSections] = useState<boolean[]>(Array(courseSelected?.content.length || 0).fill(false));
+    const [showModal, setShowModal] = useState(false);
+    const handleClose = () => setShowModal(false);
 
 
     if (!courseSelected) return <p>Curso no encontrado</p>;
@@ -71,7 +74,10 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                             style={{ border: "1px solid #1e1e1e" }}
                         />
                         <div className={styles.overlay}>
-                            <button className={styles.startButton}>
+                            <button
+                                className={styles.startButton}
+                                onClick={() => setShowModal(true)}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="16"
@@ -282,6 +288,19 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                     <button className={stylesLarge.buyCourseButton}>Comprar ahora</button>
                 </div>
             </div>
+            {/* Modal de vista previa del curso */}
+            {showModal && (
+                <CoursePreviewModal
+                    show={true}
+                    onClose={handleClose}
+                    courseTitle={course.title}
+                    videoSrc="/videos/curso-intro.mp4"
+                    videos={[
+                        { title: "Introducción al curso", duration: "3:45" },
+                        { title: "Técnicas de defensa iniciales", duration: "5:12" },
+                    ]}
+                />
+            )}
 
             <Footer />
         </>

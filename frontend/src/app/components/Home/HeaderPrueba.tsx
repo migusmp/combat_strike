@@ -70,8 +70,9 @@ export default function HeaderPrueba({ isLogged, toggleUserMenu }: HeaderProps) 
                     width={70}
                     height={70}
                     src="/assets/logo-blanco-sin-texto-small.webp"
-                    alt="logo"
+                    alt="logotipo de combat strike"
                     style={{ cursor: "pointer" }}
+                    className={styles.logoCombatStrike}
                     onClick={() => router.push("/")}
                 />
 

@@ -1,0 +1,184 @@
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    padding: 1rem;
+    /* evita que toque los bordes en móviles */
+}
+
+.modalContent {
+    background: #111;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    color: white;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.previewLabel {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Video principal */
+.videoWrapper {
+    position: relative;
+    width: 100%;
+    background: black;
+}
+
+.videoPlayer {
+    width: 100%;
+    border: none;
+    display: block;
+    aspect-ratio: 16 / 9;
+    /* mantiene proporción */
+}
+
+/* Título del curso */
+.courseTitle {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Lista de vídeos */
+.videoList {
+    padding: 1rem;
+    border-top: 1px solid #222;
+}
+
+.listHeader {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.videoList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.videoList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1a1a1a;
+    margin-bottom: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.videoList li:hover {
+    background: #272727;
+}
+
+.videoList h4 {
+    font-size: 0.95rem;
+}
+
+.videoList span {
+    font-size: 0.8rem;
+    color: #bbb;
+}
+
+/* ------------------------- */
+/* 📱 ESTILOS PARA MOBILE */
+/* ------------------------- */
+@media (max-width: 768px) {
+    .modalContent {
+        width: 100%;
+        height: 65vh;
+        border-radius: 10px;
+        overflow-y: auto;
+    }
+
+    .modalHeader {
+        padding: 0.8rem 1rem;
+    }
+
+    .previewLabel {
+        font-size: 0.8rem;
+    }
+
+    .closeBtn {
+        font-size: 1.3rem;
+    }
+
+    .courseTitle {
+        font-size: 0.95rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .videoList {
+        padding: 0.8rem;
+    }
+
+    .videoList li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 0.7rem;
+    }
+
+    .videoList h4 {
+        font-size: 0.9rem;
+    }
+
+    .videoList span {
+        font-size: 0.75rem;
+    }
+}
+
+/* ------------------------- */
+/* 💻 ESTILOS PARA DESKTOP */
+/* ------------------------- */
+@media (min-width: 1024px) {
+    .modalContent {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        max-height: 90vh;
+    }
+
+    .videoList {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .videoList::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .videoList::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 4px;
+    }
+
+    .videoList::-webkit-scrollbar-thumb:hover {
+        background: #444;
+    }
+}
