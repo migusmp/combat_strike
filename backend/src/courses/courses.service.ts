@@ -136,6 +136,13 @@ export class CoursesService {
     return this.courseRepository.findCourseById(id);
   }
 
+  /**
+   * Devuelve todos los cursos registrados.
+   */
+  async getAllCourses() {
+    return this.courseRepository.findAllCourses();
+  }
+
   // ----------------------------------------------------------------
   // 🧩 Crear curso en la base de datos
   // ----------------------------------------------------------------

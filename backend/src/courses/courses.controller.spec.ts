@@ -24,6 +24,7 @@ describe('CoursesController', () => {
     generateFullMasterPlaylist: jest.Mock;
     uploadCourse: jest.Mock;
     findCourseById: jest.Mock;
+    getAllCourses: jest.Mock;
   };
   let purchasesServiceMock: {
     hasUserPurchasedCourse: jest.Mock;
@@ -93,6 +94,7 @@ describe('CoursesController', () => {
       generateFullMasterPlaylist: jest.fn(),
       uploadCourse: jest.fn(),
       findCourseById: jest.fn(),
+      getAllCourses: jest.fn(),
     };
 
     purchasesServiceMock = {
@@ -129,6 +131,18 @@ describe('CoursesController', () => {
     expect(res.sendFile).toHaveBeenCalledWith(expectedPath);
 
     accessSpy.mockRestore();
+  });
+
+  it('returns all courses', async () => {
+    const res = responseMock();
+    const data = [{ id: 1, title: 'Course' }];
+    coursesServiceMock.getAllCourses.mockResolvedValue(data);
+
+    await controller.getCourses(res as Response);
+
+    expect(coursesServiceMock.getAllCourses).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+    expect(res.json).toHaveBeenCalledWith(data);
   });
 
   it('throws UnauthorizedException when user is missing in protected route', async () => {

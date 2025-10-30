@@ -53,6 +53,25 @@ export class CoursesController {
     private readonly purchasesService: PurchasesService,
   ) {}
 
+  /**
+   * Obtiene el usuario autenticado desde la request o lanza una excepción si no está presente.
+   *
+   * Este método se utiliza para simplificar la obtención del usuario en rutas protegidas.
+   * Si la cookie o el token no existen (o no se ha pasado por el middleware de autenticación),
+   * lanza automáticamente una excepción `UnauthorizedException`.
+   *
+   * @param req - Objeto `Request` de Express que contiene la información de la solicitud.
+   * @param unauthorizedMessage - Mensaje personalizado para la excepción (opcional).
+   * @returns El objeto `RequestUser` (usuario autenticado).
+   *
+   * @throws `UnauthorizedException` si no existe un usuario autenticado en la request.
+   *
+   * @example
+   * ```ts
+   * const user = this.getUserOrThrow(req);
+   * console.log(user.id); // ID del usuario autenticado
+   * ```
+   */
   private getUserOrThrow(
     req: Request,
     unauthorizedMessage = 'No autorizado',
@@ -64,6 +83,24 @@ export class CoursesController {
     return user;
   }
 
+  /**
+   * Verifica que el usuario autenticado tenga rol de administrador.
+   *
+   * Este método reutiliza `getUserOrThrow` para comprobar que el usuario esté autenticado,
+   * y luego valida que su propiedad `role` sea `'admin'`.
+   * Si el usuario no cumple estas condiciones, lanza una excepción `UnauthorizedException`.
+   *
+   * @param req - Objeto `Request` de Express con los datos del usuario autenticado.
+   * @returns El usuario autenticado con rol de administrador.
+   *
+   * @throws `UnauthorizedException` si el usuario no está autenticado o no es administrador.
+   *
+   * @example
+   * ```ts
+   * const admin = this.ensureAdmin(req);
+   * console.log(admin.role); // "admin"
+   * ```
+   */
   private ensureAdmin(req: Request): RequestUser {
     const user = this.getUserOrThrow(req, 'No autorizado');
     if (user.role !== 'admin') {
@@ -72,6 +109,22 @@ export class CoursesController {
     return user;
   }
 
+  /**
+   * Verifica de forma asíncrona si una ruta o archivo existe en el sistema de archivos.
+   *
+   * Este método utiliza `fs.promises.access()` para comprobar la existencia de un archivo
+   * o carpeta sin lanzar excepciones en caso de error.
+   * Devuelve `true` si la ruta es accesible, `false` si no lo es.
+   *
+   * @param filePath - Ruta absoluta o relativa al archivo o carpeta.
+   * @returns `true` si la ruta existe, `false` en caso contrario.
+   *
+   * @example
+   * ```ts
+   * const exists = await this.pathExists('/uploads/video.mp4');
+   * if (!exists) throw new NotFoundException('Archivo no encontrado');
+   * ```
+   */
   private async pathExists(filePath: string): Promise<boolean> {
     try {
       await fsp.access(filePath);
@@ -149,7 +202,6 @@ export class CoursesController {
     // Crea una ruta absoluta hacia el video dentro del directorio del proyecto
     return path.join(process.cwd(), 'videos', courseId, type, ...segments);
   }
-
   /**
    * Endpoint para comprar un curso
    *
@@ -169,10 +221,7 @@ export class CoursesController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const { id: userId } = this.getUserOrThrow(
-      req,
-      'Usuario no autenticado',
-    );
+    const { id: userId } = this.getUserOrThrow(req, 'Usuario no autenticado');
     const numericCourseId = Number(courseId);
 
     if (!Number.isInteger(numericCourseId) || numericCourseId <= 0) {
@@ -232,6 +281,73 @@ export class CoursesController {
       throw new InternalServerErrorException('Error al procesar la compra');
     }
   }
+
+  /**
+ * 🔹 Endpoint: `GET /courses/get-courses`
+ *
+ * Obtiene la lista completa de cursos disponibles en la base de datos.
+ *
+ * Este método solicita todos los cursos almacenados a través del servicio `CoursesService`
+ * y devuelve los resultados en formato JSON con código de estado **200 OK**.
+ *
+ * Si ocurre algún error interno durante la obtención de los datos (por ejemplo,
+ * un fallo de conexión con la base de datos), lanza una excepción
+ * `InternalServerErrorException` con un mensaje genérico.
+ *
+ * @param res - Objeto `Response` de Express utilizado para devolver la respuesta HTTP.
+ * @returns Una respuesta JSON con la lista de cursos.
+ *
+ * @throws `InternalServerErrorException` si ocurre un error inesperado al obtener los cursos.
+ *
+ * @example
+ * **Solicitud:**
+ * ```http
+ * GET /courses/get-courses
+ * ```
+ *
+ * **Respuesta exitosa (200):**
+ * ```json
+ * [
+ *   {
+ *     "id": 1,
+ *     "title": "Krav Maga: Defensa Personal Intensiva",
+ *     "description": "Curso práctico de defensa personal",
+ *     "price": "59.99",
+ *     "category": "Defensa Personal",
+ *     "rating": 4.8,
+ *     "isNew": true,
+ *     "language": "Español"
+ *   },
+ *   {
+ *     "id": 2,
+ *     "title": "Boxeo Avanzado",
+ *     "description": "Mejora tus técnicas de combate y velocidad",
+ *     "price": "49.99",
+ *     "category": "Deportes de Combate",
+ *     "rating": 4.6,
+ *     "isNew": false,
+ *     "language": "Español"
+ *   }
+ * ]
+ * ```
+ */
+@Get('get-courses')
+async getCourses(@Res() res: Response) {
+  try {
+    // 1️⃣ Obtener todos los cursos de la base de datos mediante el servicio
+    const courses = await this.coursesService.getAllCourses();
+
+    // 2️⃣ Enviar respuesta exitosa con los cursos en formato JSON
+    return res.status(HttpStatus.OK).json(courses);
+  } catch (err) {
+    // 3️⃣ Capturar y registrar errores en consola
+    console.error('Error al obtener cursos:', err);
+
+    // 4️⃣ Lanzar excepción genérica controlada
+    throw new InternalServerErrorException('Error al obtener los cursos');
+  }
+}
+
 
   /**
    * --- PREVIEW PLAYLIST ---

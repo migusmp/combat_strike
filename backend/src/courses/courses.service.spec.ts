@@ -44,6 +44,7 @@ describe('CoursesService', () => {
   const repositoryMock = {
     uploadCourse: jest.fn(),
     deleteCourse: jest.fn(),
+    findAllCourses: jest.fn(),
   };
   const purchasesServiceMock = {
     hasUserPurchasedCourse: jest.fn(),
@@ -104,6 +105,15 @@ describe('CoursesService', () => {
     await service.createCourse(sampleCourse);
 
     expect(repositoryMock.uploadCourse).toHaveBeenCalledWith(sampleCourse);
+  });
+
+  it('returns all courses from the repository', async () => {
+    repositoryMock.findAllCourses.mockResolvedValue([{ id: 1 }]);
+
+    const result = await service.getAllCourses();
+
+    expect(repositoryMock.findAllCourses).toHaveBeenCalled();
+    expect(result).toEqual([{ id: 1 }]);
   });
 
   it('uploads a course and triggers video conversions', async () => {
