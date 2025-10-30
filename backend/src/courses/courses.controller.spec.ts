@@ -1,21 +1,33 @@
-import { ForbiddenException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  HttpStatus,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { promises as fsp } from 'fs';
 import * as path from 'path';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { FullCourseData } from './interfaces/courses.interfaces';
+import { PurchasesService } from 'src/purchases/purchases.service';
 
 describe('CoursesController', () => {
   let controller: CoursesController;
-  let serviceMock: {
+  let coursesServiceMock: {
     userHasAccess: jest.Mock;
     createCourse: jest.Mock;
     convertVideoToHLS: jest.Mock;
     convertFullVideoToHLS: jest.Mock;
     generateFullMasterPlaylist: jest.Mock;
     uploadCourse: jest.Mock;
+    findCourseById: jest.Mock;
+  };
+  let purchasesServiceMock: {
+    hasUserPurchasedCourse: jest.Mock;
+    registerPurchase: jest.Mock;
   };
 
   type MockResponse = Response & {
@@ -73,18 +85,27 @@ describe('CoursesController', () => {
   };
 
   beforeEach(async () => {
-    serviceMock = {
+    coursesServiceMock = {
       userHasAccess: jest.fn(),
       createCourse: jest.fn(),
       convertVideoToHLS: jest.fn(),
       convertFullVideoToHLS: jest.fn(),
       generateFullMasterPlaylist: jest.fn(),
       uploadCourse: jest.fn(),
+      findCourseById: jest.fn(),
+    };
+
+    purchasesServiceMock = {
+      hasUserPurchasedCourse: jest.fn(),
+      registerPurchase: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CoursesController],
-      providers: [{ provide: CoursesService, useValue: serviceMock }],
+      providers: [
+        { provide: CoursesService, useValue: coursesServiceMock },
+        { provide: PurchasesService, useValue: purchasesServiceMock },
+      ],
     }).compile();
 
     controller = module.get<CoursesController>(CoursesController);
@@ -95,7 +116,7 @@ describe('CoursesController', () => {
   });
 
   it('serves the full playlist when the user has access', async () => {
-    serviceMock.userHasAccess.mockResolvedValue(true);
+    coursesServiceMock.userHasAccess.mockResolvedValue(true);
     const accessSpy = jest.spyOn(fsp, 'access').mockResolvedValue(undefined as any);
 
     const req = { user: { id: 42 } } as any;
@@ -104,7 +125,7 @@ describe('CoursesController', () => {
     await controller.getFullPlaylist('10', req, res as Response);
 
     const expectedPath = path.join(process.cwd(), 'videos', '10', 'full', 'full.m3u8');
-    expect(serviceMock.userHasAccess).toHaveBeenCalledWith(42, '10');
+    expect(coursesServiceMock.userHasAccess).toHaveBeenCalledWith(42, '10');
     expect(res.sendFile).toHaveBeenCalledWith(expectedPath);
 
     accessSpy.mockRestore();
@@ -119,7 +140,7 @@ describe('CoursesController', () => {
   });
 
   it('throws ForbiddenException when user lacks access', async () => {
-    serviceMock.userHasAccess.mockResolvedValue(false);
+    coursesServiceMock.userHasAccess.mockResolvedValue(false);
     const req = { user: { id: 13 } } as any;
     const res = responseMock();
 
@@ -129,7 +150,7 @@ describe('CoursesController', () => {
   });
 
   it('uploads course data manually when user is admin', async () => {
-    serviceMock.uploadCourse.mockResolvedValue(undefined);
+    coursesServiceMock.uploadCourse.mockResolvedValue(undefined);
     const req = { user: { role: 'admin' } } as any;
     const res = responseMock();
     const files = {
@@ -139,7 +160,7 @@ describe('CoursesController', () => {
 
     await controller.uploadCourse(files, JSON.stringify(sampleCourse), req, res as Response);
 
-    expect(serviceMock.uploadCourse).toHaveBeenCalledWith(
+    expect(coursesServiceMock.uploadCourse).toHaveBeenCalledWith(
       sampleCourse,
       '/tmp/full.mp4',
       '/tmp/preview.mp4',
@@ -161,7 +182,7 @@ describe('CoursesController', () => {
   });
 
   it('responds with bad request when full video is missing', async () => {
-    serviceMock.uploadCourse.mockResolvedValue(undefined);
+    coursesServiceMock.uploadCourse.mockResolvedValue(undefined);
     const req = { user: { role: 'admin' } } as any;
     const res = responseMock();
     const files = {
@@ -171,14 +192,14 @@ describe('CoursesController', () => {
 
     await controller.uploadCourse(files, JSON.stringify(sampleCourse), req, res as Response);
 
-    expect(serviceMock.uploadCourse).not.toHaveBeenCalled();
+    expect(coursesServiceMock.uploadCourse).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
     expect(res.json).toHaveBeenCalledWith({ message: 'Falta el video completo' });
     consoleSpy.mockRestore();
   });
 
   it('serves a full video playlist with section and video ids', async () => {
-    serviceMock.userHasAccess.mockResolvedValue(true);
+    coursesServiceMock.userHasAccess.mockResolvedValue(true);
     const accessSpy = jest.spyOn(fsp, 'access').mockResolvedValue(undefined as any);
     const req = { user: { id: 1 } } as any;
     const res = responseMock();
@@ -197,5 +218,61 @@ describe('CoursesController', () => {
     expect(res.sendFile).toHaveBeenCalledWith(expectedPath);
 
     accessSpy.mockRestore();
+  });
+
+  describe('buyCourse', () => {
+    const reqWithUser = (overrides: Partial<Request> & { user?: any } = {}): Request =>
+      ({
+        ...overrides,
+        user: overrides.user ?? { id: 5 },
+      } as any);
+
+    it('throws UnauthorizedException when user is missing', async () => {
+      const res = responseMock();
+
+      await expect(
+        controller.buyCourse('1', {} as any, res as Response),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
+    });
+
+    it('throws NotFoundException when course does not exist', async () => {
+      coursesServiceMock.findCourseById.mockResolvedValue(null);
+      const res = responseMock();
+
+      await expect(
+        controller.buyCourse('99', reqWithUser(), res as Response),
+      ).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(coursesServiceMock.findCourseById).toHaveBeenCalledWith(99);
+    });
+
+    it('throws ConflictException when user already purchased the course', async () => {
+      coursesServiceMock.findCourseById.mockResolvedValue({ id: 3, title: 'Curso', price: 10 });
+      purchasesServiceMock.hasUserPurchasedCourse.mockResolvedValue(true);
+      const res = responseMock();
+
+      await expect(
+        controller.buyCourse('3', reqWithUser(), res as Response),
+      ).rejects.toBeInstanceOf(ConflictException);
+
+      expect(purchasesServiceMock.hasUserPurchasedCourse).toHaveBeenCalledWith(5, 3);
+    });
+
+    it('registers purchase and responds with course data when happy path succeeds', async () => {
+      const course = { id: 7, title: 'Curso Avanzado', price: 25 };
+      coursesServiceMock.findCourseById.mockResolvedValue(course);
+      purchasesServiceMock.hasUserPurchasedCourse.mockResolvedValue(false);
+      purchasesServiceMock.registerPurchase.mockResolvedValue(undefined);
+      const res = responseMock();
+
+      await controller.buyCourse('7', reqWithUser(), res as Response);
+
+      expect(purchasesServiceMock.registerPurchase).toHaveBeenCalledWith(5, 7);
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Curso comprado exitosamente',
+        course: { title: course.title, price: course.price },
+      });
+    });
   });
 });

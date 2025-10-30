@@ -15,6 +15,7 @@ import {
   UploadedFiles,
   ConflictException,
   InternalServerErrorException,
+  HttpException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import * as path from 'path';
@@ -185,7 +186,12 @@ export class CoursesController {
         },
       });
     } catch (err) {
-      console.error('Error al procesar la compra:', err);
+      // Si ya es una excepción HTTP (Conflict, NotFound, Unauthorized, etc.)
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      // Si es un error inesperado
       throw new InternalServerErrorException('Error al procesar la compra');
     }
   }
