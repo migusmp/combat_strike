@@ -75,6 +75,15 @@ export class CoursesRepository {
     return this.repo.findOne({ where: { id } });
   }
 
+  /**
+   * Obtiene todos los cursos disponibles.
+   *
+   * @returns Lista de cursos persistidos.
+   */
+  async findAllCourses() {
+    return this.repo.find();
+  }
+
   // -------------------------------------------------
   // 🗑️ Eliminar curso
   // -------------------------------------------------
