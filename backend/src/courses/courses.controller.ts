@@ -16,6 +16,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   HttpException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import * as path from 'path';
@@ -29,6 +30,11 @@ import {
   FileInterceptor,
 } from '@nestjs/platform-express';
 import { PurchasesService } from 'src/purchases/purchases.service';
+
+type RequestUser = {
+  id: number;
+  role?: string;
+};
 
 /**
  * --- CONTROLADOR DE VIDEOS DE PREVISUALIZACIÓN ---
@@ -46,6 +52,34 @@ export class CoursesController {
     private readonly coursesService: CoursesService,
     private readonly purchasesService: PurchasesService,
   ) {}
+
+  private getUserOrThrow(
+    req: Request,
+    unauthorizedMessage = 'No autorizado',
+  ): RequestUser {
+    const user = req.user as RequestUser | undefined;
+    if (!user) {
+      throw new UnauthorizedException(unauthorizedMessage);
+    }
+    return user;
+  }
+
+  private ensureAdmin(req: Request): RequestUser {
+    const user = this.getUserOrThrow(req, 'No autorizado');
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException('No autorizado');
+    }
+    return user;
+  }
+
+  private async pathExists(filePath: string): Promise<boolean> {
+    try {
+      await fsp.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   /**
    * Envía un archivo al cliente si existe en el sistema de archivos.
@@ -87,7 +121,7 @@ export class CoursesController {
    *
    * @param courseId - ID del curso al que pertenece el video.
    * @param type - Tipo de carpeta: puede ser 'preview' (video de muestra) o 'full' (videos del curso completo).
-   * @param filename - Nombre del archivo de video (por ejemplo: "intro.mp4").
+   * @param segments - Partes adicionales de la ruta (por ejemplo: `section1`, `intro.mp4`).
    *
    * @returns Ruta absoluta del archivo de video dentro del proyecto.
    *
@@ -110,10 +144,10 @@ export class CoursesController {
   private getVideoPath(
     courseId: string,
     type: 'preview' | 'full',
-    filename: string,
+    ...segments: string[]
   ): string {
     // Crea una ruta absoluta hacia el video dentro del directorio del proyecto
-    return path.join(process.cwd(), 'videos', courseId, type, filename);
+    return path.join(process.cwd(), 'videos', courseId, type, ...segments);
   }
 
   /**
@@ -135,16 +169,19 @@ export class CoursesController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const user = req.user;
+    const { id: userId } = this.getUserOrThrow(
+      req,
+      'Usuario no autenticado',
+    );
+    const numericCourseId = Number(courseId);
 
-    // 1️⃣ Verificar autenticación
-    if (!user) {
-      throw new UnauthorizedException('Usuario no autenticado');
+    if (!Number.isInteger(numericCourseId) || numericCourseId <= 0) {
+      throw new BadRequestException('Identificador de curso inválido');
     }
 
     try {
       // 2️⃣ Verificar que el curso exista
-      const course = await this.coursesService.findCourseById(Number(courseId));
+      const course = await this.coursesService.findCourseById(numericCourseId);
       if (!course) {
         throw new NotFoundException('Curso no encontrado');
       }
@@ -152,8 +189,8 @@ export class CoursesController {
       // 3️⃣ Comprobar si el usuario ya lo compró
       const alreadyPurchased =
         await this.purchasesService.hasUserPurchasedCourse(
-          user.id,
-          Number(courseId),
+          userId,
+          numericCourseId,
         );
       if (alreadyPurchased) {
         throw new ConflictException('Ya has comprado este curso');
@@ -175,7 +212,7 @@ export class CoursesController {
        */
 
       // 5️⃣ Registrar la compra (sin pago de momento)
-      await this.purchasesService.registerPurchase(user.id, Number(courseId));
+      await this.purchasesService.registerPurchase(userId, numericCourseId);
 
       // 6️⃣ Responder al cliente con éxito
       return res.status(HttpStatus.OK).json({
@@ -273,12 +310,11 @@ export class CoursesController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    if (!req.user) throw new UnauthorizedException('No autorizado');
-
-    const userId = req.user.id;
+    const { id: userId } = this.getUserOrThrow(req);
     const hasAccess = await this.coursesService.userHasAccess(userId, courseId);
-    if (!hasAccess)
+    if (!hasAccess) {
       throw new ForbiddenException('No tienes acceso a este curso');
+    }
 
     const playlistPath = this.getVideoPath(courseId, 'full', 'full.m3u8');
     await this.sendFileIfExists(
@@ -295,12 +331,11 @@ export class CoursesController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    if (!req.user) throw new UnauthorizedException('No autorizado');
-
-    const userId = req.user.id;
+    const { id: userId } = this.getUserOrThrow(req);
     const hasAccess = await this.coursesService.userHasAccess(userId, courseId);
-    if (!hasAccess)
+    if (!hasAccess) {
       throw new ForbiddenException('No tienes acceso a este curso');
+    }
 
     const segmentPath = this.getVideoPath(courseId, 'full', segment);
     await this.sendFileIfExists(
@@ -339,26 +374,21 @@ export class CoursesController {
     @Res() res: Response,
   ): Promise<void> {
     // 1️⃣ Verificar autenticación del usuario
-    if (!req.user) {
-      throw new UnauthorizedException('No autorizado');
-    }
+    const { id: userId } = this.getUserOrThrow(req);
 
     // 2️⃣ Comprobar acceso al curso (usuario debe haberlo comprado)
-    const userId = req.user.id;
     const hasAccess = await this.coursesService.userHasAccess(userId, courseId);
     if (!hasAccess) {
       throw new ForbiddenException('No tienes acceso a este curso');
     }
 
     // 3️⃣ Construir la ruta hacia la playlist del video completo
-    const playlistPath = path.join(
-      process.cwd(), // Ruta base del proyecto
-      'videos', // Carpeta raíz de los videos
-      courseId, // ID del curso
-      'full', // Carpeta que contiene el contenido completo
-      sectionId, // Subcarpeta de la sección
-      videoId, // Subcarpeta del video
-      `${videoId}.m3u8`, // Nombre del archivo de playlist
+    const playlistPath = this.getVideoPath(
+      courseId,
+      'full',
+      sectionId,
+      videoId,
+      `${videoId}.m3u8`,
     );
 
     // 4️⃣ Enviar la playlist si existe o lanzar error si no
@@ -400,27 +430,21 @@ export class CoursesController {
     @Res() res: Response,
   ): Promise<void> {
     // 1️⃣ Verificar autenticación
-    if (!req.user) {
-      throw new UnauthorizedException('No autorizado');
-    }
+    const { id: userId } = this.getUserOrThrow(req);
 
     // 2️⃣ Comprobar si el usuario tiene acceso al curso
-    const userId = req.user.id;
     const hasAccess = await this.coursesService.userHasAccess(userId, courseId);
     if (!hasAccess) {
       throw new ForbiddenException('No tienes acceso a este curso');
     }
 
     // 3️⃣ Construir la ruta absoluta hacia el segmento solicitado
-    // Ejemplo: videos/101/full/section1/video1/segment3.ts
-    const segmentPath = path.join(
-      process.cwd(), // Directorio raíz del proyecto
-      'videos', // Carpeta base de videos
-      courseId, // ID del curso
-      'full', // Carpeta de contenido completo
-      sectionId, // Carpeta de la sección
-      videoId, // Carpeta del video
-      segment, // Nombre del archivo de segmento (.ts)
+    const segmentPath = this.getVideoPath(
+      courseId,
+      'full',
+      sectionId,
+      videoId,
+      segment,
     );
 
     // 4️⃣ Enviar el archivo si existe o lanzar error si no
@@ -479,9 +503,7 @@ export class CoursesController {
     @Res() res: Response, // Response de Express
   ) {
     // 1️⃣ Verificar que el usuario esté autenticado y sea administrador
-    if (!req.user || req.user.role !== 'admin') {
-      throw new UnauthorizedException('No autorizado');
-    }
+    this.ensureAdmin(req);
 
     // 2️⃣ Importar dinámicamente la librería unzipper para extraer ZIPs
     const unzip = require('unzipper');
@@ -518,12 +540,7 @@ export class CoursesController {
 
       // 7️⃣ Buscar video de preview.mp4 (si existe) y convertirlo a HLS
       const previewPath = path.join(extractPath, 'preview.mp4');
-      if (
-        await fsp
-          .access(previewPath)
-          .then(() => true)
-          .catch(() => false)
-      ) {
+      if (await this.pathExists(previewPath)) {
         await this.coursesService.convertVideoToHLS(
           courseId,
           previewPath,
@@ -543,10 +560,7 @@ export class CoursesController {
         const sectionDir = path.join(extractPath, section.sectionTitle);
 
         // Saltar sección si no existe su carpeta
-        const sectionExists = await fsp
-          .access(sectionDir)
-          .then(() => true)
-          .catch(() => false);
+        const sectionExists = await this.pathExists(sectionDir);
         if (!sectionExists) continue;
 
         // 9️⃣ Recorrer cada clase de la sección
@@ -555,10 +569,7 @@ export class CoursesController {
           const videoPath = path.join(sectionDir, videoFileName);
 
           // Si el video existe, convertirlo a HLS
-          const videoExists = await fsp
-            .access(videoPath)
-            .then(() => true)
-            .catch(() => false);
+          const videoExists = await this.pathExists(videoPath);
           if (videoExists) {
             // Generar un identificador limpio y normalizado para la sección
             const sectionId = section.sectionTitle
@@ -695,9 +706,7 @@ export class CoursesController {
     @Res() res: Response, // Objeto Response (para devolver resultado)
   ) {
     // 1️⃣ Verificar autenticación y permisos de administrador
-    if (!req.user || req.user.role !== 'admin') {
-      throw new UnauthorizedException('No autorizado');
-    }
+    this.ensureAdmin(req);
 
     try {
       // 2️⃣ Parsear los datos del curso desde el cuerpo del request

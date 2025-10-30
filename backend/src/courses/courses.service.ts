@@ -17,10 +17,66 @@ const ffmpeg = require('fluent-ffmpeg');
  */
 @Injectable()
 export class CoursesService {
+  private readonly videoRoot = path.join(process.cwd(), 'videos');
+
   constructor(
     private readonly courseRepository: CoursesRepository,
     private readonly purchasesService: PurchasesService,
   ) {}
+
+  private getCoursePath(
+    courseId: number | string,
+    ...segments: string[]
+  ): string {
+    return path.join(this.videoRoot, String(courseId), ...segments);
+  }
+
+  private async ensureDirExists(dir: string): Promise<void> {
+    await fs.mkdir(dir, { recursive: true });
+  }
+
+  private async convertToHls(
+    inputPath: string,
+    playlistPath: string,
+    segmentPattern: string,
+  ): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      ffmpeg(inputPath)
+        .outputOptions([
+          '-profile:v baseline',
+          '-level 3.0',
+          '-start_number 0',
+          '-hls_time 10',
+          '-hls_list_size 0',
+          '-f hls',
+          '-hls_segment_filename',
+          segmentPattern,
+        ])
+        .output(playlistPath)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
+    });
+  }
+
+  private async rewritePlaylistSegments(
+    playlistPath: string,
+    segmentFolder = 'segment',
+  ): Promise<void> {
+    const playlist = await fs.readFile(playlistPath, 'utf8');
+    const updated = playlist
+      .split(/\r?\n/)
+      .map((line) => {
+        if (!line || line.startsWith('#')) return line;
+        const trimmed = line.trim();
+        if (trimmed.includes('/')) return trimmed;
+        if (trimmed.endsWith('.ts')) return `${segmentFolder}/${trimmed}`;
+        return trimmed;
+      })
+      .join('\n');
+
+    await fs.writeFile(playlistPath, updated, 'utf8');
+  }
 
   // ----------------------------------------------------------------
   // 🔐 Verificar si un usuario tiene acceso a un curso
@@ -46,10 +102,15 @@ export class CoursesService {
    * ```
    */
   async userHasAccess(userId: number, courseId: string): Promise<boolean> {
+    const numericCourseId = Number(courseId);
+    if (!Number.isInteger(numericCourseId) || numericCourseId <= 0) {
+      throw new ForbiddenException('No tienes acceso a este curso');
+    }
+
     // 1️⃣ Verificar si el usuario ha comprado el curso
     const hasPurchased = await this.purchasesService.hasUserPurchasedCourse(
       userId,
-      Number(courseId),
+      numericCourseId,
     );
 
     // 2️⃣ Si no lo ha comprado, denegar acceso
@@ -107,7 +168,7 @@ export class CoursesService {
     fullVideoPath: string,
     previewVideoPath?: string,
   ) {
-    const newCourse = await this.courseRepository.uploadCourse(courseData);
+    const newCourse = await this.createCourse(courseData);
 
     try {
       // 1️⃣ Convertir video completo
@@ -141,41 +202,16 @@ export class CoursesService {
     inputPath: string,
     type: 'full' | 'preview',
   ) {
-    const outputDir = path.join(process.cwd(), 'videos', String(courseId), type);
-    await fs.mkdir(outputDir, { recursive: true });
-
+    const outputDir = this.getCoursePath(courseId, type);
+    await this.ensureDirExists(outputDir);
     const playlistPath = path.join(outputDir, `${type}.m3u8`);
     const segmentPattern = path.join(outputDir, 'segment%03d.ts');
 
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg(inputPath)
-        .outputOptions([
-          '-profile:v baseline',
-          '-level 3.0',
-          '-start_number 0',
-          '-hls_time 10',
-          '-hls_list_size 0',
-          '-f hls',
-          '-hls_segment_filename', segmentPattern,
-        ])
-        .output(playlistPath)
-        .on('end', resolve)
-        .on('error', reject)
-        .run();
-    });
+    await this.convertToHls(inputPath, playlistPath, segmentPattern);
 
     // Post-procesar rutas del .m3u8
     try {
-      let playlist = await fs.readFile(playlistPath, 'utf8');
-      const lines = playlist.split(/\r?\n/).map((line) => {
-        if (!line || line.startsWith('#')) return line;
-        const trimmed = line.trim();
-        if (trimmed.includes('/')) return trimmed;
-        if (trimmed.endsWith('.ts')) return `segment/${trimmed}`;
-        return trimmed;
-      });
-
-      await fs.writeFile(playlistPath, lines.join('\n'), 'utf8');
+      await this.rewritePlaylistSegments(playlistPath);
     } catch (err) {
       console.error('Error postprocesando playlist:', err);
       throw err;
@@ -204,47 +240,16 @@ export class CoursesService {
     videoId: string,
     inputPath: string,
   ): Promise<string> {
-    const outputDir = path.join(
-      process.cwd(),
-      'videos',
-      String(courseId),
-      'full',
-      sectionId,
-      videoId,
-    );
-    await fs.mkdir(outputDir, { recursive: true });
-
+    const outputDir = this.getCoursePath(courseId, 'full', sectionId, videoId);
+    await this.ensureDirExists(outputDir);
     const playlistPath = path.join(outputDir, `${videoId}.m3u8`);
     const segmentPattern = path.join(outputDir, `${videoId}_segment%03d.ts`);
 
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg(inputPath)
-        .outputOptions([
-          '-profile:v baseline',
-          '-level 3.0',
-          '-start_number 0',
-          '-hls_time 10',
-          '-hls_list_size 0',
-          '-f hls',
-          '-hls_segment_filename', segmentPattern,
-        ])
-        .output(playlistPath)
-        .on('end', resolve)
-        .on('error', reject)
-        .run();
-    });
+    await this.convertToHls(inputPath, playlistPath, segmentPattern);
 
     // Ajustar rutas dentro de la playlist generada
     try {
-      let playlist = await fs.readFile(playlistPath, 'utf8');
-      const lines = playlist.split(/\r?\n/).map((line) => {
-        if (!line || line.startsWith('#')) return line;
-        const trimmed = line.trim();
-        if (trimmed.includes('/')) return trimmed;
-        if (trimmed.endsWith('.ts')) return `segment/${trimmed}`;
-        return trimmed;
-      });
-      await fs.writeFile(playlistPath, lines.join('\n'), 'utf8');
+      await this.rewritePlaylistSegments(playlistPath);
     } catch (err) {
       console.error('Error postprocesando playlist:', err);
       throw err;
@@ -273,8 +278,8 @@ export class CoursesService {
       throw new Error('No se encontraron videos completos para generar la playlist.');
     }
 
-    const masterDir = path.join(process.cwd(), 'videos', String(courseId), 'full');
-    await fs.mkdir(masterDir, { recursive: true });
+    const masterDir = this.getCoursePath(courseId, 'full');
+    await this.ensureDirExists(masterDir);
 
     const masterPath = path.join(masterDir, 'full.m3u8');
     const masterLines: string[] = [];
