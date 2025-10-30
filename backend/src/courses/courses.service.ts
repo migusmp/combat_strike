@@ -1,53 +1,146 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { FullCourseData } from './interfaces/courses.interfaces';
 import { CoursesRepository } from './courses.repository';
+import { PurchasesService } from 'src/purchases/purchases.service';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 const ffmpeg = require('fluent-ffmpeg');
 
+/**
+ * Servicio principal para la gestión de cursos.
+ *
+ * Contiene toda la lógica de negocio relacionada con los cursos:
+ * - Creación y registro de cursos.
+ * - Conversión de vídeos a formato HLS (.m3u8 y .ts).
+ * - Generación de playlists maestras.
+ * - Verificación de acceso del usuario a cursos comprados.
+ */
 @Injectable()
 export class CoursesService {
-  constructor(private readonly courseRepository: CoursesRepository) { }
-  // Aquí defines si un usuario tiene acceso a un curso
+  constructor(
+    private readonly courseRepository: CoursesRepository,
+    private readonly purchasesService: PurchasesService,
+  ) {}
+
+  // ----------------------------------------------------------------
+  // 🔐 Verificar si un usuario tiene acceso a un curso
+  // ----------------------------------------------------------------
+
+  /**
+   * Comprueba si un usuario tiene acceso autorizado a un curso.
+   *
+   * Este método consulta la base de datos a través del `PurchasesService`
+   * para determinar si el usuario ha comprado el curso especificado.
+   * Si el usuario no tiene acceso, se lanza una excepción `ForbiddenException`.
+   *
+   * @param userId - ID del usuario autenticado.
+   * @param courseId - ID del curso que se desea acceder.
+   * @returns `true` si el usuario tiene acceso autorizado.
+   *
+   * @throws `ForbiddenException` si el usuario no tiene acceso al curso.
+   *
+   * @example
+   * ```ts
+   * const canAccess = await this.userHasAccess(1, '10');
+   * if (!canAccess) throw new ForbiddenException('No tienes acceso a este curso');
+   * ```
+   */
   async userHasAccess(userId: number, courseId: string): Promise<boolean> {
-    // Lógica real: consultar DB si el usuario compró el curso
-    // Por ejemplo:
-    // return await this.courseRepository.hasUserAccess(userId, courseId);
-    return true; // para pruebas
+    // 1️⃣ Verificar si el usuario ha comprado el curso
+    const hasPurchased = await this.purchasesService.hasUserPurchasedCourse(
+      userId,
+      Number(courseId),
+    );
+
+    // 2️⃣ Si no lo ha comprado, denegar acceso
+    if (!hasPurchased) {
+      throw new ForbiddenException('No tienes acceso a este curso');
+    }
+
+    // 3️⃣ Permitir acceso
+    return true;
   }
+
+  // ----------------------------------------------------------------
+  // 🔍 Buscar curso por ID
+  // ----------------------------------------------------------------
+
+  /**
+   * Busca un curso en la base de datos por su identificador.
+   *
+   * @param id - ID del curso.
+   * @returns La entidad del curso si existe, o `null` si no se encuentra.
+   */
   async findCourseById(id: number) {
     return this.courseRepository.findCourseById(id);
   }
 
+  // ----------------------------------------------------------------
+  // 🧩 Crear curso en la base de datos
+  // ----------------------------------------------------------------
+
+  /**
+   * Registra un nuevo curso en la base de datos a partir de los datos completos.
+   *
+   * @param courseData - Objeto con todos los datos del curso.
+   * @returns El curso creado.
+   */
   async createCourse(courseData: FullCourseData) {
     return this.courseRepository.uploadCourse(courseData);
   }
 
+  // ----------------------------------------------------------------
+  // 🎥 Subida y conversión de videos (Full / Preview)
+  // ----------------------------------------------------------------
+
+  /**
+   * Sube un nuevo curso junto con sus videos y los convierte a formato HLS.
+   *
+   * @param courseData - Datos completos del curso.
+   * @param fullVideoPath - Ruta del video principal (completo).
+   * @param previewVideoPath - Ruta opcional del video de vista previa.
+   *
+   * @throws `Error` si falla la conversión de los videos.
+   */
   async uploadCourse(
     courseData: FullCourseData,
     fullVideoPath: string,
     previewVideoPath?: string,
   ) {
-    // 1️⃣ Guardar el curso en la base de datos
     const newCourse = await this.courseRepository.uploadCourse(courseData);
 
     try {
-      // 2️⃣ Convertir el video completo a HLS
+      // 1️⃣ Convertir video completo
       await this.convertVideoToHLS(newCourse.id, fullVideoPath, 'full');
 
-      // 3️⃣ Convertir preview si existe
+      // 2️⃣ Convertir video de preview si existe
       if (previewVideoPath) {
         await this.convertVideoToHLS(newCourse.id, previewVideoPath, 'preview');
       }
     } catch (err) {
-      // opcional: borrar curso de DB si falla la conversión
+      // Si falla la conversión, eliminar el curso creado
       await this.courseRepository.deleteCourse(newCourse.id);
       throw new Error(`Error al convertir video: ${err.message}`);
     }
   }
 
-  // 🧩 Versión simple (ya existente) para preview o un solo video completo
-  async convertVideoToHLS(courseId: number, inputPath: string, type: 'full' | 'preview') {
+  // ----------------------------------------------------------------
+  // 🧩 Conversión genérica de un video (Full o Preview)
+  // ----------------------------------------------------------------
+
+  /**
+   * Convierte un video en formato HLS (.m3u8 + segmentos .ts)
+   * para compatibilidad con streaming adaptativo.
+   *
+   * @param courseId - ID del curso al que pertenece el video.
+   * @param inputPath - Ruta al archivo original (.mp4).
+   * @param type - Tipo de video: `'full'` o `'preview'`.
+   */
+  async convertVideoToHLS(
+    courseId: number,
+    inputPath: string,
+    type: 'full' | 'preview',
+  ) {
     const outputDir = path.join(process.cwd(), 'videos', String(courseId), type);
     await fs.mkdir(outputDir, { recursive: true });
 
@@ -66,12 +159,12 @@ export class CoursesService {
           '-hls_segment_filename', segmentPattern,
         ])
         .output(playlistPath)
-        .on('end', () => resolve())
-        .on('error', (err: any) => reject(err))
+        .on('end', resolve)
+        .on('error', reject)
         .run();
     });
 
-    // Post-procesar el .m3u8 para ajustar rutas
+    // Post-procesar rutas del .m3u8
     try {
       let playlist = await fs.readFile(playlistPath, 'utf8');
       const lines = playlist.split(/\r?\n/).map((line) => {
@@ -89,186 +182,136 @@ export class CoursesService {
     }
   }
 
-  // 🧠 Convierte un video completo (por clase) a formato HLS (.m3u8 y segmentos .ts)
-// Esta función procesa cada video dentro de un curso y lo convierte a un formato 
-// compatible con streaming adaptativo (HLS), generando una carpeta por video.
-async convertFullVideoToHLS(
-  courseId: number,   // ID del curso en la base de datos
-  sectionId: string,  // ID o nombre normalizado de la sección (por ejemplo "defensas-personales")
-  videoId: string,    // ID o nombre normalizado del video (por ejemplo "ataque-frontal")
-  inputPath: string,  // Ruta al archivo de video original (.mp4) que se quiere convertir
-): Promise<string> {
-  
-  // 📁 Define la estructura de carpetas donde se guardará el video convertido.
-  // Ejemplo: videos/12/full/defensas-personales/ataque-frontal/
-  const outputDir = path.join(
-    process.cwd(),
-    'videos',
-    String(courseId),
-    'full',
-    sectionId,
-    videoId,
-  );
+  // ----------------------------------------------------------------
+  // 🎬 Conversión por clase individual (Full Course)
+  // ----------------------------------------------------------------
 
-  // Crea el directorio de salida (si no existe).
-  // La opción { recursive: true } asegura que también se creen las carpetas intermedias.
-  await fs.mkdir(outputDir, { recursive: true });
+  /**
+   * Convierte un video individual (por clase) a formato HLS.
+   *
+   * Genera los archivos `.m3u8` y los segmentos `.ts` en carpetas
+   * organizadas por curso, sección y video.
+   *
+   * @param courseId - ID del curso.
+   * @param sectionId - ID o nombre de la sección.
+   * @param videoId - ID o nombre del video.
+   * @param inputPath - Ruta al archivo original del video.
+   * @returns Ruta al archivo `.m3u8` generado.
+   */
+  async convertFullVideoToHLS(
+    courseId: number,
+    sectionId: string,
+    videoId: string,
+    inputPath: string,
+  ): Promise<string> {
+    const outputDir = path.join(
+      process.cwd(),
+      'videos',
+      String(courseId),
+      'full',
+      sectionId,
+      videoId,
+    );
+    await fs.mkdir(outputDir, { recursive: true });
 
-  // Ruta del archivo de playlist (.m3u8) que genera HLS.
-  const playlistPath = path.join(outputDir, `${videoId}.m3u8`);
+    const playlistPath = path.join(outputDir, `${videoId}.m3u8`);
+    const segmentPattern = path.join(outputDir, `${videoId}_segment%03d.ts`);
 
-  // Patrón que define el nombre de los segmentos de video (.ts) generados por FFmpeg.
-  // %03d indica que se numerarán con 3 dígitos (segment001.ts, segment002.ts, etc.)
-  const segmentPattern = path.join(outputDir, `${videoId}_segment%03d.ts`);
-
-  // 🎬 Lanza el proceso de conversión con FFmpeg
-  // FFmpeg divide el video en pequeños fragmentos de ~10 segundos
-  // y genera un archivo .m3u8 con la lista de reproducción de esos fragmentos.
-  await new Promise<void>((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions([
-        '-profile:v baseline',  // Perfil bajo para compatibilidad amplia (ej. navegadores móviles)
-        '-level 3.0',           // Nivel de compresión (equilibrio entre calidad y compatibilidad)
-        '-start_number 0',      // Empieza numerando los segmentos desde 0
-        '-hls_time 10',         // Duración de cada segmento (en segundos)
-        '-hls_list_size 0',     // Incluye todos los segmentos en la playlist (no limitada)
-        '-f hls',               // Formato de salida: HTTP Live Streaming
-        '-hls_segment_filename', segmentPattern, // Patrón para nombrar los archivos .ts
-      ])
-      .output(playlistPath)     // Archivo de salida principal (.m3u8)
-      .on('end', () => resolve())   // Cuando termina correctamente
-      .on('error', (err: any) => reject(err)) // Si ocurre un error durante la conversión
-      .run();                        // Ejecuta FFmpeg
-  });
-
-  // 🧩 Post-procesamiento de la playlist (.m3u8)
-  // El archivo .m3u8 generado puede contener rutas absolutas o inconsistentes.
-  // Aquí se ajustan los paths para que sean relativos a la carpeta del video.
-  try {
-    // Lee el contenido del archivo de playlist
-    let playlist = await fs.readFile(playlistPath, 'utf8');
-
-    // Recorre cada línea de la playlist y modifica las rutas de los segmentos
-    const lines = playlist.split(/\r?\n/).map((line) => {
-      // Si la línea está vacía o comienza con "#" (metadatos de HLS), no se modifica
-      if (!line || line.startsWith('#')) return line;
-
-      const trimmed = line.trim();
-
-      // Si la línea ya contiene una ruta con "/", se deja igual (ya es relativa o completa)
-      if (trimmed.includes('/')) return trimmed;
-
-      // Si es una referencia a un archivo .ts, se coloca dentro de una carpeta "segment"
-      if (trimmed.endsWith('.ts')) return `segment/${trimmed}`;
-
-      // Si no cumple ninguna condición, se deja sin cambios
-      return trimmed;
+    await new Promise<void>((resolve, reject) => {
+      ffmpeg(inputPath)
+        .outputOptions([
+          '-profile:v baseline',
+          '-level 3.0',
+          '-start_number 0',
+          '-hls_time 10',
+          '-hls_list_size 0',
+          '-f hls',
+          '-hls_segment_filename', segmentPattern,
+        ])
+        .output(playlistPath)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
     });
 
-    // Sobrescribe la playlist con las rutas corregidas
-    await fs.writeFile(playlistPath, lines.join('\n'), 'utf8');
-  } catch (err) {
-    console.error('Error postprocesando playlist:', err);
-    throw err; // Propaga el error para que el proceso de conversión falle correctamente
-  }
-
-  // ✅ Devuelve la ruta del archivo .m3u8 generado, que servirá para el master playlist
-  return playlistPath;
-}
-
-
-  // 🧩 Genera una "playlist maestra" (full.m3u8) que agrupa todos los videos del curso
-// Esta función combina todas las playlists individuales (.m3u8) de cada clase/sección 
-// en una sola lista que representa el curso completo en formato HLS.
-async generateFullMasterPlaylist(
-  courseId: number,  // ID del curso en la base de datos
-  entries: Array<{ 
-    sectionId: string;   // Identificador o nombre de la sección (por ejemplo "defensas-personales")
-    videoId: string;     // Identificador o nombre del video (por ejemplo "ataque-frontal")
-    playlistPath: string; // Ruta absoluta al archivo .m3u8 generado para ese video
-  }>,
-) {
-  // 🚫 Verifica que haya al menos un video procesado
-  if (!entries.length) {
-    throw new Error('No se encontraron videos completos para generar la playlist.');
-  }
-
-  // 📁 Crea el directorio donde se guardará la playlist maestra
-  // Estructura: videos/{courseId}/full/full.m3u8
-  const masterDir = path.join(process.cwd(), 'videos', String(courseId), 'full');
-  await fs.mkdir(masterDir, { recursive: true });
-
-  // Ruta completa del archivo final de playlist maestra
-  const masterPath = path.join(masterDir, 'full.m3u8');
-
-  // Array que contendrá todas las líneas de las playlists individuales
-  const masterLines: string[] = [];
-
-  // Guarda la duración máxima de los segmentos (necesario para la cabecera HLS)
-  let maxDuration = 0;
-
-  // 🔁 Recorre cada playlist generada (una por clase)
-  for (const entry of entries) {
-    // Lee el contenido del archivo .m3u8 correspondiente a la clase
-    const playlist = await fs.readFile(entry.playlistPath, 'utf8');
-
-    // Divide el contenido en líneas individuales
-    const lines = playlist.split(/\r?\n/);
-
-    // Procesa cada línea de la playlist individual
-    for (const line of lines) {
-      if (!line) continue; // Omitir líneas vacías
-
-      // 🎵 Las líneas que comienzan con "#EXTINF" contienen la duración del segmento
-      if (line.startsWith('#EXTINF')) {
-        // Extrae la duración del segmento (número después de ":")
-        const durationStr = line.split(':')[1]?.split(',')[0];
-        const duration = Number(durationStr);
-
-        // Actualiza la duración máxima encontrada (para el header final)
-        if (!Number.isNaN(duration)) {
-          maxDuration = Math.max(maxDuration, Math.ceil(duration));
-        }
-
-        // Añade esta línea de duración al array maestro
-        masterLines.push(line.trim());
-      } 
-      // 📺 Si la línea no empieza con "#", es una ruta a un segmento .ts
-      else if (!line.startsWith('#')) {
+    // Ajustar rutas dentro de la playlist generada
+    try {
+      let playlist = await fs.readFile(playlistPath, 'utf8');
+      const lines = playlist.split(/\r?\n/).map((line) => {
+        if (!line || line.startsWith('#')) return line;
         const trimmed = line.trim();
+        if (trimmed.includes('/')) return trimmed;
+        if (trimmed.endsWith('.ts')) return `segment/${trimmed}`;
+        return trimmed;
+      });
+      await fs.writeFile(playlistPath, lines.join('\n'), 'utf8');
+    } catch (err) {
+      console.error('Error postprocesando playlist:', err);
+      throw err;
+    }
 
-        // Agrega el path completo relativo:
-        // sección/video/segmento.ts
-        // Ejemplo: defensas-personales/ataque-frontal/ataque-frontal_segment001.ts
-        masterLines.push(`${entry.sectionId}/${entry.videoId}/${trimmed}`);
+    return playlistPath;
+  }
+
+  // ----------------------------------------------------------------
+  // 🎵 Generar playlist maestra del curso completo
+  // ----------------------------------------------------------------
+
+  /**
+   * Combina todas las playlists individuales de clases en una playlist maestra `full.m3u8`.
+   *
+   * @param courseId - ID del curso.
+   * @param entries - Lista de secciones, videos y sus rutas `.m3u8`.
+   *
+   * @throws `Error` si no hay videos válidos para incluir.
+   */
+  async generateFullMasterPlaylist(
+    courseId: number,
+    entries: Array<{ sectionId: string; videoId: string; playlistPath: string }>,
+  ) {
+    if (!entries.length) {
+      throw new Error('No se encontraron videos completos para generar la playlist.');
+    }
+
+    const masterDir = path.join(process.cwd(), 'videos', String(courseId), 'full');
+    await fs.mkdir(masterDir, { recursive: true });
+
+    const masterPath = path.join(masterDir, 'full.m3u8');
+    const masterLines: string[] = [];
+    let maxDuration = 0;
+
+    for (const entry of entries) {
+      const playlist = await fs.readFile(entry.playlistPath, 'utf8');
+      const lines = playlist.split(/\r?\n/);
+      for (const line of lines) {
+        if (!line) continue;
+        if (line.startsWith('#EXTINF')) {
+          const durationStr = line.split(':')[1]?.split(',')[0];
+          const duration = Number(durationStr);
+          if (!Number.isNaN(duration)) {
+            maxDuration = Math.max(maxDuration, Math.ceil(duration));
+          }
+          masterLines.push(line.trim());
+        } else if (!line.startsWith('#')) {
+          const trimmed = line.trim();
+          masterLines.push(`${entry.sectionId}/${entry.videoId}/${trimmed}`);
+        }
       }
     }
+
+    if (!masterLines.length) {
+      throw new Error('No se pudieron agregar segmentos a la playlist completa.');
+    }
+
+    const header = [
+      '#EXTM3U',
+      '#EXT-X-VERSION:3',
+      `#EXT-X-TARGETDURATION:${Math.max(1, maxDuration || 10)}`,
+      '#EXT-X-MEDIA-SEQUENCE:0',
+      '#EXT-X-PLAYLIST-TYPE:VOD',
+    ];
+
+    const content = [...header, ...masterLines, '#EXT-X-ENDLIST'].join('\n');
+    await fs.writeFile(masterPath, content, 'utf8');
   }
-
-  // 🚨 Si no se añadió ningún segmento, se lanza error
-  if (!masterLines.length) {
-    throw new Error('No se pudieron agregar segmentos a la playlist completa.');
-  }
-
-  // 🏷️ Cabecera estándar del formato HLS (.m3u8)
-  // Define parámetros globales para toda la lista
-  const header = [
-    '#EXTM3U',                                  // Identificador del formato HLS
-    '#EXT-X-VERSION:3',                         // Versión HLS utilizada
-    `#EXT-X-TARGETDURATION:${Math.max(1, maxDuration || 10)}`, // Duración máxima esperada de cada segmento
-    '#EXT-X-MEDIA-SEQUENCE:0',                  // Primer número de secuencia
-    '#EXT-X-PLAYLIST-TYPE:VOD',                 // Indica que es contenido bajo demanda (Video On Demand)
-  ];
-
-  // 🧾 Combina el encabezado + contenido de todos los segmentos + cierre
-  const content = [
-    ...header,
-    ...masterLines,
-    '#EXT-X-ENDLIST', // Marca el final de la playlist
-  ].join('\n');
-
-  // 💾 Escribe la playlist maestra en disco
-  await fs.writeFile(masterPath, content, 'utf8');
-}
-
 }

@@ -16,15 +16,24 @@ import { LoginDto } from './dto/login.dto';
 import type { Response, Request } from 'express';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
+/**
+ * Exposes REST endpoints that orchestrate authentication flows and cookie-based session handling.
+ */
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Registers a new user and triggers verification e-mail dispatch.
+   */
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
+  /**
+   * Authenticates a user and stores the issued JWT inside an HttpOnly cookie.
+   */
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
@@ -34,11 +43,11 @@ export class AuthController {
 
     res.clearCookie('auth', { path: '/' });
 
-    // Guardamos JWT en cookie HttpOnly
+    // Store the JWT inside an HttpOnly cookie to protect it from client-side scripts
     res.cookie('auth', token, {
       httpOnly: true,
-      secure: false, // true en producción con HTTPS
-      maxAge: 1000 * 60 * 60, // 1 hora
+      secure: false, // Switch to true in production when HTTPS is enforced
+      maxAge: 1000 * 60 * 60, // 1 hour
       sameSite: 'lax',
       path: '/',
     });
@@ -46,16 +55,18 @@ export class AuthController {
     return { message: 'Usuario logueado correctamente' };
   }
 
+  /**
+   * Confirms the verification token sent by e-mail and activates the user account.
+   */
   @Get('verify')
   async verify(@Query('token') token: string) {
     if (!token) {
       throw new BadRequestException('Token inválido');
     }
 
-    // Llamamos al servicio que valida el token
     try {
       const result = await this.authService.verifyUser(token);
-      return result; // { message: 'Cuenta verificada correctamente' }
+      return result;
     } catch (error: unknown) {
       throw new BadRequestException(
         (error as Error).message || 'Error al verificar la cuenta',
@@ -63,13 +74,17 @@ export class AuthController {
     }
   }
 
-  // auth.controller.ts
+  /**
+   * Resends the verification e-mail for accounts that are still pending activation.
+   */
   @Post('resend-verification')
   async resendVerification(@Body('email') email: string) {
     return this.authService.resendVerification(email);
   }
 
-  // Valida si el token en la cookie es válido
+  /**
+   * Validates the cookie-issued JWT and returns the decoded user data.
+   */
   @Get('validate')
   async validate(@Req() req: Request) {
     const token: string = req.cookies['auth'];
@@ -82,6 +97,9 @@ export class AuthController {
     return { isAuthenticated: true, user };
   }
 
+  /**
+   * Initiates the password recovery flow, sending a reset link to the provided e-mail.
+   */
   @Post('forgot-password')
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
     const result = await this.authService.forgotPassword(dto.email);
@@ -91,6 +109,9 @@ export class AuthController {
     return { message: 'Correo de recuperación enviado correctamente.' };
   }
 
+  /**
+   * Resets the password using a previously issued recovery token.
+   */
   @Post('reset-password')
   async resetPassword(
     @Body('token') token: string,
@@ -100,6 +121,9 @@ export class AuthController {
     return { message: 'Contraseña restablecida correctamente.' };
   }
 
+  /**
+   * Removes the authentication cookie and ends the current session.
+   */
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const token = req.cookies['auth'];
@@ -108,7 +132,7 @@ export class AuthController {
       throw new UnauthorizedException('No hay sesión activa');
     }
 
-    // Borramos la cookie 'auth'
+    // Remove the authentication cookie
     res.clearCookie('auth', { path: '/' });
 
     return { message: 'Usuario desconectado correctamente' };

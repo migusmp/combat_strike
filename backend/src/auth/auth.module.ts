@@ -7,9 +7,12 @@ import { VerificationToken } from './entities/verificationToken.entity';
 import { MailService } from '../mail/mail.service';
 import { PasswordResetToken } from './entities/forgotPasswordToken.entity';
 
+/**
+ * AuthModule wires controllers, providers, and persistence dependencies required
+ * to support registration, login, verification, and password recovery features.
+ */
 @Module({
-  imports: [TypeOrmModule.forFeature([User,VerificationToken,PasswordResetToken])
-  ],
+  imports: [TypeOrmModule.forFeature([User, VerificationToken, PasswordResetToken])],
   controllers: [AuthController],
   providers: [AuthService, MailService],
 })
