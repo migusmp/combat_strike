@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
 import { CoursesModule } from './courses/courses.module';
+import { PurchasesService } from './purchases/purchases.service';
+import { PurchasesController } from './purchases/purchases.controller';
+import { PurchasesModule } from './purchases/purchases.module';
 
 @Module({
   imports: [
@@ -32,7 +35,8 @@ import { CoursesModule } from './courses/courses.module';
       },
     }),
     AuthModule,
-    CoursesModule, // módulo de autenticación
+    CoursesModule,
+    PurchasesModule, // módulo de autenticación
   ],
   controllers: [AppController],
   providers: [AppService, MailService],

@@ -15,6 +15,9 @@ export class CoursesService {
     // return await this.courseRepository.hasUserAccess(userId, courseId);
     return true; // para pruebas
   }
+  async findCourseById(id: number) {
+    return this.courseRepository.findCourseById(id);
+  }
 
   async createCourse(courseData: FullCourseData) {
     return this.courseRepository.uploadCourse(courseData);
