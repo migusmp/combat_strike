@@ -1,8 +1,10 @@
+import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as path from 'path';
 import { CoursesService } from './courses.service';
 import { CoursesRepository } from './courses.repository';
 import { FullCourseData } from './interfaces/courses.interfaces';
+import { PurchasesService } from '../purchases/purchases.service';
 
 jest.mock('fs/promises', () => ({
   mkdir: jest.fn(),
@@ -43,6 +45,10 @@ describe('CoursesService', () => {
     uploadCourse: jest.fn(),
     deleteCourse: jest.fn(),
   };
+  const purchasesServiceMock = {
+    hasUserPurchasedCourse: jest.fn(),
+    registerPurchase: jest.fn(),
+  };
 
   const sampleCourse: FullCourseData = {
     title: 'Sample course',
@@ -74,11 +80,14 @@ describe('CoursesService', () => {
     writeFileMock.mockReset();
     rmMock.mockReset();
     fluentFfmpegFactory.mockClear();
+    purchasesServiceMock.hasUserPurchasedCourse.mockReset();
+    purchasesServiceMock.registerPurchase.mockReset();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CoursesService,
         { provide: CoursesRepository, useValue: repositoryMock },
+        { provide: PurchasesService, useValue: purchasesServiceMock },
       ],
     }).compile();
 
@@ -192,5 +201,18 @@ segment/video2_segment000.ts
     expect(masterContent).toContain('#EXT-X-TARGETDURATION:10');
     expect(masterContent).toContain('intro/video1/segment/video1_segment000.ts');
     expect(masterContent).toContain('module-1/video2/segment/video2_segment000.ts');
+  });
+
+  it('confirms user access when purchase exists', async () => {
+    purchasesServiceMock.hasUserPurchasedCourse.mockResolvedValue(true);
+
+    await expect(service.userHasAccess(1, '20')).resolves.toBe(true);
+    expect(purchasesServiceMock.hasUserPurchasedCourse).toHaveBeenCalledWith(1, 20);
+  });
+
+  it('throws ForbiddenException when user lacks purchase', async () => {
+    purchasesServiceMock.hasUserPurchasedCourse.mockResolvedValue(false);
+
+    await expect(service.userHasAccess(2, '15')).rejects.toBeInstanceOf(ForbiddenException);
   });
 });
