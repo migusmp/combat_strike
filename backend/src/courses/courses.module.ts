@@ -6,9 +6,13 @@ import { AuthCookieMiddleware } from './auth-cookie.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Course } from './entities/course.entity';
 import { CoursesRepository } from './courses.repository';
+import { PurchasesModule } from 'src/purchases/purchases.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Course])],
+  imports: [
+    TypeOrmModule.forFeature([Course]),
+    PurchasesModule
+  ],
   controllers: [CoursesController],
   providers: [CoursesService, CoursesRepository],
 })
@@ -30,6 +34,7 @@ export class CoursesModule {
         path: 'courses/:courseId/full/:sectionId/:videoId/segment/:segment',
         method: RequestMethod.GET,
       },
+      { path: 'courses/buy/:courseId', method: RequestMethod.POST },
     );
   }
 }
