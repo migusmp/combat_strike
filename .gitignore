@@ -21,3 +21,5 @@ backend/dist/
 .vscode/
 .idea/
 
+# Videos de los cursos
+backend/videos/*
