@@ -283,71 +283,70 @@ export class CoursesController {
   }
 
   /**
- * 🔹 Endpoint: `GET /courses/get-courses`
- *
- * Obtiene la lista completa de cursos disponibles en la base de datos.
- *
- * Este método solicita todos los cursos almacenados a través del servicio `CoursesService`
- * y devuelve los resultados en formato JSON con código de estado **200 OK**.
- *
- * Si ocurre algún error interno durante la obtención de los datos (por ejemplo,
- * un fallo de conexión con la base de datos), lanza una excepción
- * `InternalServerErrorException` con un mensaje genérico.
- *
- * @param res - Objeto `Response` de Express utilizado para devolver la respuesta HTTP.
- * @returns Una respuesta JSON con la lista de cursos.
- *
- * @throws `InternalServerErrorException` si ocurre un error inesperado al obtener los cursos.
- *
- * @example
- * **Solicitud:**
- * ```http
- * GET /courses/get-courses
- * ```
- *
- * **Respuesta exitosa (200):**
- * ```json
- * [
- *   {
- *     "id": 1,
- *     "title": "Krav Maga: Defensa Personal Intensiva",
- *     "description": "Curso práctico de defensa personal",
- *     "price": "59.99",
- *     "category": "Defensa Personal",
- *     "rating": 4.8,
- *     "isNew": true,
- *     "language": "Español"
- *   },
- *   {
- *     "id": 2,
- *     "title": "Boxeo Avanzado",
- *     "description": "Mejora tus técnicas de combate y velocidad",
- *     "price": "49.99",
- *     "category": "Deportes de Combate",
- *     "rating": 4.6,
- *     "isNew": false,
- *     "language": "Español"
- *   }
- * ]
- * ```
- */
-@Get('get-courses')
-async getCourses(@Res() res: Response) {
-  try {
-    // 1️⃣ Obtener todos los cursos de la base de datos mediante el servicio
-    const courses = await this.coursesService.getAllCourses();
+   * 🔹 Endpoint: `GET /courses/get-courses`
+   *
+   * Obtiene la lista completa de cursos disponibles en la base de datos.
+   *
+   * Este método solicita todos los cursos almacenados a través del servicio `CoursesService`
+   * y devuelve los resultados en formato JSON con código de estado **200 OK**.
+   *
+   * Si ocurre algún error interno durante la obtención de los datos (por ejemplo,
+   * un fallo de conexión con la base de datos), lanza una excepción
+   * `InternalServerErrorException` con un mensaje genérico.
+   *
+   * @param res - Objeto `Response` de Express utilizado para devolver la respuesta HTTP.
+   * @returns Una respuesta JSON con la lista de cursos.
+   *
+   * @throws `InternalServerErrorException` si ocurre un error inesperado al obtener los cursos.
+   *
+   * @example
+   * **Solicitud:**
+   * ```http
+   * GET /courses/get-courses
+   * ```
+   *
+   * **Respuesta exitosa (200):**
+   * ```json
+   * [
+   *   {
+   *     "id": 1,
+   *     "title": "Krav Maga: Defensa Personal Intensiva",
+   *     "description": "Curso práctico de defensa personal",
+   *     "price": "59.99",
+   *     "category": "Defensa Personal",
+   *     "rating": 4.8,
+   *     "isNew": true,
+   *     "language": "Español"
+   *   },
+   *   {
+   *     "id": 2,
+   *     "title": "Boxeo Avanzado",
+   *     "description": "Mejora tus técnicas de combate y velocidad",
+   *     "price": "49.99",
+   *     "category": "Deportes de Combate",
+   *     "rating": 4.6,
+   *     "isNew": false,
+   *     "language": "Español"
+   *   }
+   * ]
+   * ```
+   */
+  @Get('get-courses')
+  async getCourses(@Res() res: Response) {
+    try {
+      // 1️⃣ Obtener todos los cursos de la base de datos mediante el servicio
+      const courses = await this.coursesService.getAllCourses();
 
-    // 2️⃣ Enviar respuesta exitosa con los cursos en formato JSON
-    return res.status(HttpStatus.OK).json(courses);
-  } catch (err) {
-    // 3️⃣ Capturar y registrar errores en consola
-    console.error('Error al obtener cursos:', err);
+      // 2️⃣ Enviar respuesta exitosa con los cursos en formato JSON
+      return res.status(HttpStatus.OK).json(courses);
+    } catch (err) {
+      // 3️⃣ Capturar y registrar errores en consola
+      console.error('Error al obtener cursos:', err);
 
-    // 4️⃣ Lanzar excepción genérica controlada
-    throw new InternalServerErrorException('Error al obtener los cursos');
+      // 4️⃣ Lanzar excepción genérica controlada
+      throw new InternalServerErrorException('Error al obtener los cursos');
+    }
   }
-}
-
 
   /**
    * --- PREVIEW PLAYLIST ---
