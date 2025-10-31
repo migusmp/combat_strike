@@ -1,15 +1,16 @@
-import { Course } from "../interfaces/interfaces";
 import stylesLarge from '../css/CourseLarger.module.css'
 import styles from '../css/Course.module.css'
 import Image from "next/image";
 import Footer from "@/app/components/Home/Footer";
 import ShareModal from "./ShareModal";
-import { courses } from "@/lib/mockData";
-import { useState } from "react";
+// import { courses } from "@/lib/mockData";
+import { useMemo, useState } from "react";
 import CourseRequirements from "./CourseRequirements";
 import CourseDescription from "./CourseDescription";
 import CourseReviews from "./CourseReviews";
 import CoursePreviewModal from "./CoursePreviewModal";
+import { Course } from '@/app/interfaces/courses';
+import { buildPreviewClips } from "../utils/previewClips";
 
 
 interface DesktopCourseLayoutProps {
@@ -20,20 +21,31 @@ interface DesktopCourseLayoutProps {
 }
 
 export default function LargeScreenCourseLayout({ course, isSticky, setShowShare, showShare }: DesktopCourseLayoutProps) {
-    const courseSelected = courses.find(c => c.id === course.id);
-    const [openSections, setOpenSections] = useState<boolean[]>(Array(courseSelected?.content.length || 0).fill(false));
+    const [openSections, setOpenSections] = useState<boolean[]>(
+        Array(course.content.length || 0).fill(false)
+    );
     const [showModal, setShowModal] = useState(false);
     const handleClose = () => setShowModal(false);
+    const previewClips = useMemo(() => {
+        const clips = buildPreviewClips(course);
+        return clips.length
+            ? clips
+            : [{ title: "Vista previa del curso", duration: "" }];
+    }, [course]);
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+    const videoSrc = `${baseUrl}/courses/${course.id}/preview/playlist`;
 
-
-    if (!courseSelected) return <p>Curso no encontrado</p>;
+    // 🧩 ya no necesitas buscar courseSelected ni convertir IDs
 
     // Cálculo de resumen
-    const totalSections = courseSelected.content.length;
-    const totalClasses = courseSelected.content.reduce((sum, section) => sum + section.classes.length, 0);
-    const totalDuration = courseSelected.content.reduce(
+    const totalSections = course.content.length;
+    const totalClasses = course.content.reduce(
+        (sum, section) => sum + section.classes.length,
+        0
+    );
+    const totalDuration = course.content.reduce(
         (acc, section) => {
-            section.classes.forEach(cls => {
+            section.classes.forEach((cls) => {
                 acc.hours += cls.duration.hours;
                 acc.minutes += cls.duration.minutes;
             });
@@ -46,7 +58,7 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
     totalDuration.minutes = totalDuration.minutes % 60;
 
     const toggleSection = (index: number) => {
-        setOpenSections(prev => {
+        setOpenSections((prev) => {
             const newState = [...prev];
             newState[index] = !newState[index];
             return newState;
@@ -221,7 +233,7 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                             </button>
                         </div>
 
-                        {courseSelected.content.map((section, idx) => (
+                        {course.content.map((section, idx) => (
                             <div key={idx} className={styles.courseSection}>
                                 <button
                                     className={styles.sectionHeader}
@@ -266,21 +278,31 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
             <div className={stylesLarge.fixedBottomBar}>
                 <div className={stylesLarge.leftSide}>
                     <h2 className={stylesLarge.courseName}>{course.title}</h2>
-                    <div className={stylesLarge.courseRating}>
-                        {Array.from({ length: 5 }, (_, i) => (
-                            <svg
-                                key={i}
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                fill={i + 1 <= Math.round(course.rating) ? "gold" : "lightgray"}
-                                viewBox="0 0 16 16"
-                            >
-                                <path d="M3.612 15.443c-.396.198-.86-.106-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.186-4.327c.197-.39.73-.39.927 0l2.186 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.114.486-.35.79-.746.592L8 13.187l-4.389 2.256z" />
-                            </svg>
-                        ))}
-                        <span>{course.rating.toFixed(1)} ({course.reviews} valoraciones)</span>
-                    </div>
+
+                    {/* ✅ Mostrar estrellas solo si hay valoraciones reales */}
+                    {course.reviews && course.reviews > 0 ? (
+                        <div className={stylesLarge.courseRating}>
+                            {Array.from({ length: 5 }, (_, i) => (
+                                <svg
+                                    key={i}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill={
+                                        i + 1 <= Math.round(course.rating)
+                                            ? "gold"
+                                            : "lightgray"
+                                    }
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path d="M3.612 15.443c-.396.198-.86-.106-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.186-4.327c.197-.39.73-.39.927 0l2.186 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.114.486-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                                </svg>
+                            ))}
+                            <span>
+                                {course.rating.toFixed(1)} ({course.reviews} valoraciones)
+                            </span>
+                        </div>
+                    ) : null}
                 </div>
 
                 <div className={stylesLarge.rightSide}>
@@ -288,17 +310,15 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                     <button className={stylesLarge.buyCourseButton}>Comprar ahora</button>
                 </div>
             </div>
+
             {/* Modal de vista previa del curso */}
             {showModal && (
                 <CoursePreviewModal
                     show={true}
                     onClose={handleClose}
                     courseTitle={course.title}
-                    videoSrc={`${process.env.NEXT_PUBLIC_API_URL}/courses/8/preview/playlist`}
-                    videos={[
-                        { title: "Introducción al curso", duration: "3:45" },
-                        { title: "Técnicas de defensa iniciales", duration: "5:12" },
-                    ]}
+                    videoSrc={videoSrc}
+                    videos={previewClips}
                 />
             )}
 

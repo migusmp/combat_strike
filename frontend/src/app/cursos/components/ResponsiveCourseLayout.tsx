@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Course } from '../interfaces/interfaces'
 import DesktopCourseLayout from "./DesktopCourseLayout";
 import LargeScreenCourseLayout from "./LargeScreenCourseLayout";
+import { Course } from "@/app/interfaces/courses";
 
 interface ResponsiveCourseLayoutProps {
     course: Course;
