@@ -23,3 +23,4 @@ backend/dist/
 
 # Videos de los cursos
 backend/videos/*
+backend/uploads/*
