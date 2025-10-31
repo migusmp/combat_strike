@@ -9,8 +9,8 @@ import CourseRequirements from "../components/CourseRequirements";
 import CourseDescription from "../components/CourseDescription";
 import CourseReviews from "../components/CourseReviews";
 import ShareModal from "../components/ShareModal";
-import { Course } from "../interfaces/interfaces";
 import Footer from "@/app/components/Home/Footer";
+import { Course } from "@/app/interfaces/courses";
 
 interface DesktopCourseLayoutProps {
     course: Course; // Aquí podrías usar tu tipo Course

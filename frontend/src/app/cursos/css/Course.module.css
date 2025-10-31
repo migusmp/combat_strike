@@ -50,10 +50,13 @@
 }
 
 .courseHeader section p {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     background-color: rgba(255, 255, 255, 0.2);
-    padding: 0.3rem 0.6rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 5px;
 }
 

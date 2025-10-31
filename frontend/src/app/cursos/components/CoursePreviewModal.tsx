@@ -4,13 +4,7 @@
 import { useEffect, useRef } from "react";
 import Hls from "hls.js"; // 📦 Librería para reproducir videos HLS (.m3u8) en navegadores que no lo soportan nativamente.
 import styles from "../css/CoursePreviewModal.module.css"; // 🎨 Importa los estilos del modal.
-
-
-// 🔹 Interfaz para los videos de ejemplo que se muestran en la lista.
-interface Video {
-    title: string;   // Título del video
-    duration: string; // Duración del video (ej: "5:23")
-}
+import { PreviewClip } from "../utils/previewClips";
 
 // 🔹 Interfaz de las propiedades que recibe el componente
 interface CoursePreviewModalProps {
@@ -18,7 +12,7 @@ interface CoursePreviewModalProps {
     onClose: () => void;  // Función que se ejecuta al cerrar el modal
     courseTitle: string;  // Título del curso
     videoSrc: string;     // URL del video HLS (.m3u8)
-    videos: Video[];      // Lista de videos gratuitos
+    videos: PreviewClip[];      // Lista de videos gratuitos
 }
 
 
@@ -75,6 +69,10 @@ export default function CoursePreviewModal({
         };
     }, [show, videoSrc]);
     // 👆 Dependencias: se ejecuta cada vez que "show" o "videoSrc" cambian
+
+    if (!show) {
+        return null;
+    }
 
 
     // 🧱 Renderizado del modal

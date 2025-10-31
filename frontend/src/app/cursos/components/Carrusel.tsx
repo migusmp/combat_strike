@@ -8,7 +8,7 @@ import { Course } from "@/app/interfaces/courses";
 /**
  * Componente Carrusel
  *
- * Muestra los cursos organizados por categorías (Recomendado, Krav Maga, Sprays)
+ * Muestra los cursos organizados por categorías (Todos, Krav Maga, Sprays)
  * obtenidos dinámicamente desde el backend usando el hook `useCourses()`.
  *
  * Incluye:
@@ -18,13 +18,13 @@ import { Course } from "@/app/interfaces/courses";
  */
 export default function Carrusel() {
   // Estado para controlar la pestaña activa
-  const [activeTab, setActiveTab] = useState("Recomendado");
+  const [activeTab, setActiveTab] = useState("Todos");
 
   // Hook personalizado para obtener los cursos desde el backend
   const { courses, isLoading, error } = useCourses();
 
   // Pestañas disponibles en el carrusel
-  const tabs = ["Recomendado", "Krav Maga", "Sprays"];
+  const tabs = ["Todos", "Krav Maga", "Sprays"];
 
   /**
    * Filtra los cursos según la pestaña activa.
@@ -34,8 +34,8 @@ export default function Carrusel() {
     if (!courses) return [];
 
     switch (tab) {
-      case "Recomendado":
-        return courses.filter((c) => c.rating >= 4.5);
+      case "Todos":
+        return courses;
       case "Krav Maga":
         return courses.filter((c) => c.category === "Defensa Personal");
       case "Sprays":
@@ -79,7 +79,7 @@ export default function Carrusel() {
 
       {/* ✅ Encabezado dinámico según la pestaña activa */}
       <h2 className={styles.sectionTitle}>
-        {activeTab === "Recomendado" && "Cursos recomendados"}
+        {activeTab === "Todos" && "Todos los cursos"}
         {activeTab === "Krav Maga" && "Cursos de Krav Maga"}
         {activeTab === "Sprays" && "Cursos de Sprays"}
       </h2>

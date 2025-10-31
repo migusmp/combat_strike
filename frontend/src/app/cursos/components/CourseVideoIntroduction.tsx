@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import CoursePreviewModal from "./CoursePreviewModal";
 import styles from "../css/Course.module.css";
-
-interface Course {
-    image: string;
-    title: string;
-    price: number | string;
-    includes: string[];
-}
+import { Course } from "@/app/interfaces/courses";
+import { buildPreviewClips } from "../utils/previewClips";
 
 interface CourseVideoIntroductionProps {
     course: Course;
@@ -25,6 +20,14 @@ export default function CourseVideoIntroduction({
 }: CourseVideoIntroductionProps) {
     const [showModal, setShowModal] = useState(false);
     const handleClose = () => setShowModal(false);
+    const previewClips = useMemo(() => {
+        const clips = buildPreviewClips(course);
+        return clips.length
+            ? clips
+            : [{ title: "Vista previa del curso", duration: "" }];
+    }, [course]);
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+    const videoSrc = `${baseUrl}/courses/${course.id}/preview/playlist`;
 
     return (
         <>
@@ -70,7 +73,7 @@ export default function CourseVideoIntroduction({
                 <section className={styles.courseIncludes}>
                     <h3>Este curso incluye:</h3>
                     <ul>
-                        {course.includes.map((item: string, idx: number) => (
+                        {course.includes?.map((item: string, idx: number) => (
                             <li key={idx}>{item}</li>
                         ))}
                     </ul>
@@ -100,14 +103,10 @@ export default function CourseVideoIntroduction({
                     show={true}
                     onClose={handleClose}
                     courseTitle={course.title}
-                    videoSrc={`${process.env.NEXT_PUBLIC_API_URL}/courses/8/preview/playlist`}
-                    videos={[
-                        { title: "Introducción al curso", duration: "3:45" },
-                        { title: "Técnicas de defensa iniciales", duration: "5:12" },
-                    ]}
+                    videoSrc={videoSrc}
+                    videos={previewClips}
                 />
             )}
         </>
     );
 }
-
