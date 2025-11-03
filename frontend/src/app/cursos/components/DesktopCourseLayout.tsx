@@ -17,21 +17,34 @@ interface DesktopCourseLayoutProps {
     isSticky: boolean;
     showShare: boolean;
     setShowShare: (val: boolean) => void;
+
+    // Nuevas props para el modal de vista previa
+    setShowPreviewModal: (val: boolean) => void;
+    showPreviewModal: boolean
 }
 
-export default function DesktopCourseLayout({ course, isSticky, setShowShare, showShare }: DesktopCourseLayoutProps) {
+export default function DesktopCourseLayout({ course, isSticky, setShowShare, showShare, setShowPreviewModal, showPreviewModal }: DesktopCourseLayoutProps) {
     return (
         <>
             <main className={styles.courseContainer}>
                 <section className={styles.coursePresentation}>
                     <CourseHeader course={course} />
-                    <CourseVideoIntroduction course={course} isSticky={isSticky} setShowShare={setShowShare} />
+                    <CourseVideoIntroduction
+                        course={course}
+                        isSticky={isSticky}
+                        setShowShare={setShowShare}
+                        showPreviewModal={showPreviewModal}
+                        setShowPreviewModal={setShowPreviewModal}
+                    />
                 </section>
 
                 <WhatYouWillLearn points={course.whatYouWillLearn} />
                 <CourseContent courseId={course.id} />
                 <CourseRequirements requirements={course.requirements} />
-                <CourseDescription text={course.longDescription} maxLength={250} />
+                <CourseDescription
+                    text={course.longDescription}
+                    maxLength={250}
+                />
 
                 {showShare && (
                     <ShareModal

@@ -18,7 +18,8 @@ import {
   HttpException,
   BadRequestException,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import slugify from 'slugify';
+import type { Response, Request } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 import { promises as fsp } from 'fs';
@@ -51,7 +52,7 @@ export class CoursesController {
   constructor(
     private readonly coursesService: CoursesService,
     private readonly purchasesService: PurchasesService,
-  ) {}
+  ) { }
 
   /**
    * Obtiene el usuario autenticado desde la request o lanza una excepción si no está presente.
@@ -81,6 +82,20 @@ export class CoursesController {
       throw new UnauthorizedException(unauthorizedMessage);
     }
     return user;
+  }
+
+  // --- 🔁 Helper recursivo para recorrer subcarpetas ---
+  private async getAllFilesRecursive(dir: string): Promise<string[]> {
+    const entries = await fsp.readdir(dir, { withFileTypes: true });
+    const files = await Promise.all(
+      entries.map(async (entry) => {
+        const fullPath = path.join(dir, entry.name);
+        return entry.isDirectory()
+          ? await this.getAllFilesRecursive(fullPath)
+          : fullPath;
+      }),
+    );
+    return files.flat();
   }
 
   /**
@@ -571,6 +586,41 @@ export class CoursesController {
   }
 
   /**
+   * --- SUBTÍTULOS DE PREVIEW (PÚBLICOS) ---
+   * GET /courses/:courseId/preview/subtitles/:filename
+   */
+  @Get(':courseId/preview/subtitles/:filename')
+  async getPreviewSubtitle(
+    @Param('courseId') courseId: string,
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const filePath = this.getVideoPath(courseId, 'preview', filename);
+    await this.sendFileIfExists(res, filePath, 'Subtítulo de preview no encontrado');
+  }
+
+  /**
+   * --- SUBTÍTULOS DE CURSO COMPLETO (PROTEGIDOS) ---
+   * GET /courses/:courseId/full/:sectionId/:videoId/subtitles/:filename
+   */
+  @Get(':courseId/full/:sectionId/:videoId/subtitles/:filename')
+  async getFullSubtitle(
+    @Param('courseId') courseId: string,
+    @Param('sectionId') sectionId: string,
+    @Param('videoId') videoId: string,
+    @Param('filename') filename: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { id: userId } = this.getUserOrThrow(req);
+    const hasAccess = await this.coursesService.userHasAccess(userId, courseId);
+    if (!hasAccess) throw new ForbiddenException('No tienes acceso a este curso');
+
+    const filePath = this.getVideoPath(courseId, 'full', sectionId, videoId, filename);
+    await this.sendFileIfExists(res, filePath, 'Subtítulo no encontrado');
+  }
+
+  /**
    * --- UPLOAD COURSE ZIP ---
    *
    * Este endpoint permite **subir un curso completo comprimido en formato .zip**.
@@ -604,7 +654,6 @@ export class CoursesController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
-          // 🧩 Define un nombre único para el archivo subido
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, uniqueSuffix + path.extname(file.originalname));
@@ -613,17 +662,13 @@ export class CoursesController {
     }),
   )
   async uploadCourseZip(
-    @UploadedFile() file: Express.Multer.File, // Archivo ZIP recibido
-    @Req() req: Request, // Request de Express
-    @Res() res: Response, // Response de Express
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
+    @Res() res: Response,
   ) {
-    // 1️⃣ Verificar que el usuario esté autenticado y sea administrador
     this.ensureAdmin(req);
-
-    // 2️⃣ Importar dinámicamente la librería unzipper para extraer ZIPs
     const unzip = require('unzipper');
 
-    // 📂 Crear una ruta temporal única dentro de /uploads/tmp/
     const extractPath = path.join(
       process.cwd(),
       'uploads',
@@ -632,10 +677,8 @@ export class CoursesController {
     );
 
     try {
-      // 3️⃣ Crear el directorio temporal (si no existe)
       await fsp.mkdir(extractPath, { recursive: true });
 
-      // 4️⃣ Descomprimir el archivo ZIP en la carpeta temporal
       await new Promise<void>((resolve, reject) => {
         fs.createReadStream(file.path)
           .pipe(unzip.Extract({ path: extractPath }))
@@ -643,105 +686,107 @@ export class CoursesController {
           .on('error', reject);
       });
 
-      // 5️⃣ Leer y parsear el JSON con los datos del curso (courseData.json)
       const courseJsonPath = path.join(extractPath, 'courseData.json');
       const courseData: FullCourseData = JSON.parse(
         await fsp.readFile(courseJsonPath, 'utf-8'),
       );
 
-      // 6️⃣ Crear el curso en la base de datos
       const createdCourse = await this.coursesService.createCourse(courseData);
       const courseId = createdCourse.id;
 
-      // 7️⃣ Buscar video de preview.mp4 (si existe) y convertirlo a HLS
+      // --- PREVIEW ---
       const previewPath = path.join(extractPath, 'preview.mp4');
       if (await this.pathExists(previewPath)) {
-        await this.coursesService.convertVideoToHLS(
-          courseId,
-          previewPath,
-          'preview',
-        );
-      }
+        await this.coursesService.convertVideoToHLS(courseId, previewPath, 'preview');
+        const previewDir = path.join(process.cwd(), 'videos', courseId.toString(), 'preview');
+        await fsp.mkdir(previewDir, { recursive: true });
 
-      // 🗂️ Lista donde se almacenan todas las playlists generadas de los videos
-      const generatedPlaylists: Array<{
-        sectionId: string;
-        videoId: string;
-        playlistPath: string;
-      }> = [];
-
-      // 8️⃣ Recorrer todas las secciones del curso
-      for (const section of courseData.content) {
-        const sectionDir = path.join(extractPath, section.sectionTitle);
-
-        // Saltar sección si no existe su carpeta
-        const sectionExists = await this.pathExists(sectionDir);
-        if (!sectionExists) continue;
-
-        // 9️⃣ Recorrer cada clase de la sección
-        for (const classData of section.classes) {
-          const videoFileName = `${classData.title}.mp4`;
-          const videoPath = path.join(sectionDir, videoFileName);
-
-          // Si el video existe, convertirlo a HLS
-          const videoExists = await this.pathExists(videoPath);
-          if (videoExists) {
-            // Generar un identificador limpio y normalizado para la sección
-            const sectionId = section.sectionTitle
-              .replace(/\s+/g, '-')
-              .toLowerCase();
-
-            // Generar un ID de video seguro y normalizado
-            const videoId = classData.title
-              .replace(/\.[^/.]+$/, '') // elimina extensión si viene incluida
-              .replace(/\s+/g, '-') // espacios → guiones
-              .replace(/[^a-zA-Z0-9-_]/g, '') // elimina caracteres no válidos
-              .toLowerCase();
-
-            // Convertir el video a formato HLS y obtener la ruta de la playlist generada
-            const playlistPath =
-              await this.coursesService.convertFullVideoToHLS(
-                courseId,
-                sectionId,
-                videoId,
-                videoPath,
-              );
-
-            // Guardar info del video convertido para el master.m3u8
-            generatedPlaylists.push({ sectionId, videoId, playlistPath });
-          }
+        const previewFiles = await fsp.readdir(extractPath);
+        const previewVtts = previewFiles.filter(f => f.toLowerCase().endsWith('.vtt'));
+        for (const sub of previewVtts) {
+          await fsp.copyFile(path.join(extractPath, sub), path.join(previewDir, sub));
         }
       }
 
-      // 🔟 Generar la playlist maestra (master.m3u8) si hay videos convertidos
-      if (generatedPlaylists.length) {
-        await this.coursesService.generateFullMasterPlaylist(
-          courseId,
-          generatedPlaylists,
-        );
-      } else {
-        throw new Error(
-          'El archivo ZIP no contiene videos completos para el curso.',
-        );
+      // --- FULL VIDEOS ---
+      const generatedPlaylists: Array<{ sectionId: string; videoId: string; playlistPath: string }> = [];
+
+      for (const section of courseData.content) {
+        const folders = await fsp.readdir(extractPath);
+        const sectionSlug = slugify(section.sectionTitle, { lower: true, strict: true });
+
+        const sectionFolder = folders.find(f => slugify(f, { lower: true, strict: true }) === sectionSlug);
+        if (!sectionFolder) {
+          console.warn(`⚠️ Carpeta no encontrada para sección: ${section.sectionTitle}`);
+          continue;
+        }
+
+        const sectionDir = path.join(extractPath, sectionFolder);
+        const allFiles = await this.getAllFilesRecursive(sectionDir);
+
+        for (const classData of section.classes) {
+          const videoSlug = slugify(classData.title, { lower: true, strict: true });
+
+          const videoFilePath = allFiles.find((p) => {
+            const base = path.parse(p).name;
+            return slugify(base, { lower: true, strict: true }) === videoSlug && p.toLowerCase().endsWith('.mp4');
+          });
+
+          if (!videoFilePath) {
+            console.warn(`⚠️ Video no encontrado para clase: ${classData.title}`);
+            continue;
+          }
+
+          const playlistPath = await this.coursesService.convertFullVideoToHLS(
+            courseId,
+            sectionSlug,
+            videoSlug,
+            videoFilePath,
+          );
+
+          // --- SUBTÍTULOS ---
+          const subtitleDir = path.join(
+            process.cwd(),
+            'videos',
+            courseId.toString(),
+            'full',
+            sectionSlug,
+            videoSlug,
+          );
+          await fsp.mkdir(subtitleDir, { recursive: true });
+
+          const subtitleFiles = allFiles.filter((p) => {
+            if (!p.toLowerCase().endsWith('.vtt')) return false;
+            const base = path.parse(p).name;
+            return slugify(base, { lower: true, strict: true }).includes(videoSlug);
+          });
+
+          if (subtitleFiles.length != 0) {
+            for (const sub of subtitleFiles) {
+              await fsp.copyFile(sub, path.join(subtitleDir, path.basename(sub)));
+            }
+          }
+
+          generatedPlaylists.push({ sectionId: sectionSlug, videoId: videoSlug, playlistPath });
+        }
       }
 
-      // ✅ Respuesta final
+      if (generatedPlaylists.length) {
+        await this.coursesService.generateFullMasterPlaylist(courseId, generatedPlaylists);
+      } else {
+        throw new Error('El archivo ZIP no contiene videos completos para el curso.');
+      }
+
       return res.status(HttpStatus.CREATED).json({
         message: 'Curso subido y procesado correctamente',
         courseId,
       });
     } catch (err) {
-      // ⚠️ Manejo centralizado de errores
       console.error('Error al subir curso:', err);
       return res.status(400).json({ message: err.message });
     } finally {
-      // 🧹 Limpieza final: eliminar carpeta temporal y archivo ZIP
-      await fsp
-        .rm(extractPath, { recursive: true, force: true })
-        .catch(() => undefined);
-      if (file?.path) {
-        await fsp.rm(file.path, { force: true }).catch(() => undefined);
-      }
+      await fsp.rm(extractPath, { recursive: true, force: true }).catch(() => undefined);
+      if (file?.path) await fsp.rm(file.path, { force: true }).catch(() => undefined);
     }
   }
 

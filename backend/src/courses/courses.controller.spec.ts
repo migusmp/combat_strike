@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as fs from 'fs';
 import { promises as fsp } from 'fs';
 import * as path from 'path';
 import { Request, Response } from 'express';
@@ -13,6 +14,18 @@ import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { FullCourseData } from './interfaces/courses.interfaces';
 import { PurchasesService } from 'src/purchases/purchases.service';
+import * as unzipper from 'unzipper';
+
+jest.mock('unzipper', () => ({
+  Extract: jest.fn(),
+}));
+jest.mock('fs', () => {
+  const actualFs = jest.requireActual('fs');
+  return {
+    ...actualFs,
+    createReadStream: jest.fn(),
+  };
+});
 
 describe('CoursesController', () => {
   let controller: CoursesController;
@@ -232,6 +245,225 @@ describe('CoursesController', () => {
     expect(res.sendFile).toHaveBeenCalledWith(expectedPath);
 
     accessSpy.mockRestore();
+  });
+
+  describe('uploadCourseZip', () => {
+    const createZipFile = () =>
+      createFile({
+        fieldname: 'courseZip',
+        path: '/tmp/course.zip',
+        originalname: 'course.zip',
+      });
+
+    const setupExtraction = () => {
+      const extractStream = {
+        on: jest.fn((event: string, handler: () => void) => {
+          if (event === 'close') {
+            handler();
+          }
+          return extractStream;
+        }),
+      };
+      (unzipper.Extract as jest.Mock).mockReturnValue(extractStream);
+      const createReadStreamMock = fs.createReadStream as jest.Mock;
+      createReadStreamMock.mockReturnValue({
+        pipe: jest.fn().mockReturnValue(extractStream),
+      });
+      return { extractStream, createReadStreamMock };
+    };
+
+    it('procesa el zip completo y genera playlists y subtítulos', async () => {
+      const now = 1_700_000_000_000;
+      const dateSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
+      const extractPath = path.join(process.cwd(), 'uploads', 'tmp', String(now));
+      const file = createZipFile();
+      const req = { user: { role: 'admin' } } as any;
+      const res = responseMock();
+
+      const { createReadStreamMock } = setupExtraction();
+
+      const mkdirSpy = jest
+        .spyOn(fsp, 'mkdir')
+        .mockResolvedValue(undefined as any);
+      const rmSpy = jest.spyOn(fsp, 'rm').mockResolvedValue(undefined as any);
+      const accessSpy = jest
+        .spyOn(fsp, 'access')
+        .mockResolvedValue(undefined as any);
+      const readFileSpy = jest
+        .spyOn(fsp, 'readFile')
+        .mockResolvedValueOnce(JSON.stringify(sampleCourse));
+
+      const readdirSpy = jest
+        .spyOn(fsp, 'readdir')
+        .mockImplementation(async (dir: any) => {
+          if (dir === extractPath) {
+            return ['preview.mp4', 'preview_es.vtt', 'Intro'] as any;
+          }
+          throw new Error(`Unexpected readdir path: ${dir}`);
+        });
+
+      const copyFileSpy = jest
+        .spyOn(fsp, 'copyFile')
+        .mockResolvedValue(undefined as any);
+
+      const getAllFilesSpy = jest
+        .spyOn(controller as any, 'getAllFilesRecursive')
+        .mockResolvedValue([
+          path.join(extractPath, 'Intro', 'Welcome.mp4'),
+          path.join(extractPath, 'Intro', 'Welcome-es.vtt'),
+        ]);
+
+      coursesServiceMock.createCourse.mockResolvedValue({ id: 123 });
+      coursesServiceMock.convertVideoToHLS.mockResolvedValue(undefined);
+      coursesServiceMock.convertFullVideoToHLS.mockResolvedValue(
+        '/videos/123/full/intro/welcome/playlist.m3u8',
+      );
+      coursesServiceMock.generateFullMasterPlaylist.mockResolvedValue(
+        undefined,
+      );
+
+      await controller.uploadCourseZip(file, req, res as Response);
+
+      const previewPath = path.join(extractPath, 'preview.mp4');
+      expect(coursesServiceMock.createCourse).toHaveBeenCalledWith(
+        sampleCourse,
+      );
+      expect(coursesServiceMock.convertVideoToHLS).toHaveBeenCalledWith(
+        123,
+        previewPath,
+        'preview',
+      );
+      expect(coursesServiceMock.convertFullVideoToHLS).toHaveBeenCalledWith(
+        123,
+        'intro',
+        'welcome',
+        path.join(extractPath, 'Intro', 'Welcome.mp4'),
+      );
+      expect(coursesServiceMock.generateFullMasterPlaylist).toHaveBeenCalledWith(
+        123,
+        [
+          {
+            sectionId: 'intro',
+            videoId: 'welcome',
+            playlistPath: '/videos/123/full/intro/welcome/playlist.m3u8',
+          },
+        ],
+      );
+
+      expect(copyFileSpy).toHaveBeenCalledWith(
+        path.join(extractPath, 'preview_es.vtt'),
+        path.join(process.cwd(), 'videos', '123', 'preview', 'preview_es.vtt'),
+      );
+      expect(copyFileSpy).toHaveBeenCalledWith(
+        path.join(extractPath, 'Intro', 'Welcome-es.vtt'),
+        path.join(
+          process.cwd(),
+          'videos',
+          '123',
+          'full',
+          'intro',
+          'welcome',
+          'Welcome-es.vtt',
+        ),
+      );
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.CREATED);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Curso subido y procesado correctamente',
+        courseId: 123,
+      });
+      expect(fsp.rm).toHaveBeenCalledWith(extractPath, {
+        recursive: true,
+        force: true,
+      });
+      expect(fsp.rm).toHaveBeenCalledWith(file.path, expect.any(Object));
+      expect(fsp.readdir).toHaveBeenCalledWith(extractPath);
+
+      dateSpy.mockRestore();
+      createReadStreamMock.mockReset();
+      (unzipper.Extract as jest.Mock).mockReset();
+      readdirSpy.mockRestore();
+      getAllFilesSpy.mockRestore();
+      mkdirSpy.mockRestore();
+      rmSpy.mockRestore();
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
+      copyFileSpy.mockRestore();
+    });
+
+    it('rechaza la subida en zip cuando el usuario no es admin', async () => {
+      const file = createZipFile();
+      const req = { user: { role: 'student' } } as any;
+      const res = responseMock();
+
+      await expect(
+        controller.uploadCourseZip(file, req, res as Response),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
+    });
+
+    it('devuelve bad request si el zip no contiene videos completos', async () => {
+      const now = 1_700_000_000_100;
+      const dateSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
+      const extractPath = path.join(process.cwd(), 'uploads', 'tmp', String(now));
+      const file = createZipFile();
+      const req = { user: { role: 'admin' } } as any;
+      const res = responseMock();
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => undefined);
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      const { createReadStreamMock } = setupExtraction();
+
+      const mkdirSpy = jest
+        .spyOn(fsp, 'mkdir')
+        .mockResolvedValue(undefined as any);
+      const rmSpy = jest.spyOn(fsp, 'rm').mockResolvedValue(undefined as any);
+      const accessSpy = jest
+        .spyOn(fsp, 'access')
+        .mockResolvedValue(undefined as any);
+      const readFileSpy = jest
+        .spyOn(fsp, 'readFile')
+        .mockResolvedValueOnce(JSON.stringify(sampleCourse));
+      const readdirSpy = jest
+        .spyOn(fsp, 'readdir')
+        .mockResolvedValue(['preview.mp4', 'Intro'] as any);
+      const getAllFilesSpy = jest
+        .spyOn(controller as any, 'getAllFilesRecursive')
+        .mockResolvedValue([]);
+
+      coursesServiceMock.createCourse.mockResolvedValue({ id: 321 });
+      coursesServiceMock.convertVideoToHLS.mockResolvedValue(undefined);
+      coursesServiceMock.convertFullVideoToHLS.mockResolvedValue(undefined);
+      coursesServiceMock.generateFullMasterPlaylist.mockResolvedValue(
+        undefined,
+      );
+
+      await controller.uploadCourseZip(file, req, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'El archivo ZIP no contiene videos completos para el curso.',
+      });
+      expect(fsp.rm).toHaveBeenCalledWith(extractPath, {
+        recursive: true,
+        force: true,
+      });
+      expect(fsp.rm).toHaveBeenCalledWith(file.path, expect.any(Object));
+      expect(coursesServiceMock.generateFullMasterPlaylist).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+      warnSpy.mockRestore();
+      dateSpy.mockRestore();
+      createReadStreamMock.mockReset();
+      (unzipper.Extract as jest.Mock).mockReset();
+      mkdirSpy.mockRestore();
+      rmSpy.mockRestore();
+      accessSpy.mockRestore();
+      readFileSpy.mockRestore();
+      readdirSpy.mockRestore();
+      getAllFilesSpy.mockRestore();
+    });
   });
 
   describe('buyCourse', () => {

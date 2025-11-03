@@ -277,6 +277,9 @@
     transition-delay: 0.5s;
 }
 
+.showMoreBtn {
+    display: none;
+}
 @media (max-width: 1456px) {
     .trainerSection {
         padding: 1rem 4%;

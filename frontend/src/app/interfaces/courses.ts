@@ -1,4 +1,3 @@
-// 💡 Tipo de datos esperado (puedes importar tu interfaz Course si ya la tienes tipada)
 /**
  * Representa la duración de una clase (en horas y minutos).
  */
@@ -10,6 +9,18 @@ export interface Duration {
 }
 
 /**
+ * Representa un archivo de subtítulos (.vtt) asociado a un video.
+ */
+export interface SubtitleTrack {
+  /** Código del idioma (ej: "es", "en") */
+  lang: string;
+  /** Nombre legible del idioma (ej: "Español", "English") */
+  label: string;
+  /** Nombre del archivo o ruta relativa al .vtt */
+  file: string;
+}
+
+/**
  * Representa una clase individual dentro de una sección del curso.
  */
 export interface Classes {
@@ -17,6 +28,9 @@ export interface Classes {
   title: string;
   /** Duración estimada de la clase */
   duration: Duration;
+
+  /** Lista de subtítulos disponibles para esta clase */
+  subtitles?: SubtitleTrack[];
 }
 
 /**
@@ -106,4 +120,7 @@ export interface Course {
 
   /** Reseñas de los usuarios que han realizado el curso */
   userReviews: UserReview[];
+
+  /** 🔹 Subtítulos del video de preview (ej: Español, Inglés, etc.) */
+  previewSubtitles?: SubtitleTrack[];
 }

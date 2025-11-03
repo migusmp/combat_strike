@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import CoursePreviewModal from "./CoursePreviewModal";
 import styles from "../css/Course.module.css";
@@ -11,15 +11,20 @@ interface CourseVideoIntroductionProps {
     course: Course;
     isSticky: boolean;
     setShowShare: (show: boolean) => void;
+
+    // Nuevas props para el modal de vista previa
+    setShowPreviewModal: (val: boolean) => void;
+    showPreviewModal: boolean
 }
 
 export default function CourseVideoIntroduction({
     course,
     isSticky,
     setShowShare,
+    showPreviewModal,
+    setShowPreviewModal
 }: CourseVideoIntroductionProps) {
-    const [showModal, setShowModal] = useState(false);
-    const handleClose = () => setShowModal(false);
+    const handleClose = () => setShowPreviewModal(false);
     const previewClips = useMemo(() => {
         const clips = buildPreviewClips(course);
         return clips.length
@@ -47,7 +52,7 @@ export default function CourseVideoIntroduction({
                     <div className={styles.overlay}>
                         <button
                             className={styles.startButton}
-                            onClick={() => setShowModal(true)}
+                            onClick={() => setShowPreviewModal(true)}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -98,13 +103,14 @@ export default function CourseVideoIntroduction({
             </div>
 
             {/* Modal de vista previa del curso */}
-            {showModal && (
+            {showPreviewModal && (
                 <CoursePreviewModal
                     show={true}
                     onClose={handleClose}
                     courseTitle={course.title}
                     videoSrc={videoSrc}
                     videos={previewClips}
+                    course={course}
                 />
             )}
         </>
