@@ -132,6 +132,31 @@ export class Course {
   whatYouWillLearn?: string[];
 
   /**
+   * Subtítulos disponibles para el video de previsualización del curso.
+   *
+   * Este campo permite ofrecer soporte multilenguaje en los videos de vista previa,
+   * facilitando la accesibilidad y el entendimiento para usuarios de distintos idiomas.
+   *
+   * Se almacena como un array de objetos JSON, donde cada objeto define:
+   * - `lang`: código o identificador del idioma (por ejemplo, `"es"`, `"en"`, `"fr"`).
+   * - `label`: nombre visible del idioma (por ejemplo, `"Español"`, `"English"`).
+   * - `file`: nombre del archivo `.vtt` correspondiente al idioma (por ejemplo, `"preview_es.vtt"`).
+   *
+   * Ejemplo:
+   * ```json
+   * [
+   *   { "lang": "es", "label": "Español", "file": "preview_es.vtt" },
+   *   { "lang": "en", "label": "English", "file": "preview_en.vtt" }
+   * ]
+   * ```
+   *
+   * El archivo `.vtt` debe estar disponible en la carpeta del curso,
+   * dentro de la subcarpeta `/preview/subtitles/`.
+   */
+  @Column({ type: 'json', nullable: true })
+  previewSubtitles?: Array<{ lang: string; label: string; file: string }>;
+
+  /**
    * Contenido estructurado del curso.
    *
    * Este campo almacena un array de secciones, cada una con sus vídeos y metadatos.

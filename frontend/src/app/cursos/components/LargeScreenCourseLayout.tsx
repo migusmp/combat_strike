@@ -18,14 +18,17 @@ interface DesktopCourseLayoutProps {
     isSticky: boolean;
     showShare: boolean;
     setShowShare: (val: boolean) => void;
+    
+    // Nuevas props para el modal de vista previa
+    setShowPreviewModal: (val: boolean) => void;
+    showPreviewModal: boolean;
 }
 
-export default function LargeScreenCourseLayout({ course, isSticky, setShowShare, showShare }: DesktopCourseLayoutProps) {
+export default function LargeScreenCourseLayout({ course, isSticky, setShowShare, showShare, setShowPreviewModal, showPreviewModal }: DesktopCourseLayoutProps) {
     const [openSections, setOpenSections] = useState<boolean[]>(
         Array(course.content.length || 0).fill(false)
     );
-    const [showModal, setShowModal] = useState(false);
-    const handleClose = () => setShowModal(false);
+    const handleClose = () => setShowPreviewModal(false);
     const previewClips = useMemo(() => {
         const clips = buildPreviewClips(course);
         return clips.length
@@ -88,7 +91,7 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                         <div className={styles.overlay}>
                             <button
                                 className={styles.startButton}
-                                onClick={() => setShowModal(true)}
+                                onClick={() => setShowPreviewModal(true)}
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -312,13 +315,14 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
             </div>
 
             {/* Modal de vista previa del curso */}
-            {showModal && (
+            {showPreviewModal && (
                 <CoursePreviewModal
                     show={true}
                     onClose={handleClose}
                     courseTitle={course.title}
                     videoSrc={videoSrc}
                     videos={previewClips}
+                    courseId={course.id}
                 />
             )}
 

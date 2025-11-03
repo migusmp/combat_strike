@@ -5,6 +5,8 @@ import { useEffect, useRef } from "react";
 import Hls from "hls.js"; // 📦 Librería para reproducir videos HLS (.m3u8) en navegadores que no lo soportan nativamente.
 import styles from "../css/CoursePreviewModal.module.css"; // 🎨 Importa los estilos del modal.
 import { PreviewClip } from "../utils/previewClips";
+import { API_URL } from "@/app/utils/api_url";
+import { Course } from "@/app/interfaces/courses";
 
 // 🔹 Interfaz de las propiedades que recibe el componente
 interface CoursePreviewModalProps {
@@ -13,6 +15,7 @@ interface CoursePreviewModalProps {
     courseTitle: string;  // Título del curso
     videoSrc: string;     // URL del video HLS (.m3u8)
     videos: PreviewClip[];      // Lista de videos gratuitos
+    course: Course;
 }
 
 
@@ -23,6 +26,7 @@ export default function CoursePreviewModal({
     courseTitle,
     videoSrc, // URL al .m3u8
     videos,
+    course
 }: CoursePreviewModalProps) {
     // 🎥 Crea una referencia al elemento <video> para manipularlo directamente.
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -90,11 +94,24 @@ export default function CoursePreviewModal({
                 <div className={styles.videoWrapper}>
                     <video
                         controls
+                        crossOrigin="anonymous"
                         ref={videoRef}
                         className={styles.videoPlayer}
-                    />
+                    >
+                        {course?.previewSubtitles?.map((sub, i) => (
+                            <track
+                                key={i}
+                                kind="subtitles"
+                                src={`${API_URL}/courses/${course.id}/preview/subtitles/${sub.file}`}
+                                srcLang={sub.lang}
+                                label={sub.label}
+                                default={sub.lang === "es"} // Español por defecto
+                            />
+                        ))}
+                    </video>
                     <h3 className={styles.courseTitle}>{courseTitle}</h3>
                 </div>
+
 
                 {/* 🎞️ Lista de videos gratuitos que se muestran debajo */}
                 <div className={styles.videoList}>
