@@ -15,6 +15,7 @@ export interface Classes {
     /** Número de minutos adicionales (0–59). */
     minutes: number;
   };
+  subtitle?: PreviewSubtitle[];
 }
 
 /**
@@ -42,19 +43,33 @@ export interface UserReviews {
   rating: number;
 
   /** Comentario opcional escrito por el usuario. */
-  comment: string;
+  comment?: string;
 }
 
 /**
- * Estructura completa de un curso, utilizada para crear o subir cursos nuevos.
+ * Representa un subtítulo disponible para el video de previsualización del curso.
+ */
+export interface PreviewSubtitle {
+  /** Código o identificador del idioma (por ejemplo, "es", "en"). */
+  lang: string;
+
+  /** Nombre visible del idioma (por ejemplo, "Español", "English"). */
+  label: string;
+
+  /** Nombre del archivo `.vtt` asociado a este idioma. */
+  file: string;
+}
+
+/**
+ * Estructura completa de un curso, utilizada tanto para crear, como para obtener
+ * o actualizar información detallada de un curso en el sistema.
  *
- * Incluye tanto los metadatos del curso (nombre, descripción, categoría, etc.)
- * como el contenido detallado (secciones, clases, requisitos, reseñas, etc.).
- *
- * Esta interfaz suele corresponder al payload enviado al backend
- * al registrar o actualizar un curso.
+ * Esta interfaz está alineada con la entidad `Course` de la base de datos.
  */
 export interface FullCourseData {
+  /** Identificador único del curso. */
+  id?: number;
+
   /** Título del curso. */
   title: string;
 
@@ -62,16 +77,16 @@ export interface FullCourseData {
   description: string;
 
   /** Descripción extendida o detallada. */
-  longDescription: string;
+  longDescription?: string;
 
   /** Ruta o URL de la imagen principal del curso. */
-  image: string;
+  image?: string;
 
   /** Precio del curso (en formato string para incluir decimales). */
   price: string;
 
   /** Lista de temas o tópicos que aborda el curso. */
-  topics: string[];
+  topics?: string[];
 
   /** Categoría a la que pertenece el curso. */
   category: string;
@@ -80,23 +95,38 @@ export interface FullCourseData {
   isSubtitled: boolean;
 
   /** Idioma en el que se imparte el curso. */
-  language: string;
+  language?: string;
 
   /** Indica si el curso es reciente o destacado. */
   isNew: boolean;
 
   /** Lista de elementos incluidos con el curso (por ejemplo, certificado, acceso de por vida, etc.). */
-  includes: string[];
+  includes?: string[];
 
   /** Requisitos previos recomendados para cursarlo. */
-  requirements: string[];
+  requirements?: string[];
 
   /** Habilidades o conocimientos que el usuario adquirirá al completarlo. */
-  whatYouWillLearn: string[];
+  whatYouWillLearn?: string[];
+
+  /** Subtítulos disponibles para el video de previsualización del curso. */
+  previewSubtitles?: PreviewSubtitle[];
 
   /** Estructura del contenido del curso (secciones y clases). */
-  content: ContentCourse[];
+  content?: ContentCourse[];
+
+  /** Valoración media del curso. */
+  rating: number;
+
+  /** Número total de reseñas recibidas. */
+  reviews: number;
 
   /** Reseñas y valoraciones de usuarios. */
-  userReviews: UserReviews[];
+  userReviews?: UserReviews[];
+
+  /** Fecha de creación del curso (generada automáticamente por la base de datos). */
+  created_at?: Date;
+
+  /** Fecha de última actualización del curso (generada automáticamente por la base de datos). */
+  updated_at?: Date;
 }
