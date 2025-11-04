@@ -24,7 +24,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { promises as fsp } from 'fs';
 import { CoursesService } from './courses.service';
-import { FullCourseData } from './interfaces/courses.interfaces';
+import { ContentCourse, FullCourseData } from './interfaces/courses.interfaces';
 import { diskStorage } from 'multer';
 import {
   FileFieldsInterceptor,
@@ -52,7 +52,7 @@ export class CoursesController {
   constructor(
     private readonly coursesService: CoursesService,
     private readonly purchasesService: PurchasesService,
-  ) { }
+  ) {}
 
   /**
    * Obtiene el usuario autenticado desde la request o lanza una excepción si no está presente.
@@ -96,6 +96,67 @@ export class CoursesController {
       }),
     );
     return files.flat();
+  }
+
+  // Helper to map section folders and infer structure when JSON lacks content info.
+  private async discoverSectionFolders(
+    extractPath: string,
+    rootEntries: string[],
+  ): Promise<{
+    folderMap: Map<string, string>;
+    filesCache: Map<string, string[]>;
+    fallbackContent: ContentCourse[];
+  }> {
+    const folderMap = new Map<string, string>();
+    const filesCache = new Map<string, string[]>();
+    const fallbackContent: ContentCourse[] = [];
+
+    for (const entry of rootEntries) {
+      const lowerName = entry.toLowerCase();
+      if (lowerName === 'coursedata.json') continue;
+      if (
+        lowerName.endsWith('.json') ||
+        lowerName.endsWith('.mp4') ||
+        lowerName.endsWith('.mov') ||
+        lowerName.endsWith('.mkv') ||
+        lowerName.endsWith('.vtt') ||
+        lowerName.endsWith('.srt') ||
+        lowerName.startsWith('__macosx')
+      ) {
+        continue;
+      }
+
+      const candidatePath = path.join(extractPath, entry);
+
+      try {
+        const files = await this.getAllFilesRecursive(candidatePath);
+        const sectionSlug = slugify(entry, { lower: true, strict: true });
+        folderMap.set(sectionSlug, entry);
+        filesCache.set(sectionSlug, files);
+
+        const classTitles = Array.from(
+          new Set(
+            files
+              .filter((filePath) => filePath.toLowerCase().endsWith('.mp4'))
+              .map((filePath) => path.parse(filePath).name),
+          ),
+        );
+
+        if (!classTitles.length) continue;
+
+        fallbackContent.push({
+          sectionTitle: entry,
+          classes: classTitles.map((title) => ({
+            title,
+            duration: { hours: 0, minutes: 0 },
+          })),
+        });
+      } catch {
+        // entry is not a directory; ignore
+      }
+    }
+
+    return { folderMap, filesCache, fallbackContent };
   }
 
   /**
@@ -596,7 +657,14 @@ export class CoursesController {
     @Res() res: Response,
   ): Promise<void> {
     const filePath = this.getVideoPath(courseId, 'preview', filename);
-    await this.sendFileIfExists(res, filePath, 'Subtítulo de preview no encontrado');
+    if (filename.endsWith('.vtt')) {
+      res.type('text/vtt');
+    }
+    await this.sendFileIfExists(
+      res,
+      filePath,
+      'Subtítulo de preview no encontrado',
+    );
   }
 
   /**
@@ -614,9 +682,16 @@ export class CoursesController {
   ): Promise<void> {
     const { id: userId } = this.getUserOrThrow(req);
     const hasAccess = await this.coursesService.userHasAccess(userId, courseId);
-    if (!hasAccess) throw new ForbiddenException('No tienes acceso a este curso');
+    if (!hasAccess)
+      throw new ForbiddenException('No tienes acceso a este curso');
 
-    const filePath = this.getVideoPath(courseId, 'full', sectionId, videoId, filename);
+    const filePath = this.getVideoPath(
+      courseId,
+      'full',
+      sectionId,
+      videoId,
+      filename,
+    );
     await this.sendFileIfExists(res, filePath, 'Subtítulo no encontrado');
   }
 
@@ -690,6 +765,12 @@ export class CoursesController {
       const courseData: FullCourseData = JSON.parse(
         await fsp.readFile(courseJsonPath, 'utf-8'),
       );
+      const rootEntries = await fsp.readdir(extractPath);
+      const {
+        folderMap: sectionFolderMap,
+        filesCache: sectionFilesCache,
+        fallbackContent,
+      } = await this.discoverSectionFolders(extractPath, rootEntries);
 
       const createdCourse = await this.coursesService.createCourse(courseData);
       const courseId = createdCourse.id;
@@ -697,43 +778,78 @@ export class CoursesController {
       // --- PREVIEW ---
       const previewPath = path.join(extractPath, 'preview.mp4');
       if (await this.pathExists(previewPath)) {
-        await this.coursesService.convertVideoToHLS(courseId, previewPath, 'preview');
-        const previewDir = path.join(process.cwd(), 'videos', courseId.toString(), 'preview');
+        await this.coursesService.convertVideoToHLS(
+          courseId,
+          previewPath,
+          'preview',
+        );
+        const previewDir = path.join(
+          process.cwd(),
+          'videos',
+          courseId.toString(),
+          'preview',
+        );
         await fsp.mkdir(previewDir, { recursive: true });
 
-        const previewFiles = await fsp.readdir(extractPath);
-        const previewVtts = previewFiles.filter(f => f.toLowerCase().endsWith('.vtt'));
+        const previewVtts = rootEntries.filter((f) =>
+          f.toLowerCase().endsWith('.vtt'),
+        );
         for (const sub of previewVtts) {
-          await fsp.copyFile(path.join(extractPath, sub), path.join(previewDir, sub));
+          await fsp.copyFile(
+            path.join(extractPath, sub),
+            path.join(previewDir, sub),
+          );
         }
       }
 
       // --- FULL VIDEOS ---
-      const generatedPlaylists: Array<{ sectionId: string; videoId: string; playlistPath: string }> = [];
+      const generatedPlaylists: Array<{
+        sectionId: string;
+        videoId: string;
+        playlistPath: string;
+      }> = [];
+      const contentToProcess =
+        courseData.content && courseData.content.length
+          ? courseData.content
+          : fallbackContent;
 
-      for (const section of courseData.content) {
-        const folders = await fsp.readdir(extractPath);
-        const sectionSlug = slugify(section.sectionTitle, { lower: true, strict: true });
+      for (const section of contentToProcess) {
+        const sectionSlug = slugify(section.sectionTitle, {
+          lower: true,
+          strict: true,
+        });
 
-        const sectionFolder = folders.find(f => slugify(f, { lower: true, strict: true }) === sectionSlug);
+        const sectionFolder = sectionFolderMap.get(sectionSlug);
         if (!sectionFolder) {
-          console.warn(`⚠️ Carpeta no encontrada para sección: ${section.sectionTitle}`);
+          console.warn(
+            `⚠️ Carpeta no encontrada para sección: ${section.sectionTitle}`,
+          );
           continue;
         }
 
         const sectionDir = path.join(extractPath, sectionFolder);
-        const allFiles = await this.getAllFilesRecursive(sectionDir);
+        const allFiles =
+          sectionFilesCache.get(sectionSlug) ??
+          (await this.getAllFilesRecursive(sectionDir));
 
         for (const classData of section.classes) {
-          const videoSlug = slugify(classData.title, { lower: true, strict: true });
+          const videoSlug = slugify(classData.title, {
+            lower: true,
+            strict: true,
+          });
 
           const videoFilePath = allFiles.find((p) => {
             const base = path.parse(p).name;
-            return slugify(base, { lower: true, strict: true }) === videoSlug && p.toLowerCase().endsWith('.mp4');
+            return (
+              slugify(base, { lower: true, strict: true }) === videoSlug &&
+              p.toLowerCase().endsWith('.mp4')
+            );
           });
 
           if (!videoFilePath) {
-            console.warn(`⚠️ Video no encontrado para clase: ${classData.title}`);
+            console.warn(
+              `⚠️ Video no encontrado para clase: ${classData.title}`,
+            );
             continue;
           }
 
@@ -758,23 +874,37 @@ export class CoursesController {
           const subtitleFiles = allFiles.filter((p) => {
             if (!p.toLowerCase().endsWith('.vtt')) return false;
             const base = path.parse(p).name;
-            return slugify(base, { lower: true, strict: true }).includes(videoSlug);
+            return slugify(base, { lower: true, strict: true }).includes(
+              videoSlug,
+            );
           });
 
           if (subtitleFiles.length != 0) {
             for (const sub of subtitleFiles) {
-              await fsp.copyFile(sub, path.join(subtitleDir, path.basename(sub)));
+              await fsp.copyFile(
+                sub,
+                path.join(subtitleDir, path.basename(sub)),
+              );
             }
           }
 
-          generatedPlaylists.push({ sectionId: sectionSlug, videoId: videoSlug, playlistPath });
+          generatedPlaylists.push({
+            sectionId: sectionSlug,
+            videoId: videoSlug,
+            playlistPath,
+          });
         }
       }
 
       if (generatedPlaylists.length) {
-        await this.coursesService.generateFullMasterPlaylist(courseId, generatedPlaylists);
+        await this.coursesService.generateFullMasterPlaylist(
+          courseId,
+          generatedPlaylists,
+        );
       } else {
-        throw new Error('El archivo ZIP no contiene videos completos para el curso.');
+        throw new Error(
+          'El archivo ZIP no contiene videos completos para el curso.',
+        );
       }
 
       return res.status(HttpStatus.CREATED).json({
@@ -785,8 +915,11 @@ export class CoursesController {
       console.error('Error al subir curso:', err);
       return res.status(400).json({ message: err.message });
     } finally {
-      await fsp.rm(extractPath, { recursive: true, force: true }).catch(() => undefined);
-      if (file?.path) await fsp.rm(file.path, { force: true }).catch(() => undefined);
+      await fsp
+        .rm(extractPath, { recursive: true, force: true })
+        .catch(() => undefined);
+      if (file?.path)
+        await fsp.rm(file.path, { force: true }).catch(() => undefined);
     }
   }
 

@@ -76,27 +76,26 @@ describe('CoursesController', () => {
     } as Express.Multer.File);
 
   const sampleCourse: FullCourseData = {
-    title: 'Sample course',
-    description: 'Short description',
-    longDescription: 'Long description',
-    image: 'image.jpg',
-    price: '10',
-    topics: ['topic'],
-    category: 'category',
-    isSubtitled: true,
-    language: 'es',
-    isNew: false,
-    includes: ['resource'],
-    requirements: ['req'],
-    whatYouWillLearn: ['skill'],
-    content: [
-      {
-        sectionTitle: 'Intro',
-        classes: [{ title: 'Welcome', duration: { hours: 0, minutes: 5 } }],
-      },
-    ],
-    userReviews: [],
-  };
+  title: "Curso de prueba",
+  description: "Descripción breve del curso",
+  longDescription: "Descripción completa",
+  image: "test.jpg",
+  price: "59.99",
+  topics: ["Tema 1", "Tema 2"],
+  category: "Defensa Personal",
+  isSubtitled: true,
+  language: "Español",
+  isNew: false,
+  includes: ["Acceso de por vida", "Certificado"],
+  requirements: ["Ninguno"],
+  whatYouWillLearn: ["Aprenderás defensa personal"],
+  content: [],
+  userReviews: [],
+  /** 🟢 Campos nuevos requeridos */
+  rating: 0,
+  reviews: 0,
+};
+
 
   beforeEach(async () => {
     coursesServiceMock = {
