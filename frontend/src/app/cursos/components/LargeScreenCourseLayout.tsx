@@ -322,7 +322,7 @@ export default function LargeScreenCourseLayout({ course, isSticky, setShowShare
                     courseTitle={course.title}
                     videoSrc={videoSrc}
                     videos={previewClips}
-                    courseId={course.id}
+                    course={course}
                 />
             )}
 

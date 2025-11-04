@@ -72,9 +72,7 @@ export default function useCourses() {
 
       const data: Course[] = await res.json();
       setCourses(data);
-      console.log('Courses fetched successfully:', data);
     } catch (err: any) {
-      console.error('Error fetching courses:', err);
       setError(err.message || 'Error desconocido al obtener los cursos');
       setCourses([]);
     } finally {
