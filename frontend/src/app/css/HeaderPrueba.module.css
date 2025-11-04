@@ -85,6 +85,10 @@
 .headerMobile {
     display: none;
 }
+.divider {
+    display: flex;
+    gap: 0.5rem;
+}
 
 /* botones */
 /* Botón Iniciar sesión */
@@ -133,7 +137,7 @@
 
 .userMenu {
     position: absolute;
-    top: 85px;
+    top: 50px;
     /* debajo del header */
     right: 20px;
     /* alinea con el icono de usuario */
