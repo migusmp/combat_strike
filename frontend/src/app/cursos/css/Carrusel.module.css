@@ -1,126 +1,181 @@
 .carruselContainer {
-    margin-top: 2rem;
-    padding: 0 3rem;
-    margin-bottom: 3rem;
+  margin: 0;
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  border-radius: 26px;
+  background: linear-gradient(160deg, rgba(4, 9, 32, 0.92), rgba(2, 4, 18, 0.86));
+  border: 1px solid rgba(138, 166, 190, 0.14);
+  box-shadow: 0 30px 55px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 4vw, 2.75rem);
 }
 
 /* Menú superior */
 .menuContainer {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 0.5rem;
+  align-self: center;
+  display: inline-flex;
+  gap: 0.4rem;
+  padding: 0.45rem;
+  border-radius: 999px;
+  background: rgba(2, 6, 25, 0.65);
+  border: 1px solid rgba(138, 166, 190, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .tabButton {
-    background: none;
-    border: none;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #666;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s ease;
-    font-weight: bold;
+  position: relative;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: transparent;
+  color: rgba(216, 226, 255, 0.7);
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease, background 0.3s ease;
 }
 
 .tabButton:hover {
-    color: #000;
+  color: #f5f9ff;
 }
 
 .active {
-    color: #000;
-}
-
-.active::after {
-    content: "";
-    position: absolute;
-    bottom: -0.6rem;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #000;
-    border-radius: 2px;
+  color: #0a1026;
+  background: linear-gradient(130deg, #8aa6be, #5e96be);
+  box-shadow: 0 8px 18px rgba(94, 150, 190, 0.35);
+  transform: translateY(-1px);
 }
 
 /* Grid de cursos */
 .coursesGrid {
-    margin-top: 1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.1rem, 2.5vw, 1.75rem);
+  justify-content: flex-start;
 }
 
 .courseCard {
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    padding: 0rem;
-    text-align: left;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: clamp(260px, 28vw, 320px);
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: linear-gradient(168deg, rgba(5, 82, 147, 0.22), rgba(0, 0, 32, 0.75));
+  border: 1px solid rgba(94, 150, 190, 0.2);
+  color: #f1f5ff;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  flex: 0 0 auto;
 }
 
-/* .courseCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-} */
+.courseCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(138, 166, 190, 0.35), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.courseCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(138, 166, 190, 0.55);
+  box-shadow: 0 22px 44px rgba(4, 9, 32, 0.45);
+}
+
+.courseCard:hover::before {
+  opacity: 1;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+}
 
 .courseImage {
-    width: 100%;
-    /* Ocupa todo el ancho del card */
-    height: 180px;
-    /* Altura fija para todas las imágenes */
-    object-fit: cover;
-    /* Rellena y recorta la imagen sin deformarla */
-    border-radius: 0.2rem;
-    /* Opcional, esquinas redondeadas */
-    margin-bottom: 1rem;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-
 .courseTitle {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #222;
-    margin-bottom: 0.3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f5f8ff;
+  margin: 0;
 }
 
 .courseAuthor {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: rgba(219, 229, 255, 0.8);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .coursePrice {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #000;
+  margin-top: auto;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #8aa6be;
 }
 
 .newCoursesSection {
-    margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  margin-top: clamp(2.5rem, 7vw, 4rem);
 }
 
 .sectionTitle {
-    width: 100%;
-    font-size: 2rem;
-    padding-bottom: 0.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
-    border-bottom: 2px solid #e0e0e0;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #dfe7ff;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(138, 166, 190, 0.2);
+  margin: 0;
 }
 
+@media (max-width: 820px) {
+  .carruselContainer {
+    border-radius: 22px;
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
 
+  .menuContainer {
+    align-self: stretch;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
 
-@media (max-width: 685px) {
-    .carruselContainer {
-        padding: 0.5rem 1.5rem;
-    }
+@media (max-width: 640px) {
+  .tabButton {
+    padding-inline: 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .menuContainer {
+    gap: 0.35rem;
+  }
+
+  .tabButton {
+    flex: 1;
+    text-align: center;
+  }
 }

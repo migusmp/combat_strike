@@ -90,6 +90,7 @@
 
 /* Título */
 .courseTitle {
+  margin: 0;
   padding: 0.8rem 1rem;
   font-size: 1.05rem;
   font-weight: 600;
@@ -160,57 +161,6 @@
 
 
 
-/* 🔁 Corrección para modo horizontal (landscape) en móviles */
-@media screen and (orientation: landscape) and (max-width: 900px) {
-    .previewLabel {
-        display: none;
-    }
-  .modalContent {
-    width: 100vw;
-    height: auto;
-    max-height: none;
-    border-radius: 0;
-    overflow-y: auto; /* ✅ permite hacer scroll si no cabe todo */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-
-  .videoWrapper {
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-  }
-
-  .videoPlayer {
-    width: 100%;
-    height: auto;
-    max-height: 60vh; /* ✅ deja espacio para el menú */
-    border: none;
-  }
-
-  .videoList {
-    padding: 0.8rem 1rem;
-    background: #0d1520;
-    border-top: 1px solid var(--azul-grisaceo);
-    overflow-y: auto;
-    max-height: 35vh; /* ✅ ocupa el resto de la pantalla */
-  }
-
-  .videoList ul {
-    padding-bottom: 0.5rem;
-  }
-
-  .closeBtn {
-    position: absolute;
-    top: 0.7rem;
-    right: 1rem;
-    font-size: 2rem;
-    z-index: 10;
-  }
-}
 
 /* ------------------------- */
 /* 📱 MOBILE */
@@ -249,5 +199,63 @@
 
   .videoList span {
     font-size: 0.75rem;
+  }
+}
+
+/* 🔁 Optimización para modo horizontal (landscape) en móviles */
+@media (max-width: 1000px) and (orientation: landscape) {
+  .modalOverlay {
+    align-items: flex-start;
+    padding: 1.25rem 0.9rem 1.5rem;
+  }
+
+  .modalContent {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    max-height: none;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .modalHeader {
+    padding: 0.9rem 1.2rem;
+  }
+
+  .previewLabel {
+    font-size: 0.85rem;
+  }
+
+  .closeBtn {
+    font-size: 2.2rem;
+  }
+
+  .videoWrapper {
+    width: 100%;
+    background: black;
+    overflow: hidden;
+  }
+
+  .videoPlayer {
+    width: 100%;
+    height: auto;
+  }
+
+  .courseTitle {
+    padding: 0.85rem 1.1rem;
+    font-size: 1.05rem;
+  }
+
+  .videoList {
+    padding: 1.1rem;
+    border-left: none;
+    border-top: 1px solid rgba(17, 24, 39, 0.55);
+    background: var(--dark-bg);
+  }
+
+  .videoList li {
+    padding: 0.7rem 0.85rem;
   }
 }

@@ -109,8 +109,10 @@ export default function CoursePreviewModal({
                             />
                         ))}
                     </video>
-                    <h3 className={styles.courseTitle}>{courseTitle}</h3>
                 </div>
+
+                {/* 📌 Título principal del curso */}
+                <h3 className={styles.courseTitle}>{courseTitle}</h3>
 
 
                 {/* 🎞️ Lista de videos gratuitos que se muestran debajo */}

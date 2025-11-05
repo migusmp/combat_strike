@@ -2,10 +2,10 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import styles from "../../css/LandingPage2.module.css";
-import Link from "next/link";
-import CoursesSection from "./CoursesSection";
 import CollaborationSection from "./CollaborationSection";
 import Footer from "./Footer";
+import useCourses from "@/app/hooks/useCourses";
+import Link from "next/link";
 
 export default function LandingPage2() {
     const trainerRef = useRef<HTMLDivElement>(null);
@@ -15,6 +15,8 @@ export default function LandingPage2() {
 
     const [trainerVisible, setTrainerVisible] = useState(false);
     const [assistantVisible, setAssistantVisible] = useState(false);
+    const { courses, isLoading, error } = useCourses();
+    const featuredCourses = (courses ?? []).slice(0, 3);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -157,10 +159,58 @@ export default function LandingPage2() {
                     </button>
                 </div>
             </section>
-            <CoursesSection />
+            <section className={styles.featuredCourses}>
+                <div className={styles.featuredInner}>
+                    <h2 className={styles.featuredTitle}>Algunos de nuestros cursos</h2>
+                    {isLoading && (
+                        <p className={styles.featuredStatus}>Cargando cursos...</p>
+                    )}
+                    {error && !isLoading && (
+                        <p className={styles.featuredStatus}>Error al cargar cursos: {error}</p>
+                    )}
+                    {!isLoading && !error && featuredCourses.length === 0 && (
+                        <p className={styles.featuredStatus}>No hay cursos disponibles en este momento.</p>
+                    )}
+                    {!isLoading && !error && featuredCourses.length > 0 && (
+                        <div className={styles.featuredGrid}>
+                            {featuredCourses.map(course => (
+                                <Link
+                                    key={course.id}
+                                    href={`/cursos/${course.id}`}
+                                    className={styles.featuredCard}
+                                >
+                                    <div className={styles.featuredImageWrapper}>
+                                        <Image
+                                            src={course.image}
+                                            alt={course.title}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 360px"
+                                            className={styles.featuredImage}
+                                        />
+                                        <span className={styles.featuredCategory}>
+                                            {course.category}
+                                        </span>
+                                    </div>
+                                    <div className={styles.featuredContent}>
+                                        <h3 className={styles.featuredCourseTitle}>{course.title}</h3>
+                                        <p className={styles.featuredDescription}>
+                                            {course.description}
+                                        </p>
+                                        <div className={styles.featuredFooter}>
+                                            <span className={styles.featuredPrice}>
+                                                {course.price} €
+                                            </span>
+                                            <span className={styles.featuredLink}>Ver más</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
             <CollaborationSection />
             <Footer />
         </>
     );
 }
-

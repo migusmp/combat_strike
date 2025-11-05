@@ -87,18 +87,16 @@ export default function Carrusel() {
       {/* 📚 Cursos filtrados según la pestaña */}
       <div className={styles.coursesGrid}>
         {filteredCourses.map((course) => (
-          <Link
-            key={course.id}
-            href={`/cursos/${course.id}`}
-            className={styles.courseCard}
-          >
-            <Image
-              width={200}
-              height={200}
-              src={course.image}
-              alt={course.title}
-              className={styles.courseImage}
-            />
+          <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
+            <div className={styles.imageWrapper}>
+              <Image
+                src={course.image}
+                alt={course.title}
+                fill
+                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
+                className={styles.courseImage}
+              />
+            </div>
             <h3 className={styles.courseTitle}>{course.title}</h3>
             <p className={styles.courseAuthor}>{course.description}</p>
             <p className={styles.coursePrice}>{course.price} €</p>
@@ -112,18 +110,16 @@ export default function Carrusel() {
           <h2 className={styles.sectionTitle}>Defensa Personal</h2>
           <div className={styles.coursesGrid}>
             {personalDefenseCourses.map((course) => (
-              <Link
-                key={course.id}
-                href={`/cursos/${course.id}`}
-                className={styles.courseCard}
-              >
-                <Image
-                  width={200}
-                  height={200}
-                  src={course.image}
-                  alt={course.title}
-                  className={styles.courseImage}
-                />
+              <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
+                <div className={styles.imageWrapper}>
+                  <Image
+                    src={course.image}
+                    alt={course.title}
+                    fill
+                    sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
+                    className={styles.courseImage}
+                  />
+                </div>
                 <h3 className={styles.courseTitle}>{course.title}</h3>
                 <p className={styles.courseAuthor}>{course.description}</p>
                 <p className={styles.coursePrice}>{course.price} €</p>
@@ -139,18 +135,16 @@ export default function Carrusel() {
           <h2 className={styles.sectionTitle}>Sprays</h2>
           <div className={styles.coursesGrid}>
             {sprayCourses.map((course) => (
-              <Link
-                key={course.id}
-                href={`/cursos/${course.id}`}
-                className={styles.courseCard}
-              >
-                <Image
-                  width={200}
-                  height={200}
-                  src={course.image}
-                  alt={course.title}
-                  className={styles.courseImage}
-                />
+              <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
+                <div className={styles.imageWrapper}>
+                  <Image
+                    src={course.image}
+                    alt={course.title}
+                    fill
+                    sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
+                    className={styles.courseImage}
+                  />
+                </div>
                 <h3 className={styles.courseTitle}>{course.title}</h3>
                 <p className={styles.courseAuthor}>{course.description}</p>
                 <p className={styles.coursePrice}>{course.price} €</p>
