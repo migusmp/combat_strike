@@ -146,79 +146,120 @@
   }
 }
 
-/* ESTILOS DE SECCIÓN DE DESCRIPCION DE ENTRENADOR */
-/* ======================= */
-/* TRAINER SECTION */
-/* ======================= */
-.trainerSection {
-  padding: 2rem 8%;
+.teamSection {
+  padding: clamp(3rem, 6vw, 4rem) clamp(1.5rem, 4vw, 3rem);
   display: flex;
   justify-content: center;
+}
+
+.teamCard {
+  width: min(1180px, 92%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(2rem, 4vw, 3rem);
   align-items: center;
-  background-color: #000032;
+  padding: clamp(2.4rem, 5vw, 3.6rem);
+  border-radius: 30px;
+  background: linear-gradient(140deg, rgba(10, 21, 48, 0.88), rgba(4, 9, 22, 0.92));
+  border: 1px solid rgba(91, 213, 255, 0.16);
+  box-shadow: 0 30px 70px rgba(3, 9, 22, 0.55);
+}
+
+.assistantLayout .teamCard {
+  background: linear-gradient(140deg, rgba(30, 36, 74, 0.88), rgba(6, 16, 38, 0.92));
+}
+
+.teamVisual {
+  position: relative;
+  width: min(420px, 100%);
+  aspect-ratio: 3 / 4;
+  border-radius: 32px;
   overflow: hidden;
+  background: radial-gradient(circle at top, rgba(91, 213, 255, 0.22), rgba(8, 18, 38, 0.9));
+  box-shadow: 0 30px 60px rgba(5, 14, 32, 0.65);
+  margin: 0 auto;
 }
 
-/* Imagen entrenador */
-.imageTrainer {
-  max-width: 400px;
-  height: auto;
-  opacity: 0;
-  transform: translateY(40px);
-  filter: blur(8px);
-  transition: all 1s ease-out;
+.teamImage {
+  object-fit: cover;
+  filter: drop-shadow(0 24px 45px rgba(0, 0, 0, 0.45));
 }
 
-/* Texto entrenador */
-.trainerText {
-  padding-left: 4rem;
-  opacity: 0;
+.teamBadge {
+  position: absolute;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  background: rgba(3, 10, 24, 0.8);
+  border: 1px solid rgba(91, 213, 255, 0.25);
+  font-size: 0.78rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.teamContent {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  transform: translateY(40px);
-  filter: blur(8px);
-  transition: all 1s ease-out;
+  gap: 1.2rem;
+  color: rgba(217, 230, 255, 0.88);
 }
 
-.trainerText h2 {
-  text-align: center;
-  font-weight: bold;
-  font-size: 3rem;
+.teamContent h2 {
+  margin: 0;
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+  color: #f7fbff;
 }
 
-.trainerText p {
-  text-align: justify;
-  font-size: 1.6rem;
+.teamContent p {
+  margin: 0;
+  line-height: 1.7;
 }
 
-/* Animación visible */
-.trainerSectionVisible .imageTrainer {
-  opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
-  transition-delay: 0.2s;
+.teamHighlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
 }
 
-.trainerSectionVisible .trainerText {
-  opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
-  transition-delay: 0.5s;
+.teamHighlights li {
+  position: relative;
+  padding-left: 1.4rem;
+  line-height: 1.6;
 }
 
-/* ======================= */
-/* ASSISTANT SECTION */
-/* ======================= */
-.assistantSection {
-  padding: 2rem 8%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #0a0a2f;
-  overflow: hidden;
-  /* Esto hace que la imagen vaya a la derecha */
-  flex-direction: row-reverse;
+.teamHighlights li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5dca0, #cfba7c);
+}
+
+.teamToggle {
+  align-self: flex-start;
+  padding: 0.6rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 213, 255, 0.3);
+  background: rgba(4, 12, 26, 0.75);
+  color: #f5f9ff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.teamToggle:hover {
+  transform: translateY(-2px);
+  border-color: rgba(91, 213, 255, 0.55);
+}
+
+.contentExpanded {
+  gap: 1.4rem;
 }
 
 /* ======================= */

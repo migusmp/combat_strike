@@ -1,15 +1,16 @@
 // app/contact/page.tsx (o ContactPage.tsx)
 "use client";
 import { useState } from "react";
-import styles from "../css/Contact.module.css";
 import Footer from "../components/Home/Footer";
 import Link from "next/link";
+import Image from "next/image";
+import styles from "../css/Contact.module.css";
 
 export default function ContactPage() {
     const [form, setForm] = useState({
         name: "",
         email: "",
-        subject: "",
+        topic: "",
         message: "",
     });
 
@@ -21,68 +22,147 @@ export default function ContactPage() {
         e.preventDefault();
         console.log("Formulario enviado:", form);
         alert("Formulario enviado correctamente!");
-        setForm({ name: "", email: "", subject: "", message: "" });
+        setForm({ name: "", email: "", topic: "", message: "" });
     };
 
     return (
         <>
-            <div className={styles.contactContainer}>
-                <h1>Contacto</h1>
-                <p>Si tienes alguna duda o comentario, completa el formulario y te responderemos pronto.</p>
-                <form className={styles.contactForm} onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Nombre"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Correo electrónico"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
-                    <input
-                        type="text"
-                        name="subject"
-                        placeholder="Asunto"
-                        value={form.subject}
-                        onChange={handleChange}
-                        required
-                    />
-                    <textarea
-                        name="message"
-                        placeholder="Mensaje"
-                        value={form.message}
-                        onChange={handleChange}
-                        required
-                        rows={6}
-                    />
-                    <button type="submit">Enviar</button>
-                </form>
-                <ul>
-                    <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                        <li>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" className="bi bi-instagram" viewBox="0 0 16 16">
-                                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" />
-                            </svg>
-                        </li>
-                    </Link>
-                    <Link href="https://tiktok.com" target="_blank" rel="noopener noreferrer">
-                        <li>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" className="bi bi-tiktok" viewBox="0 0 16 16">
-                                <path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z" />
-                            </svg>
-                        </li>
-                    </Link>
-                </ul>
+            <div className={styles.contactWrapper}>
+                <section className={styles.hero}>
+                    <div className={styles.heroContent}>
+                        <span className={styles.sectionEyebrow}>Hablemos</span>
+                        <h1>¿Listo para entrenar o colaborar con nosotros?</h1>
+                        <p>
+                            Cuéntanos en qué podemos ayudarte. Nuestro equipo responde cada mensaje con la
+                            atención personalizada que mereces.
+                        </p>
+                        <ul className={styles.heroHighlights}>
+                            <li>Asesoría para cursos, talleres y formaciones in-company</li>
+                            <li>Consultas sobre productos tácticos y equipamiento</li>
+                            <li>Colaboraciones con marcas y eventos de defensa personal</li>
+                        </ul>
+                    </div>
+                    <div className={styles.heroVisual}>
+                        <div className={styles.heroVisualFrame}>
+                            <Image
+                                src="/assets/hero-contact.webp"
+                                alt="Equipo de soporte Combat Strike"
+                                fill
+                                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 360px"
+                                className={styles.heroImage}
+                            />
+                            <span className={styles.heroBadge}>Respuesta en menos de 24h</span>
+                        </div>
+                        <div className={styles.heroStats}>
+                            <div>
+                                <strong>+500</strong>
+                                <span>Alumnos contactados</span>
+                            </div>
+                            <div>
+                                <strong>4.9/5</strong>
+                                <span>Satisfacción media</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className={styles.formSection}>
+                    <div className={styles.formCard}>
+                        <h2>Escríbenos</h2>
+                        <p>Completa el formulario y nos pondremos en contacto lo antes posible.</p>
+                        <form className={styles.contactForm} onSubmit={handleSubmit}>
+                            <div className={styles.formGrid}>
+                                <label className={styles.formField}>
+                                    <span>Nombre y apellidos</span>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Ana López"
+                                        value={form.name}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </label>
+                                <label className={styles.formField}>
+                                    <span>Correo electrónico</span>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="ana@email.com"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </label>
+                                <label className={styles.formField}>
+                                    <span>Interés principal</span>
+                                    <input
+                                        type="text"
+                                        name="topic"
+                                        placeholder="Curso, producto o colaboración"
+                                        value={form.topic}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </label>
+                                <label className={`${styles.formField} ${styles.formFieldFull}`}>
+                                    <span>Mensaje</span>
+                                    <textarea
+                                        name="message"
+                                        placeholder="Cuéntanos en qué podemos ayudarte"
+                                        value={form.message}
+                                        onChange={handleChange}
+                                        required
+                                        rows={6}
+                                    />
+                                </label>
+                            </div>
+                            <div className={styles.formActions}>
+                                <button type="submit">Enviar mensaje</button>
+                                <p className={styles.privacyNote}>
+                                    Al enviar aceptas nuestra política de privacidad. Nunca compartiremos tus datos con
+                                    terceros sin tu consentimiento.
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside className={styles.contactInfo}>
+                        <div className={styles.infoCard}>
+                            <h3>Información directa</h3>
+                            <div className={styles.infoGroup}>
+                                <span>Email</span>
+                                <a href="mailto:hola@combatstrike.es">hola@combatstrike.es</a>
+                            </div>
+                            <div className={styles.infoGroup}>
+                                <span>Teléfono</span>
+                                <a href="tel:+34600123456">+34 600 123 456</a>
+                            </div>
+                            <div className={styles.infoGroup}>
+                                <span>Ubicación</span>
+                                <p>Albacete · España</p>
+                            </div>
+                        </div>
+
+                        <div className={styles.socialCard}>
+                            <h3>Síguenos</h3>
+                            <p>Descubre clases, consejos y eventos en nuestras redes.</p>
+                            <div className={styles.socialGrid}>
+                                <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                                    <span>Instagram</span>
+                                </Link>
+                                <Link href="https://tiktok.com" target="_blank" rel="noopener noreferrer">
+                                    <span>TikTok</span>
+                                </Link>
+                                <Link href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                                    <span>YouTube</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
             </div>
             <Footer />
         </>
     );
 }
-

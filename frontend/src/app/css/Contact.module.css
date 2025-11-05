@@ -1,108 +1,356 @@
-/* Contact.module.css */
-/* Contact.module.css */
-
-body {
-    background-color: #fff;
-    /* Fondo blanco */
+.contactWrapper {
+  min-height: 100vh;
+  background:
+      radial-gradient(circle at 18% 10%, rgba(27, 51, 123, 0.25), transparent 45%),
+      radial-gradient(circle at 88% 0%, rgba(6, 152, 205, 0.2), transparent 55%),
+      #020712;
+  color: #f2f6ff;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 6vw, 5rem);
+  padding: clamp(3rem, 7vw, 5rem) 0 4rem;
 }
 
-.contactContainer {
-    max-width: 600px;
-    min-height: 91vh;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: 'Arial', sans-serif;
-    /* Azul muy claro de fondo del formulario */
-    color: #0a1a4f;
-    /* Azul oscuro para texto */
+.hero {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(2rem, 4.5vw, 3.5rem);
+  align-items: center;
 }
 
-.contactContainer ul {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    list-style: none;
-    margin-top: 3rem;
-    align-items: center;
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
 }
 
-.contactContainer ul li {
-    cursor: pointer;
+.sectionEyebrow {
+  align-self: flex-start;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 213, 255, 0.25);
+  background: rgba(91, 213, 255, 0.12);
+  letter-spacing: 0.16rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #bfefff;
 }
 
-
-.contactContainer h1 {
-    margin-top: 4rem;
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    color: #0a1a4f;
-    /* Azul oscuro */
+.heroContent h1 {
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  line-height: 1.15;
+  margin: 0;
 }
 
-.contactContainer p {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #3a4b9c;
-    /* Azul medio */
+.heroContent p {
+  margin: 0;
+  color: rgba(217, 230, 255, 0.82);
+  line-height: 1.7;
+  max-width: 540px;
+}
+
+.heroHighlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.heroHighlights li {
+  position: relative;
+  padding-left: 1.6rem;
+  color: rgba(215, 229, 255, 0.85);
+  line-height: 1.6;
+}
+
+.heroHighlights li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5bd5ff, #80ffe8);
+}
+
+.heroVisual {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.heroVisualFrame {
+  position: relative;
+  width: min(360px, 100%);
+  aspect-ratio: 3 / 4;
+  border-radius: 28px;
+  overflow: hidden;
+  background: radial-gradient(circle at top, rgba(91, 213, 255, 0.22), rgba(8, 18, 38, 0.9));
+  box-shadow: 0 30px 60px rgba(5, 14, 32, 0.65);
+}
+
+.heroImage {
+  object-fit: cover;
+  filter: drop-shadow(0 24px 45px rgba(0, 0, 0, 0.45));
+}
+
+.heroBadge {
+  position: absolute;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  background: rgba(3, 10, 24, 0.8);
+  border: 1px solid rgba(91, 213, 255, 0.25);
+  font-size: 0.78rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.heroStats {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.heroStats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: 16px;
+  background: rgba(5, 15, 32, 0.7);
+  border: 1px solid rgba(91, 213, 255, 0.22);
+  min-width: 130px;
+  text-align: center;
+}
+
+.heroStats strong {
+  font-size: 1.75rem;
+  color: #5bd5ff;
+}
+
+.heroStats span {
+  font-size: 0.82rem;
+  color: rgba(215, 229, 255, 0.75);
+}
+
+.formSection {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(2rem, 4.5vw, 3.5rem);
+  align-items: stretch;
+}
+
+.formCard {
+  padding: clamp(2.4rem, 5vw, 3.4rem);
+  border-radius: 28px;
+  background: linear-gradient(140deg, rgba(10, 21, 48, 0.85), rgba(6, 11, 27, 0.92));
+  border: 1px solid rgba(91, 213, 255, 0.18);
+  box-shadow: 0 26px 65px rgba(4, 11, 26, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.formCard h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+}
+
+.formCard p {
+  margin: 0;
+  color: rgba(214, 227, 255, 0.78);
+  line-height: 1.6;
 }
 
 .contactForm {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
 }
 
-.contactForm input,
-.contactForm textarea {
-    padding: 0.75rem 1rem;
-    border: 1px solid #7a8ccf;
-    /* Azul suave para el borde */
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: #e6edff;
-    /* Azul muy claro para inputs */
-    color: #0a1a4f;
-    /* Azul oscuro para texto */
-    transition: border 0.2s, box-shadow 0.2s;
+.formGrid {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.contactForm input::placeholder,
-.contactForm textarea::placeholder {
-    color: #7a8ccf;
-    /* Azul medio para placeholder */
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  color: rgba(215, 229, 255, 0.85);
 }
 
-.contactForm input:focus,
-.contactForm textarea:focus {
-    border-color: #1c3bbf;
-    /* Azul intenso al focus */
-    box-shadow: 0 0 5px rgba(28, 59, 191, 0.5);
-    outline: none;
+.formField span {
+  font-size: 0.9rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
 }
 
-.contactForm button {
-    padding: 0.75rem 1rem;
-    background-color: #1c3bbf;
-    /* Azul intenso para el botón */
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
+.formField input,
+.formField textarea {
+  background: rgba(4, 12, 28, 0.8);
+  border: 1px solid rgba(91, 213, 255, 0.18);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  color: #f5f9ff;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.contactForm button:hover {
-    background-color: #0a1a4f;
-    /* Azul más oscuro al hover */
-    transform: translateY(-2px);
+.formField input::placeholder,
+.formField textarea::placeholder {
+  color: rgba(168, 192, 225, 0.6);
 }
 
-/* Responsive */
-@media (max-width: 685px) {
-    .contactContainer {
-        padding: 0.5rem;
-    }
+.formField input:focus,
+.formField textarea:focus {
+  border-color: rgba(91, 213, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(91, 213, 255, 0.18);
+  outline: none;
+}
+
+.formFieldFull {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formActions button {
+  align-self: flex-start;
+  padding: 0.75rem 2.2rem;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #5bd5ff, #5e96be);
+  color: #031021;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formActions button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(91, 213, 255, 0.35);
+}
+
+.privacyNote {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(205, 220, 240, 0.65);
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.infoCard,
+.socialCard {
+  padding: clamp(1.8rem, 4vw, 2.6rem);
+  border-radius: 24px;
+  background: rgba(4, 12, 26, 0.82);
+  border: 1px solid rgba(91, 213, 255, 0.15);
+  box-shadow: 0 18px 45px rgba(3, 9, 22, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.infoCard h3,
+.socialCard h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.infoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.infoGroup span {
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+  font-size: 0.78rem;
+  color: rgba(180, 197, 222, 0.75);
+}
+
+.infoGroup a,
+.infoGroup p {
+  margin: 0;
+  color: rgba(224, 234, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.infoGroup a:hover {
+  color: #5bd5ff;
+}
+
+.socialGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.socialGrid a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(91, 213, 255, 0.18);
+  text-decoration: none;
+  color: rgba(224, 234, 255, 0.9);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.socialGrid a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(91, 213, 255, 0.45);
+}
+
+@media (max-width: 880px) {
+  .heroStats,
+  .collabActions,
+  .socialGrid {
+    justify-content: center;
+  }
+
+  .heroContent,
+  .formActions button {
+    align-self: center;
+    text-align: center;
+  }
+
+  .heroHighlights li::before {
+    left: 0.35rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .heroVisualFrame {
+    aspect-ratio: 1 / 1;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
 }

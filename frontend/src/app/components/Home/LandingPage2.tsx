@@ -74,89 +74,85 @@ export default function LandingPage2() {
                 </div>
             </section>
 
-            {/* Trainer Section */}
             <section
-                className={`${styles.trainerSection} ${trainerVisible ? styles.trainerSectionVisible : ""}`}
+                className={`${styles.teamSection} ${trainerVisible ? styles.teamVisible : ""}`}
                 ref={trainerRef}
             >
-                <div className={styles.imageTrainerWrapper}>
-                    <Image
-                        src="/assets/valores-foto.JPEG"
-                        width={400}
-                        height={400}
-                        alt="FOTO ENTRENADOR"
-                        className={styles.imageTrainer}
-                    />
-                </div>
-                <div className={`${styles.trainerText} ${showTrainerMore ? styles.expanded : ""}`}>
-                    <h2>DAMIÁN GUTIÉRREZ ROLDÁN</h2>
-                    <p>Soy <strong>Instructor Nacional en Defensa Personal Femenina (Nivel 1)</strong> desde el año 2018.
-                        A lo largo de mi trayectoria profesional he dedicado mi trabajo a la formación en
-                        seguridad personal y técnicas de autoprotección, colaborando en diferentes ámbitos
-                        tanto civiles como institucionales.
-                        He tenido el privilegio de impartir formación especializada a la Policía Local de
-                        Albacete, avalado por el <strong>certificado en Defensa Personal Policial (Nivel 2)</strong>. Además,
-                        soy <strong>cinturón negro 2º Dan</strong> y poseo el <strong>certificado de Director de Seguridad</strong> expedido
-                        por la Universidad de Ávila, lo que refuerza mi perfil técnico y mi compromiso con la
-                        enseñanza responsable de la defensa personal.
-                        Desde el año 2019, desarrollo mi labor como instructor de boxeo y Krav Maga
-                        impartiendo clases tanto a adultos como a jóvenes. Mi objetivo como profesional
-                        es promover la formación integral en defensa personal, fomentando valores como
-                        la disciplina, la seguridad y el autocontrol, pilares fundamentales para el desarrollo
-                        físico y mental de cada alumno.</p>
-                    <button
-                        className={styles.showMoreBtn}
-                        onClick={() => setShowTrainerMore(prev => !prev)}
-                    >
-                        {showTrainerMore ? "Ver menos" : "Ver más"}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path fillRule="evenodd"
-                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                        </svg>
-                    </button>
+                <div className={`${styles.teamCard} ${styles.trainerCard}`}>
+                    <div className={styles.teamVisual}>
+                        <Image
+                            src="/assets/valores-foto.JPEG"
+                            alt="Damián Gutiérrez Roldán"
+                            fill
+                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 320px"
+                            className={styles.teamImage}
+                        />
+                        <span className={styles.teamBadge}>Head Coach</span>
+                    </div>
+                    <div className={`${styles.teamContent} ${showTrainerMore ? styles.contentExpanded : ""}`}>
+                        <span className={styles.sectionEyebrow}>Instructor principal</span>
+                        <h2>Damián Gutiérrez Roldán</h2>
+                        <p>
+                            Instructor nacional en defensa personal femenina nivel 1, cinturón negro 2º Dan y director de
+                            seguridad certificado. Desde 2019 lidera las formaciones de boxeo y Krav Maga de Combat
+                            Strike, integrando protocolos policiales, prevención y valores de autocontrol.
+                        </p>
+                        {showTrainerMore && (
+                            <ul className={styles.teamHighlights}>
+                                <li>Formador para cuerpos de seguridad locales y entidades privadas</li>
+                                <li>Especializado en defensa personal aplicada a escenarios reales</li>
+                                <li>Diseña programas adaptados a adolescentes, adultos y colectivos vulnerables</li>
+                            </ul>
+                        )}
+                        <button
+                            className={styles.teamToggle}
+                            onClick={() => setShowTrainerMore(prev => !prev)}
+                            type="button"
+                        >
+                            {showTrainerMore ? "Ver menos" : "Ver perfil completo"}
+                        </button>
+                    </div>
                 </div>
             </section>
 
-            {/* Assistant Section */}
             <section
-                className={`${styles.assistantSection} ${assistantVisible ? styles.assistantVisible : ""}`}
+                className={`${styles.teamSection} ${assistantVisible ? styles.teamVisible : ""} ${styles.assistantLayout}`}
                 ref={assistantRef}
             >
-                <div className={styles.imageAssistantWrapper}>
-                    <Image
-                        src="/assets/valores-foto.JPEG"
-                        width={400}
-                        height={400}
-                        alt="FOTO AYUDANTE"
-                        className={styles.imageAssistant}
-                    />
-                </div>
-                <div className={`${styles.assistantText} ${showAssistantMore ? styles.expanded : ""}`}>
-                    <h2>LLANOS MARTÍNEZ TORRES</h2>
-                    <p>
-                        Desde el año 2021 colaboro como <strong>ayudante de Damián, desempeñando
-                            funciones de apoyo tanto en la enseñanza como en la preparación técnica. </strong>
-                        Comencé a practicar boxeo y Krav Maga a los 14 años, disciplinas que
-                        con el tiempo se han convertido en una auténtica pasión y en parte
-                        esencial de mi desarrollo personal y profesional.
-                        Actualmente, me encuentro <strong>federada como cinturón negro de Krav
-                            Maga</strong> y continúo ampliando mis conocimientos y competencias. Mi
-                        próximo objetivo es obtener la certificación oficial como instructora
-                        de defensa personal femenina, con el propósito de transmitir a otras
-                        mujeres las herramientas necesarias para fortalecer su seguridad, confianza y autonomía.
-                    </p>
-                    <button
-                        className={styles.showMoreBtn}
-                        onClick={() => setShowAssistantMore(prev => !prev)}
-                    >
-                        {showAssistantMore ? "Ver menos" : "Ver más"}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16">
-                            <path fillRule="evenodd"
-                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                        </svg>
-                    </button>
+                <div className={`${styles.teamCard} ${styles.assistantCard}`}>
+                    <div className={styles.teamVisual}>
+                        <Image
+                            src="/assets/valores-foto.JPEG"
+                            alt="Llanos Martínez Torres"
+                            fill
+                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 320px"
+                            className={styles.teamImage}
+                        />
+                        <span className={styles.teamBadge}>Assistant Coach</span>
+                    </div>
+                    <div className={`${styles.teamContent} ${showAssistantMore ? styles.contentExpanded : ""}`}>
+                        <span className={styles.sectionEyebrow}>Coach asistente</span>
+                        <h2>Llanos Martínez Torres</h2>
+                        <p>
+                            Boxeadora y cinturón negro de Krav Maga, federada y apasionada por la enseñanza. Desde 2021
+                            acompaña cada entrenamiento aportando técnica, cercanía y una visión estratégica orientada a
+                            mujeres y jóvenes.
+                        </p>
+                        {showAssistantMore && (
+                            <ul className={styles.teamHighlights}>
+                                <li>Especialista en acompañamiento y preparación técnica en defensa femenina</li>
+                                <li>Referente para nuevas alumnas: empatía, disciplina y actitud de superación</li>
+                                <li>En proceso de certificación como instructora oficial de defensa personal femenina</li>
+                            </ul>
+                        )}
+                        <button
+                            className={styles.teamToggle}
+                            onClick={() => setShowAssistantMore(prev => !prev)}
+                            type="button"
+                        >
+                            {showAssistantMore ? "Ver menos" : "Ver perfil completo"}
+                        </button>
+                    </div>
                 </div>
             </section>
             <section className={styles.featuredCourses}>
