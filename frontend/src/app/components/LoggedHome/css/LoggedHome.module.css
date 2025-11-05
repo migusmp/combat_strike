@@ -1,377 +1,393 @@
-.mainContent {
-    margin-top: 90px;
-    /* espacio para el header */
+.dashboardWrapper {
+  min-height: 100vh;
+  background:
+      radial-gradient(circle at 18% 12%, rgba(27, 51, 123, 0.25), transparent 45%),
+      radial-gradient(circle at 86% 0%, rgba(6, 152, 205, 0.18), transparent 55%),
+      #020610;
+  color: #f2f6ff;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 6vw, 5rem);
+  padding: clamp(3rem, 7vw, 5rem) 0 4rem;
 }
 
-/* HEADER STYLES */
-.header {
-    position: fixed;
-    /* correcto */
-    top: 0;
-    /* falta: asegura que esté pegado arriba */
-    left: 0;
-    /* opcional, pero recomendable */
-    width: 100%;
-    height: 90px;
-    background-color: #000032;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 999;
+.sectionEyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 213, 255, 0.25);
+  background: rgba(91, 213, 255, 0.12);
+  color: #bfefff;
+  letter-spacing: 0.16rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
 }
 
-/* Contenedor de los links */
-.header section {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.heroSection {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
 }
 
-/* Nav interno */
-.header section nav {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    font-size: 1.3rem;
-    margin-right: 50px;
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
 }
 
-/* Cada link individual */
-.header section nav a {
-    position: relative;
-    /* necesario para el ::after */
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    padding: 5px 0;
-    /* separa la línea del texto */
+.heroContent h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
 }
 
-/* Línea que se desliza debajo de cada link */
-.header section nav a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    /* justo debajo del texto */
-    width: 0;
-    /* empieza desde cero */
-    height: 2px;
-    /* grosor de la línea */
-    background-color: #fff;
-    /* color de la línea */
-    transition: width 0.3s ease;
-    /* animación suave */
+.heroContent p {
+  margin: 0;
+  color: rgba(217, 232, 255, 0.82);
+  line-height: 1.7;
+  max-width: 520px;
 }
 
-/* Hover: la línea se expande a todo el ancho del link */
-.header section nav a:hover::after {
-    width: 100%;
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
 }
 
-/* Hover: opcional, cambio de color del texto */
-.header section nav a:hover {
-    color: #ccc;
+.statsGrid article {
+  padding: 1rem 1.4rem;
+  border-radius: 18px;
+  background: rgba(4, 12, 26, 0.78);
+  border: 1px solid rgba(91, 213, 255, 0.18);
+  box-shadow: 0 18px 45px rgba(3, 9, 22, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-
-.usermenu {
-    position: absolute;
-    top: 8vh;
-    right: 2%;
-    width: 200px;
-    /* tamaño fijo */
-    background-color: #fff;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    /* opcional para darle profundidad */
-    z-index: 1000;
+.statsGrid strong {
+  font-size: 1.8rem;
+  color: #5bd5ff;
 }
 
-.usermenu ul {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    font-size: 1rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.statsGrid span {
+  font-size: 0.85rem;
+  color: rgba(203, 219, 240, 0.8);
 }
 
-.usermenu ul li {
-    width: 100%;
-    padding: 12px 16px;
-    /* reduce un poco para que quepa en tamaño fijo */
-    cursor: pointer;
-    color: #000032;
-    transition: all 0.2s ease-in-out;
+.currentCourseCard {
+  padding: clamp(2.2rem, 5vw, 3rem);
+  border-radius: 28px;
+  background: linear-gradient(140deg, rgba(10, 21, 48, 0.86), rgba(4, 9, 22, 0.88));
+  border: 1px solid rgba(91, 213, 255, 0.18);
+  box-shadow: 0 26px 65px rgba(3, 11, 26, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
 }
 
-.usermenu ul li:hover {
-    background-color: #EDEBEB;
-    color: #000;
+.currentCourseVisual {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 17 / 10;
 }
 
-.usermenu ul li.cerrarSesionBtn {
-    background-color: #fff;
-    color: #d32f2f;
+.currentCourseImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
 }
 
-.usermenu ul li.cerrarSesionBtn:hover {
-    background-color: #d32f2f;
-    color: #fff;
+.currentCourseCategory {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(3, 10, 24, 0.8);
+  border: 1px solid rgba(91, 213, 255, 0.3);
+  font-size: 0.75rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
 }
 
+.currentCourseCard h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+}
 
-/* LOGGED HOME STYLES */
-.loggedhome {
-    width: 100%;
-    min-height: 95vh;
-    /* altura de la ventana menos header */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    /* antes era center */
-    align-items: center;
-    padding: 2rem;
-    background: linear-gradient(135deg, #d9d9d9, #f5f5f5);
-    color: #000;
+.currentCourseLesson {
+  margin: 0;
+  color: rgba(205, 220, 240, 0.78);
+}
+
+.progressBar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(91, 213, 255, 0.18);
+  overflow: hidden;
+}
+
+.progressBar div {
+  height: 100%;
+  background: linear-gradient(135deg, #5bd5ff, #5e96be);
+}
+
+.currentCourseFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(203, 219, 240, 0.78);
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.6rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #5bd5ff, #5e96be);
+  color: #031021;
+  box-shadow: 0 16px 36px rgba(91, 213, 255, 0.28);
+}
+
+.secondaryBtn {
+  border: 1px solid rgba(91, 213, 255, 0.4);
+  color: #f5f9ff;
+  background: transparent;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 42px rgba(91, 213, 255, 0.35);
+}
+
+.secondaryBtn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(91, 213, 255, 0.65);
+}
+
+.progressSection,
+.recommendSection,
+.feedSection {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+}
+
+.sectionHeader p {
+  margin: 0;
+  color: rgba(206, 220, 240, 0.78);
+}
+
+.courseList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(1.4rem, 3vw, 2rem);
+}
+
+.courseCard {
+  padding: 1.6rem;
+  border-radius: 22px;
+  background: rgba(4, 12, 26, 0.8);
+  border: 1px solid rgba(91, 213, 255, 0.16);
+  box-shadow: 0 22px 50px rgba(3, 9, 22, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.courseThumbnail {
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.courseCategory {
+  display: inline-flex;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(91, 213, 255, 0.1);
+  border: 1px solid rgba(91, 213, 255, 0.25);
+  font-size: 0.75rem;
+  letter-spacing: 0.08rem;
+  margin-bottom: 0.35rem;
+}
+
+.courseCard h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.courseLesson,
+.courseNext {
+  margin: 0;
+  color: rgba(197, 212, 235, 0.78);
+  font-size: 0.95rem;
+}
+
+.courseCard footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(203, 219, 240, 0.78);
+}
+
+.recommendGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(1.2rem, 3vw, 2rem);
+}
+
+.recommendCard {
+  padding: 1.4rem;
+  border-radius: 20px;
+  background: rgba(3, 10, 24, 0.75);
+  border: 1px solid rgba(91, 213, 255, 0.14);
+  box-shadow: 0 18px 45px rgba(3, 9, 22, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.recommendCard h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.recommendCard span {
+  font-size: 0.9rem;
+  color: rgba(197, 212, 235, 0.75);
+}
+
+.recommendCard a {
+  text-decoration: none;
+  color: #5bd5ff;
+  font-weight: 600;
+}
+
+.feedSection {
+  background: rgba(3, 10, 24, 0.75);
+  border-radius: 24px;
+  border: 1px solid rgba(91, 213, 255, 0.14);
+  box-shadow: 0 18px 45px rgba(3, 9, 22, 0.45);
+  padding: 2.2rem;
+}
+
+.feedHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.feedList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.feedList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(91, 213, 255, 0.12);
+  color: rgba(217, 232, 255, 0.86);
+}
+
+.feedList li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.feedList small {
+  color: rgba(168, 192, 225, 0.7);
+}
+
+@media (max-width: 860px) {
+  .heroSection {
     text-align: center;
-}
+  }
 
-
-.loggedhome h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #000032;
-    /* azul oscuro de tu header */
-    margin-bottom: 2rem;
-}
-
-/* Contenedor de los artículos */
-.loggedHomeContent {
-    display: flex;
-    gap: 2rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-    /* para que en móvil se apilen */
-    justify-content: center;
-}
-
-/* Cada tarjeta (curso / tienda) */
-.loggedhome article {
-    background: #fff;
-    border-radius: 1rem;
-    padding: 2rem;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    min-width: 220px;
-    max-width: 300px;
-    flex: 1;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.loggedhome article:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
-}
-
-/* Texto dentro de la tarjeta */
-.loggedhome article p {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-}
-
-.loggedhome article h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: #000032;
-}
-
-.loggedhome article p {
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    line-height: 1.4;
-    color: #333;
-}
-
-.loggedhome article img {
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-    object-fit: cover;
-}
-
-
-/* Botones */
-.loggedhome button {
-    background: #000032;
-    /* azul oscuro */
-    color: #fff;
-    padding: 0.8rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.loggedhome button:hover {
-    background: #1a1a66;
-    transform: scale(1.05);
-}
-
-.contactBtn {
-    display: none;
-    cursor: pointer;
-}
-
-.contactBtn:hover {
-    background-color: #055293;
-    color: #fff;
-}
-
-/* Navbar en móvil */
-.navbar {
-    position: fixed;
-    top: 90px;
-    /* debajo del header */
-    width: 100%;
-    background-color: #000032;
-    display: none;
-    justify-content: center;
+  .heroContent,
+  .currentCourseCard {
     align-items: center;
-    padding: 20px 0;
-    /* 20px arriba y abajo, 0 a los lados */
-    gap: 0;
-    /* no necesitamos gap, lo hacemos con pseudo-elemento */
-    z-index: 998;
-    border-top: 1px solid #ccc;
+  }
+
+  .currentCourseCard {
+    text-align: left;
+  }
+
+  .courseList,
+  .recommendGrid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
 }
 
-.navbar a {
-    color: #fff;
-    width: 50%;
-    /* cada link ocupa la mitad */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.2rem;
-    text-decoration: none;
-    font-weight: 500;
-    /* espacio alrededor del link */
-    position: relative;
-    transition: color 0.3s ease;
-}
+@media (max-width: 600px) {
+  .dashboardWrapper {
+    padding-top: 2.5rem;
+  }
 
-/* Línea divisoria justo en medio entre links */
-.navbar a+a::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    /* al principio del link */
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    /* centro exacto horizontal y vertical */
-    width: 1px;
-    /* grosor */
-    height: 150%;
-    /* altura de la línea */
-    background-color: #ccc;
-}
+  .currentCourseCard {
+    text-align: center;
+  }
 
-.navbar a:hover {
-    color: #ccc;
-}
+  .currentCourseFooter {
+    flex-direction: column;
+  }
 
-.telephoneSvg {
-    display: none;
-}
+  .courseCard footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.contactBtn p {
-    display: flex;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .mainContent {
-        margin-top: 155px;
-        /* espacio para el header y navbar */
-    }
-
-    .loggedhome h1 {
-        font-size: 2rem;
-    }
-
-    .loggedHomeContent {
-        flex-direction: column;
-        gap: 1.5rem;
-        align-items: center;
-        /* centra las cards en columna */
-    }
-
-    .loggedhome article {
-        flex: none;
-        /* evita que se expandan */
-        min-width: unset;
-        /* quita el mínimo */
-        width: 100%;
-        /* ocupa todo el ancho disponible */
-        max-width: 400px;
-        /* límite para que no se estire demasiado */
-    }
-
-    .header {
-        justify-content: center;
-    }
-
-    .header section nav {
-        display: none;
-    }
-
-    .header section {
-        position: absolute;
-        right: 2%;
-    }
-
-    .contactBtn {
-        position: absolute;
-        left: 2%;
-        display: block;
-        padding: 13px 20px;
-        border-radius: 6px;
-        background-color: #fff;
-        color: #000;
-        font-weight: bold;
-        border: none;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease, transform 0.2s ease;
-    }
-
-    .navbar {
-        display: flex;
-    }
-}
-
-@media (max-width: 590px) {
-    .contactBtn {
-        border-radius: 50%;
-        padding: 15px;
-    }
-
-    .telephoneSvg {
-        display: flex;
-    }
-
-    .contactBtn p {
-        display: none;
-    }
-
+  .feedList li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
 }
