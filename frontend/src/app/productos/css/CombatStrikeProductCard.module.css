@@ -1,84 +1,143 @@
-/* COMBAT STRIKE PRODUCT CARD CSS */
 .productCard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* reparte el contenido */
-    background-color: #fff;
-    border-radius: 5px;
-    gap: 0.7rem;
-    padding: 1rem;
-    width: 300px;
-    height: 400px;
-    /* ✅ todas las tarjetas tendrán la misma altura */
-    color: #000;
-    box-sizing: border-box;
-    text-align: center;
-    overflow: hidden;
-    /* evita desbordes */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: clamp(260px, 28vw, 320px);
+  padding: 1.75rem;
+  border-radius: 24px;
+  background: linear-gradient(150deg, rgba(14, 24, 52, 0.92), rgba(7, 12, 28, 0.95));
+  border: 1px solid rgba(91, 213, 255, 0.14);
+  color: #f5f8ff;
+  box-shadow: 0 22px 55px rgba(3, 11, 26, 0.45);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Efecto hover sutil */
+.productCard::before {
+  content: "";
+  position: absolute;
+  inset: -120px -120px auto auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(91, 213, 255, 0.35), transparent 65%);
+  z-index: 0;
+}
+
 .productCard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-6px);
+  border-color: rgba(91, 213, 255, 0.35);
+  box-shadow: 0 28px 65px rgba(3, 11, 26, 0.6);
+}
+
+.imageHalo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 35%, rgba(91, 213, 255, 0.25), rgba(8, 14, 32, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
 .productImage {
-    width: 170px;
-    height: 170px;
-    /* ✅ misma altura de imagen */
-    object-fit: contain;
-    /* evita deformaciones */
-    border-radius: 5px;
-}
-
-.productTitle {
-    font-size: 1.2rem;
-    font-weight: bold;
-    min-height: 2.5rem;
-    /* mantiene espacio uniforme */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 35px rgba(0, 0, 0, 0.45));
 }
 
 .productName {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: bold;
-    text-align: center;
-    position: relative;
-    color: #cfba7c;
-    min-height: 1.5rem;
-    /* para alinear los nombres */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+  color: #f5dca0;
+  z-index: 1;
 }
 
-.productBtn {
-    text-align: center;
-    width: 100%;
-    padding: 0.6rem 1rem;
-    background-color: #cfba7c;
-    color: #fff;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.productBtn:hover {
-    background-color: #bca766;
+.productName svg {
+  color: #f5dca0;
 }
 
 .divider {
-    width: 100%;
-    height: 1px;
-    background-color: #cfba7c;
-    border-radius: 2px;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(91, 213, 255, 0), rgba(91, 213, 255, 0.45), rgba(91, 213, 255, 0));
+  border-radius: 999px;
+  z-index: 1;
+}
+
+.productTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #f7fbff;
+  z-index: 1;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+  z-index: 1;
+}
+
+.features li {
+  position: relative;
+  padding-left: 1.4rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(223, 235, 255, 0.85);
+}
+
+.features li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5dca0, #cfba7c);
+}
+
+.ageWarning {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  color: #ff9b9b;
+  z-index: 1;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+}
+
+.productBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f5dca0, #cfba7c);
+  color: #221a07;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.productBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(207, 186, 124, 0.35);
 }
