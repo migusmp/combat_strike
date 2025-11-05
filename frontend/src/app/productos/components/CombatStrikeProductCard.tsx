@@ -1,12 +1,20 @@
-import { Product } from "../page";
 import Image from "next/image";
 
 import styles from '../css/CombatStrikeProductCard.module.css';
 
+export interface ProductCardData {
+    title: string;
+    image: string;
+    name: string;
+    topics: string[];
+    ageWarning?: string;
+    href: string;
+}
+
 interface CombatStrikeProductCardProps {
-    product: Product,
-    loaded: boolean,
-    index: number,
+    product: ProductCardData,
+    loaded?: boolean,
+    index?: number,
 }
 
 // {product.ageWarning && <p>{product.ageWarning}</p>}
@@ -15,7 +23,7 @@ interface CombatStrikeProductCardProps {
 //         <li key={i}>{topic}</li>
 //     ))}
 // </ul>
-export default function CombatStrikeProductCard({ product, loaded, index }: CombatStrikeProductCardProps) {
+export default function CombatStrikeProductCard({ product, loaded = false, index = 0 }: CombatStrikeProductCardProps) {
     return (
         <article key={index} className={styles.productCard} data-loaded={loaded}>
             <div className={styles.imageHalo}>

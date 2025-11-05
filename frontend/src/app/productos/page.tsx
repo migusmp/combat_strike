@@ -3,16 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Footer from "../components/Home/Footer";
 import styles from "../css/Productos.module.css";
-import CombatStrikeProductCard from "./components/CombatStrikeProductCard";
-
-export interface Product {
-    title: string;
-    image: string;
-    name: string;
-    topics: string[];
-    ageWarning?: string;
-    href: string;
-}
+import CombatStrikeProductCard, { ProductCardData } from "./components/CombatStrikeProductCard";
 
 export default function ZuluTacticalPage() {
     const [loaded, setLoaded] = useState(false);
@@ -21,7 +12,7 @@ export default function ZuluTacticalPage() {
         setLoaded(true);
     }, []);
 
-    const products: Product[] = [
+    const products: ProductCardData[] = [
         {
             title: "Spray de Defensa Personal",
             image: "/assets/spray-pimienta-2.webp",

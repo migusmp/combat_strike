@@ -1,240 +1,223 @@
-.collaborationSection {
-    padding: 3.5rem 2rem;
-    background-color: #ffffff;
-    color: #1a1a1a;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.collabSection {
+  padding: clamp(3.5rem, 6vw, 5rem) 0;
+  background:
+      radial-gradient(circle at 18% 12%, rgba(91, 213, 255, 0.28), transparent 45%),
+      radial-gradient(circle at 82% 0%, rgba(5, 16, 45, 0.6), transparent 55%),
+      #020712;
+  color: #f7fbff;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 3.5rem);
 }
 
-.sectionTitle {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #1a1a1a;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s ease;
+.collabInner {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: center;
 }
 
-.sectionSubtitle {
-    font-size: 1.2rem;
-    color: #333333;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease 0.2s;
-    margin-bottom: 2rem;
+.collabCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
 }
 
-.partnerLink {
-    color: #055293;
-    font-weight: bold;
-    text-decoration: underline;
-    transition: color 0.3s ease;
+.sectionEyebrow {
+  align-self: flex-start;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 213, 255, 0.3);
+  background: rgba(91, 213, 255, 0.15);
+  letter-spacing: 0.16rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #c1f0ff;
 }
 
-.partnerLink:hover {
-    color: #03346d;
+.collabCopy h2 {
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  margin: 0;
+  line-height: 1.2;
 }
 
-.collaborationContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3rem;
-    width: 100%;
-    max-width: 1200px;
+.collabCopy p {
+  margin: 0;
+  color: rgba(220, 233, 255, 0.82);
+  line-height: 1.7;
 }
 
-.sectionHeader {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* centra horizontalmente */
-    text-align: center;
+.collabHighlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
 }
 
-.partnerLogo {
-    max-width: 250px;
-    height: auto;
-    margin-bottom: 1.5rem;
-    display: block;
-    /* asegura que la imagen se comporte como bloque */
+.collabHighlights li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  color: rgba(213, 229, 255, 0.85);
+  line-height: 1.6;
 }
 
-.productsContainer {
-    display: flex;
-    flex-wrap: wrap;
+.collabHighlights li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5dca0, #cfba7c);
+}
+
+.collabActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #f5dca0, #cfba7c);
+  color: #1e1204;
+  box-shadow: 0 16px 38px rgba(207, 186, 124, 0.32);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 45px rgba(207, 186, 124, 0.4);
+}
+
+.secondaryBtn {
+  border: 1px solid rgba(91, 213, 255, 0.35);
+  color: #f7fbff;
+}
+
+.secondaryBtn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(91, 213, 255, 0.55);
+}
+
+.collabVisual {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.collabFrame {
+  position: relative;
+  width: min(360px, 100%);
+  aspect-ratio: 3 / 4;
+  border-radius: 28px;
+  overflow: hidden;
+  background: radial-gradient(circle at top, rgba(91, 213, 255, 0.28), rgba(5, 12, 34, 0.9));
+  box-shadow: 0 28px 60px rgba(3, 10, 28, 0.65);
+}
+
+.collabImage {
+  object-fit: cover;
+  filter: drop-shadow(0 24px 45px rgba(0, 0, 0, 0.45));
+}
+
+.collabBadge {
+  position: absolute;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  padding: 0.35rem 1rem;
+  border-radius: 12px;
+  background: rgba(3, 12, 28, 0.75);
+  border: 1px solid rgba(91, 213, 255, 0.25);
+  font-size: 0.78rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.collabStats {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.collabStats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: 16px;
+  background: rgba(5, 14, 35, 0.7);
+  border: 1px solid rgba(91, 213, 255, 0.2);
+  min-width: 130px;
+  text-align: center;
+}
+
+.collabStats strong {
+  font-size: 1.75rem;
+  color: #5bd5ff;
+}
+
+.collabStats span {
+  font-size: 0.82rem;
+  color: rgba(215, 229, 255, 0.75);
+}
+
+.collabProducts {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.4rem, 3vw, 2.1rem);
+  justify-content: flex-start;
+}
+
+.collabLegal {
+  width: min(900px, 92%);
+  margin: 0 auto;
+  text-align: center;
+  color: rgba(206, 220, 240, 0.7);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 840px) {
+  .collabActions,
+  .collabStats,
+  .collabProducts {
     justify-content: center;
-    gap: 2rem;
-    width: 100%;
-}
+  }
 
-.productCard {
-    background: #ffffff;
-    color: #1a1a1a;
-    padding: 2rem;
-    border-radius: 25px;
-    width: 400px;
+  .collabCopy {
+    align-items: center;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    border: 1px solid #e5e5e5;
+  }
+
+  .sectionEyebrow {
+    align-self: center;
+  }
 }
 
-.productCard:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+@media (max-width: 560px) {
+  .collabFrame {
+    aspect-ratio: 1 / 1;
+  }
+
+  .collabHighlights li::before {
+    top: 0.45rem;
+  }
 }
-
-
-.sectionTitle,
-.sectionSubtitle,
-.productCard {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-}
-
-
-.productImage {
-    max-width: 100%;
-    height: auto;
-    border-radius: 15px;
-    margin: 0 auto 1.5rem;
-}
-
-.productTitle {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-    border-bottom: 2px solid #055293;
-    padding-bottom: 0.3rem;
-    color: #055293;
-}
-
-.ageWarning {
-    color: #d9534f;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-.productTopics {
-    list-style: none; /* quitamos el estilo por defecto */
-    padding: 0;
-    margin-bottom: 1.5rem;
-    color: #333333;
-}
-
-.productTopics li {
-    display: flex;
-    align-items: center; /* centra verticalmente el punto y el texto */
-    gap: 0.5rem;        /* espacio entre el punto y el texto */
-    font-size: 1rem;
-}
-
-.productTopics li::before {
-    content: "•";
-    color: #055293;
-}
-
-
-.productBtn {
-    padding: 0.8rem 2rem;
-    background-color: #055293;
-    color: #ffffff;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.productBtn:hover {
-    background-color: #03346d;
-}
-
-.legalNotice {
-    margin-top: 4rem;
-    font-size: 0.9rem;
-    color: #666666;
-    text-align: center;
-}
-
-/* RESPONSIVE */
-/* Tablets medianas */
-@media (max-width: 1024px) {
-    .productsContainer {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .productCard {
-        width: 70%; /* ya reducido */
-    }
-}
-
-/* Tablets pequeñas / móviles grandes */
-@media (max-width: 768px) {
-    .productCard {
-        width: 70%; /* más estrechas */
-        padding: 1.5rem; /* reduce padding */
-    }
-
-    .productImage {
-        width: 120px;
-        height: auto;
-        margin-bottom: 0.5rem;
-    }
-
-    .productTitle {
-        font-size: 1rem;
-    }
-
-    .ageWarning {
-        font-size: 0.9rem;
-    }
-
-    .productTopics li {
-        font-size: 0.9rem;
-    }
-
-    .productBtn {
-        padding: 0.6rem 1.5rem;
-        font-size: 0.9rem;
-    }
-}
-
-/* Móviles pequeños */
-@media (max-width: 480px) {
-    .productCard {
-        width: 90%;
-        padding: 1rem;
-    }
-
-    .productImage {
-        width: 100px;
-    }
-
-    .productTitle {
-        font-size: 1.3rem;
-    }
-
-    .ageWarning {
-        font-size: 0.8rem;
-    }
-
-    .productTopics li {
-        font-size: 0.8rem;
-    }
-
-    .productBtn {
-        padding: 0.5rem 1rem;
-        font-size: 0.8rem;
-    }
-}
-

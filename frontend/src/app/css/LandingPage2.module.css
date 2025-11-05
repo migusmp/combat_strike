@@ -225,85 +225,111 @@
 /* FEATURED COURSES */
 /* ======================= */
 .featuredCourses {
-  background: radial-gradient(
-      circle at top,
-      rgba(17, 24, 39, 0.08),
-      transparent 55%
-    ),
-    #f6f8fc;
-  padding: 4.5rem 0;
-  color: #111;
+  padding: clamp(3.5rem, 6vw, 5rem) 0;
+  background:
+      radial-gradient(circle at 14% 10%, rgba(5, 82, 147, 0.25), transparent 45%),
+      radial-gradient(circle at 86% 0%, rgba(8, 35, 76, 0.3), transparent 55%),
+      #020510;
+  color: #f7fbff;
 }
 
 .featuredInner {
-  width: min(1100px, 92%);
+  width: min(1180px, 92%);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
 }
 
-.featuredTitle {
-  font-size: 2.4rem;
-  font-weight: 700;
+.featuredHeader {
   text-align: center;
-  color: #03346d;
-  letter-spacing: 0.02em;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionEyebrow {
+  align-self: center;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 213, 255, 0.22);
+  background: rgba(91, 213, 255, 0.12);
+  letter-spacing: 0.16rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #bfefff;
+}
+
+.featuredHeader h2 {
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  margin: 0;
+}
+
+.featuredHeader p {
+  margin: 0 auto;
+  max-width: 640px;
+  color: rgba(222, 235, 255, 0.82);
+  line-height: 1.7;
+  font-size: 1rem;
 }
 
 .featuredStatus {
   text-align: center;
-  margin-top: 1.5rem;
-  color: #1f3a63;
-  font-weight: 500;
+  color: rgba(191, 223, 255, 0.8);
 }
 
 .featuredGrid {
-  margin-top: 3rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.4rem, 3vw, 2.1rem);
+  justify-content: flex-start;
 }
 
 .featuredCard {
-  background: linear-gradient(
-    160deg,
-    rgba(5, 82, 147, 0.92),
-    rgba(0, 0, 50, 0.95)
-  );
-  border-radius: 1.2rem;
-  padding: 1.25rem;
-  text-decoration: none;
-  color: #f9fbff;
+  position: relative;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 16px 45px rgba(5, 82, 147, 0.25);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
+  gap: 1rem;
+  width: clamp(260px, 28vw, 320px);
+  padding: 1.4rem;
+  border-radius: 24px;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(160deg, rgba(5, 82, 147, 0.32), rgba(2, 7, 24, 0.95));
+  border: 1px solid rgba(91, 213, 255, 0.2);
+  box-shadow: 0 24px 55px rgba(2, 9, 26, 0.55);
   overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .featuredCard::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    rgba(255, 255, 255, 0.06),
-    transparent 40%
-  );
-  pointer-events: none;
+  inset: -120px -120px auto auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(91, 213, 255, 0.25), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .featuredCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 24px 55px rgba(5, 82, 147, 0.35);
+  transform: translateY(-6px);
+  border-color: rgba(91, 213, 255, 0.4);
+  box-shadow: 0 28px 65px rgba(2, 9, 26, 0.65);
+}
+
+.featuredCard:hover::before {
+  opacity: 1;
 }
 
 .featuredImageWrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 1rem;
+  border-radius: 18px;
   overflow: hidden;
-  margin-bottom: 1.25rem;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
 }
 
 .featuredImage {
@@ -312,33 +338,39 @@
 
 .featuredCategory {
   position: absolute;
-  bottom: 0.75rem;
-  left: 0.75rem;
-  background: rgba(0, 0, 50, 0.8);
+  bottom: 0.9rem;
+  left: 0.9rem;
   padding: 0.35rem 0.9rem;
   border-radius: 999px;
+  background: rgba(3, 10, 28, 0.8);
+  border: 1px solid rgba(91, 213, 255, 0.35);
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08rem;
 }
 
 .featuredContent {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.8rem;
   flex: 1;
+  z-index: 1;
 }
 
 .featuredCourseTitle {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .featuredDescription {
   font-size: 0.95rem;
-  color: rgba(233, 239, 255, 0.85);
-  line-height: 1.5;
+  color: rgba(213, 227, 255, 0.82);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .featuredFooter {
@@ -346,29 +378,67 @@
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(91, 213, 255, 0.2);
+  color: rgba(191, 223, 255, 0.85);
 }
 
 .featuredPrice {
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #5bd5ff;
 }
 
 .featuredLink {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.08rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #d9e6ff;
+}
+
+.featuredActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #5bd5ff, #5e96be);
+  color: #031021;
+  box-shadow: 0 12px 30px rgba(91, 213, 255, 0.25);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(91, 213, 255, 0.35);
+}
+
+.secondaryBtn {
+  border: 1px solid rgba(91, 213, 255, 0.35);
+  color: #f7fbff;
+}
+
+.secondaryBtn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(91, 213, 255, 0.55);
 }
 
 @media (max-width: 768px) {
-  .featuredTitle {
-    font-size: 2rem;
-  }
-
-  .featuredCard {
-    padding: 1rem;
+  .featuredGrid {
+    justify-content: center;
   }
 }
 

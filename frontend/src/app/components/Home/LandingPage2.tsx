@@ -161,10 +161,16 @@ export default function LandingPage2() {
             </section>
             <section className={styles.featuredCourses}>
                 <div className={styles.featuredInner}>
-                    <h2 className={styles.featuredTitle}>Algunos de nuestros cursos</h2>
-                    {isLoading && (
-                        <p className={styles.featuredStatus}>Cargando cursos...</p>
-                    )}
+                    <div className={styles.featuredHeader}>
+                        <span className={styles.sectionEyebrow}>Selección Combat Strike</span>
+                        <h2>Algunos de nuestros cursos</h2>
+                        <p>
+                            Entrena con las experiencias que más recomendamos a quienes se inician o buscan dar
+                            el siguiente paso en defensa personal.
+                        </p>
+                    </div>
+
+                    {isLoading && <p className={styles.featuredStatus}>Cargando cursos...</p>}
                     {error && !isLoading && (
                         <p className={styles.featuredStatus}>Error al cargar cursos: {error}</p>
                     )}
@@ -173,7 +179,7 @@ export default function LandingPage2() {
                     )}
                     {!isLoading && !error && featuredCourses.length > 0 && (
                         <div className={styles.featuredGrid}>
-                            {featuredCourses.map(course => (
+                            {featuredCourses.map((course, idx) => (
                                 <Link
                                     key={course.id}
                                     href={`/cursos/${course.id}`}
@@ -186,27 +192,30 @@ export default function LandingPage2() {
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 360px"
                                             className={styles.featuredImage}
+                                            priority={idx < 2}
                                         />
-                                        <span className={styles.featuredCategory}>
-                                            {course.category}
-                                        </span>
+                                        <span className={styles.featuredCategory}>{course.category}</span>
                                     </div>
                                     <div className={styles.featuredContent}>
                                         <h3 className={styles.featuredCourseTitle}>{course.title}</h3>
-                                        <p className={styles.featuredDescription}>
-                                            {course.description}
-                                        </p>
+                                        <p className={styles.featuredDescription}>{course.description}</p>
                                         <div className={styles.featuredFooter}>
-                                            <span className={styles.featuredPrice}>
-                                                {course.price} €
-                                            </span>
-                                            <span className={styles.featuredLink}>Ver más</span>
+                                            <span className={styles.featuredPrice}>{course.price} €</span>
+                                            <span className={styles.featuredLink}>Ver curso</span>
                                         </div>
                                     </div>
                                 </Link>
                             ))}
                         </div>
                     )}
+                    <div className={styles.featuredActions}>
+                        <Link href="/cursos" className={styles.primaryBtn}>
+                            Ir a todos los cursos
+                        </Link>
+                        <Link href="/register" className={styles.secondaryBtn}>
+                            Empieza a entrenar
+                        </Link>
+                    </div>
                 </div>
             </section>
             <CollaborationSection />

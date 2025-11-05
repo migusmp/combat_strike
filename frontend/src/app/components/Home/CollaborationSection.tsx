@@ -2,93 +2,98 @@
 import Link from "next/link";
 import Image from "next/image";
 import styles from "../../css/CollaborationSection.module.css";
-
-interface Product {
-    title: string;
-    image: string;
-    topics: string[];
-    ageWarning?: string;
-    href: string;
-}
+import CombatStrikeProductCard, { ProductCardData } from "@/app/productos/components/CombatStrikeProductCard";
 
 export default function CollaborationSection() {
-    const products: Product[] = [
+    const products: ProductCardData[] = [
         {
             title: "Spray de Defensa Personal",
-            image: "/assets/spray-pimienta-1.png",
-            topics: ["Alcance: 3 metros", "Fácil de usar", "Normativa: Cumple con legislación vigente"],
+            image: "/assets/spray-pimienta-2.webp",
+            name: "Spray clásico",
+            topics: ["Alcance efectivo 3 m", "Activación ergonómica", "Homologado en la UE"],
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
         {
             title: "Spray de Gas Pimienta",
-            image: "/assets/spray-pimienta-2.png",
-            topics: ["Alcance: 4 metros", "Resistente al viento", "Normativa: Cumple con legislación vigente"],
+            image: "/assets/spray-pimienta-1.webp",
+            name: "Serie profesional",
+            topics: ["Chorro anti-viento", "Producción nacional", "Formulación certificada"],
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
         {
-            title: "Spray de Gas Pimienta",
+            title: "Spray Compacto",
             image: "/assets/spray-pimienta-2.png",
-            topics: ["Alcance: 4 metros", "Resistente al viento", "Normativa: Cumple con legislación vigente"],
+            name: "Edición urbana",
+            topics: ["Formato bolsillo", "Seguro anti-activación", "Uso cotidiano"],
             ageWarning: "Solo para mayores de 18 años",
             href: "/productos",
         },
     ];
 
     return (
-        <section className={styles.collaborationSection}>
-            <div className={styles.sectionHeader}>
-                <Image
-                    src="/assets/zulu-tactical.webp"
-                    alt="Logo Zulu Tactical"
-                    width={250}
-                    height={250}
-                    className={styles.partnerLogo}
-                />
-                <p className={styles.sectionSubtitle}>
-                    Presentamos los productos de{" "}
-                    <a
-                        href="https://zulutactical.es/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.partnerLink}
-                    >
-                        Zulu Tactical
-                    </a>{" "}
-                    para tu defensa personal
-                </p>
-            </div>
-
-            <div className={styles.collaborationContent}>
-                <div className={styles.productsContainer}>
-                    {products.map((product, index) => (
-                        <div key={index} className={styles.productCard}>
-                            <Image
-                                src={product.image}
-                                width={150}
-                                height={50}
-                                alt={product.title}
-                                className={styles.productImage}
-                            />
-                            <h3 className={styles.productTitle}>{product.title}</h3>
-                            {product.ageWarning && <p className={styles.ageWarning}>{product.ageWarning}</p>}
-                            <ul className={styles.productTopics}>
-                                {product.topics.map((topic, i) => (
-                                    <li key={i}>{topic}</li>
-                                ))}
-                            </ul>
-                            <Link href={product.href} className={styles.productBtn}>
-                                Ver Producto
-                            </Link>
+        <section className={styles.collabSection}>
+            <div className={styles.collabInner}>
+                <div className={styles.collabCopy}>
+                    <span className={styles.sectionEyebrow}>Colaboración oficial</span>
+                    <h2>Equipamiento táctico junto a Zulu Tactical</h2>
+                    <p>
+                        Recomendamos su gama de sprays porque responde a los mismos estándares que exigimos en
+                        nuestros entrenamientos: fiabilidad, ergonomía y cumplimiento legal.
+                    </p>
+                    <ul className={styles.collabHighlights}>
+                        <li>Formulaciones auditadas con cuerpos de seguridad y formadores</li>
+                        <li>Diseños ergonómicos con bloqueos anti-activación accidental</li>
+                        <li>Envío rápido desde España y soporte directo de la marca</li>
+                    </ul>
+                    <div className={styles.collabActions}>
+                        <Link href="/productos" className={styles.primaryBtn}>
+                            Ver selección de productos
+                        </Link>
+                        <a
+                            href="https://zulutactical.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.secondaryBtn}
+                        >
+                            Visitar tienda Zulu Tactical
+                        </a>
+                    </div>
+                </div>
+                <div className={styles.collabVisual}>
+                    <div className={styles.collabFrame}>
+                        <Image
+                            src="/assets/spray-pimienta-1.webp"
+                            alt="Spray Zulu Tactical"
+                            fill
+                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 320px"
+                            className={styles.collabImage}
+                        />
+                        <span className={styles.collabBadge}>Protección inmediata</span>
+                    </div>
+                    <div className={styles.collabStats}>
+                        <div>
+                            <strong>+10</strong>
+                            <span>Años de experiencia</span>
                         </div>
-                    ))}
+                        <div>
+                            <strong>100%</strong>
+                            <span>Producción nacional</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className={styles.legalNotice}>
-                <p>Todos los productos están sujetos a normativa vigente. Solo mayores de 18 años.</p>
+            <div className={styles.collabProducts}>
+                {products.map((product, index) => (
+                    <CombatStrikeProductCard key={index} product={product} index={index} />
+                ))}
             </div>
+
+            <p className={styles.collabLegal}>
+                Todos los productos están sujetos a la normativa vigente. Venta exclusiva para mayores de 18 años.
+            </p>
         </section>
     );
 }
