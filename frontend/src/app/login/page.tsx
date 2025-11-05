@@ -93,7 +93,7 @@ export default function Login() {
                 <div className={styles.formBox}>
                     <div className={styles.logoWrapper}>
                         <Image
-                            src="/assets/logo-negro-sin-texto.webp"
+                            src="/assets/logo-blanco-sin-texto.webp"
                             alt="Logo"
                             width={100}
                             height={100}

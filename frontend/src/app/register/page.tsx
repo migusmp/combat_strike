@@ -84,7 +84,7 @@ export default function Register() {
                     {/* Logo arriba */}
                     <div className={styles.logoWrapper}>
                         <Image
-                            src="/assets/logo-negro-sin-texto.webp"
+                            src="/assets/logo-blanco-sin-texto.webp"
                             alt="Logo"
                             width={60}
                             height={60}
@@ -95,17 +95,7 @@ export default function Register() {
 
                     {/* Cartel de éxito */}
                     {successMessage && (
-                        <div
-                            style={{
-                                backgroundColor: "#42cd38ff",
-                                color: "#072a06ff",
-                                padding: "1rem",
-                                borderRadius: "8px",
-                                marginBottom: "1rem",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                            }}
-                        >
+                        <div className={styles.successMessage}>
                             {successMessage}
                         </div>
                     )}
