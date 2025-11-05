@@ -347,6 +347,62 @@
   color: rgba(168, 192, 225, 0.7);
 }
 
+.usermenu {
+  position: absolute;
+  top: 58px;
+  right: 0;
+  min-width: 180px;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: rgba(4, 9, 22, 0.92);
+  border: 1px solid rgba(91, 213, 255, 0.14);
+  box-shadow: 0 16px 40px rgba(3, 9, 22, 0.55);
+  backdrop-filter: blur(12px);
+  color: #f5f9ff;
+  animation: fadeInUp 0.18s ease-out;
+  z-index: 1000;
+}
+
+.usermenu ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.usermenu li {
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.usermenu li:hover {
+  color: #55aaff;
+  transform: translateX(4px);
+}
+
+.cerrarSesionBtn {
+  color: #ff7676;
+}
+
+.cerrarSesionBtn:hover {
+  color: #ff9b9b;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 860px) {
   .heroSection {
     text-align: center;
