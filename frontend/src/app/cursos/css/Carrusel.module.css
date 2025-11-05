@@ -178,4 +178,8 @@
     flex: 1;
     text-align: center;
   }
+
+  .coursesGrid {
+    justify-content: center;
+  }
 }
