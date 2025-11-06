@@ -228,12 +228,12 @@ export default function LandingPage2() {
                         <article className={styles.presencialCard}>
                             <div className={styles.presencialMedia}>
                                 <Image
-                                    src="/assets/presencial-krav.jpg"
+                                    src="/assets/imagen-presencial.jpg"
                                     alt="Taller intensivo Krav Maga"
                                     fill
                                     className={styles.presencialImage}
                                 />
-                                <span className={styles.presencialBadge}>Madrid · Sábados</span>
+                                <span className={styles.presencialBadge}>Albacete · Martes</span>
                             </div>
                             <div className={styles.presencialBody}>
                                 <h3>Krav Maga · Defensa Urbana Intensiva</h3>
@@ -255,15 +255,15 @@ export default function LandingPage2() {
                         <article className={styles.presencialCard}>
                             <div className={styles.presencialMedia}>
                                 <Image
-                                    src="/assets/presencial-sprays.jpg"
+                                    src="/assets/imagen-presencial-spray.jpg"
                                     alt="Clínica uso de sprays"
                                     fill
                                     className={styles.presencialImage}
                                 />
-                                <span className={styles.presencialBadge}>Valencia · Domingos</span>
+                                <span className={styles.presencialBadge}>Albacete · Jueves</span>
                             </div>
                             <div className={styles.presencialBody}>
-                                <h3>Clínica de uso táctico de sprays</h3>
+                                <h3>Uso profesional de sprays</h3>
                                 <p>
                                     Manejo seguro, distancias reales y protocolos de desescalada con simulacros controlados.
                                 </p>
