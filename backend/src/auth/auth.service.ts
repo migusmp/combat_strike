@@ -120,9 +120,11 @@ export class AuthService {
       });
     }
 
+    const jwtSecret = process.env.JWTSECRET || 'secret';
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      String(process.env.JWTSECRET),
+      jwtSecret,
       { expiresIn: '1h' },
     );
 
@@ -214,7 +216,8 @@ export class AuthService {
    */
   async validateToken(token: string) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET! || 'secret');
+      const jwtSecret = process.env.JWTSECRET || 'secret';
+      const decoded = jwt.verify(token, jwtSecret);
       return decoded;
     } catch (err) {
       console.error('Token validation error:', err);
