@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Footer from "../Home/Footer";
 import styles from "./css/LoggedHome.module.css";
+import { useAuthContext } from "@/app/context/AuthContext";
 
 const inProgressCourses = [
     {
@@ -47,7 +48,8 @@ const achievements = [
 ];
 
 export default function LoggedHome() {
-    const userName = "Damián";
+    const { user } = useAuthContext();
+    const userName = user?.name ?? "Combatiente";
     const currentCourse = inProgressCourses[0];
 
     return (

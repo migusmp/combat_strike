@@ -17,7 +17,7 @@ export default function Login() {
     });
     const [canResend, setCanResend] = useState(false);
 
-    const { setAuthenticated } = useAuthContext();
+    const { setAuthenticated, refreshUser } = useAuthContext();
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -50,6 +50,11 @@ export default function Login() {
                     setCanResend(true);
                 }
             } else {
+                try {
+                    await refreshUser();
+                } catch (error) {
+                    console.warn("No se pudo cargar el perfil del usuario", error);
+                }
                 setAuthenticated(true);
                 router.push("/");
             }

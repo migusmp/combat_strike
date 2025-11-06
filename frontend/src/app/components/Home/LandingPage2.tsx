@@ -214,6 +214,73 @@ export default function LandingPage2() {
                     </div>
                 </div>
             </section>
+            <section className={styles.presencialSection}>
+                <div className={styles.presencialInner}>
+                    <div className={styles.presencialHeader}>
+                        <span className={styles.sectionEyebrow}>Entrenamiento presencial</span>
+                        <h2>Vive Combat Strike en directo</h2>
+                        <p>
+                            Sesiones reducidas con nuestros coaches para llevar la técnica a otro nivel.
+                            Grupos selectos, material incluido y feedback personalizado.
+                        </p>
+                    </div>
+                    <div className={styles.presencialGrid}>
+                        <article className={styles.presencialCard}>
+                            <div className={styles.presencialMedia}>
+                                <Image
+                                    src="/assets/presencial-krav.jpg"
+                                    alt="Taller intensivo Krav Maga"
+                                    fill
+                                    className={styles.presencialImage}
+                                />
+                                <span className={styles.presencialBadge}>Madrid · Sábados</span>
+                            </div>
+                            <div className={styles.presencialBody}>
+                                <h3>Krav Maga · Defensa Urbana Intensiva</h3>
+                                <p>
+                                    Entrenamiento de 4 horas centrado en escenarios urbanos, control corporal
+                                    y respuesta ante agarres.
+                                </p>
+                                <ul>
+                                    <li>Máximo 14 plazas</li>
+                                    <li>Incluye material y water break</li>
+                                    <li>Certificado Combat Strike</li>
+                                </ul>
+                                <footer>
+                                    <span>Próxima fecha: 12 Abril</span>
+                                    <Link href="/contacto">Reservar plaza</Link>
+                                </footer>
+                            </div>
+                        </article>
+                        <article className={styles.presencialCard}>
+                            <div className={styles.presencialMedia}>
+                                <Image
+                                    src="/assets/presencial-sprays.jpg"
+                                    alt="Clínica uso de sprays"
+                                    fill
+                                    className={styles.presencialImage}
+                                />
+                                <span className={styles.presencialBadge}>Valencia · Domingos</span>
+                            </div>
+                            <div className={styles.presencialBody}>
+                                <h3>Clínica de uso táctico de sprays</h3>
+                                <p>
+                                    Manejo seguro, distancias reales y protocolos de desescalada con simulacros controlados.
+                                </p>
+                                <ul>
+                                    <li>2 h 30 min de práctica guiada</li>
+                                    <li>Sprays inertes incluidos</li>
+                                    <li>Enfoque mixto: defensa femenina y urbana</li>
+                                </ul>
+                                <footer>
+                                    <span>Próxima fecha: 21 Abril</span>
+                                    <Link href="/contacto">Solicitar info</Link>
+                                </footer>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
             <CollaborationSection />
             <Footer />
         </>

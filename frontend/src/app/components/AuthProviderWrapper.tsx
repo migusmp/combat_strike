@@ -16,10 +16,10 @@ export function AuthProviderWrapper({ children }: { children: ReactNode }) {
 }
 
 function AuthWrapper({ children }: { children: ReactNode }) {
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated, checkingAuth } = useAuthContext();
     const pathname = usePathname();
 
-    if (isAuthenticated === null) return <LoadingSpinner />;
+    if (checkingAuth) return <LoadingSpinner />;
 
     // Rutas donde NO quieres header
     const noHeaderRoutes = ["/login", "/register", "/reset-password", "/forgot-password", "/verify"];
