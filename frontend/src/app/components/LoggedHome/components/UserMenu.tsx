@@ -2,6 +2,7 @@
 import { forwardRef } from "react";
 import styles from "../css/LoggedHome.module.css";
 import { API_URL } from "@/app/utils/api_url";
+import Link from "next/link";
 
 const UserMenu = forwardRef<HTMLDivElement>((props, ref) => {
 
@@ -19,8 +20,8 @@ const UserMenu = forwardRef<HTMLDivElement>((props, ref) => {
     return (
         <section ref={ref} className={styles.usermenu}>
             <ul>
-                <li>Cuenta</li>
-                <li>Mis Cursos</li>
+                <Link href="/account"><li>Cuenta</li></Link>
+                <Link href="/mis-cursos"><li>Mis Cursos</li></Link>
                 <li className={styles.cerrarSesionBtn} onClick={handleClickLogout}>Cerrar sesión</li>
             </ul>
         </section>
