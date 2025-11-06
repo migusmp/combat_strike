@@ -66,7 +66,7 @@ export default function CourseContent({ courseId }: CourseContentProps) {
         <section className={styles.courseContentSection}>
             <div className={styles.courseContentHeader}>
                 <div>
-                    <p className={styles.contentEyebrow}>Plan de estudio</p>
+                    <p className={styles.contentEyebrow}>Plan de entrenamiento</p>
                     <h2>Contenido del curso</h2>
                 </div>
                 <div className={styles.courseContentSummary}>

@@ -262,11 +262,41 @@
 }
 
 .contentEyebrow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     margin: 0;
+    padding: 0.35rem 1rem 0.35rem 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 0.25em;
-    font-size: 0.7rem;
-    color: #7f8bc1;
+    letter-spacing: 0.32em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: transparent;
+    background: linear-gradient(120deg, #7cf2ff, #4ee1c1, #1f73ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.contentEyebrow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(10, 34, 91, 0.12);
+    box-shadow: 0 10px 25px rgba(31, 115, 255, 0.18);
+    z-index: -1;
+}
+
+.contentEyebrow::after {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, rgba(124, 242, 255, 0.85), rgba(31, 115, 255, 0.95));
+    box-shadow: 0 0 12px rgba(124, 242, 255, 0.4);
 }
 
 .courseContentSummary {
@@ -523,6 +553,7 @@
 }
 
 .courseName {
+    font-weight: bold;
     font-size: 1rem;
     margin: 0;
 }
@@ -549,11 +580,19 @@
 .bottomBarCTA {
     border: none;
     border-radius: 999px;
-    background: linear-gradient(120deg, #1f73ff, #4ee1c1);
-    color: #031537;
+    background: linear-gradient(135deg, #0b3a9d, #041f63);
+    color: #ffffff;
     font-weight: 600;
-    padding: 0.5rem 1.3rem;
+    padding: 0.55rem 1.5rem;
     cursor: pointer;
+    box-shadow: 0 12px 35px rgba(8, 34, 92, 0.55);
+    border: 1px solid rgba(112, 160, 255, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bottomBarCTA:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(8, 34, 92, 0.6);
 }
 
 @media (max-width: 640px) {
