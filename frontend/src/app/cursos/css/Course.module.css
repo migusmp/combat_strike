@@ -10,16 +10,22 @@
 
 .coursePresentation {
     width: 100%;
-    height: 350px;
-    background-color: #000032;
+    height: 360px;
+    background: linear-gradient(135deg, #020617, #04134c 60%, #0b1f66);
     display: flex;
     justify-content: center;
-    /* centra horizontalmente */
     align-items: flex-start;
-    /* alinea al inicio verticalmente */
     position: relative;
-    /* para que los hijos puedan sobrepasar */
     padding: 2rem;
+    overflow: hidden;
+}
+
+.coursePresentation::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 35% 10%, rgba(255, 255, 255, 0.15), transparent 55%);
+    pointer-events: none;
 }
 
 .courseHeader {
@@ -28,55 +34,85 @@
     padding: 1rem;
     color: white;
     flex-shrink: 0;
-    /* evita que se encoja */
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
 }
 
 .courseHeader h1 {
     margin: 0;
-    font-size: 1.7rem;
-    font-weight: bold;
+    font-size: 2.2rem;
+    font-weight: 700;
 }
-
-.courseHeader p {
-    font-size: 1.1rem;
-    color: #fffdfd;
-    margin-top: 0.7rem;
+.courseSubtitle {
+    font-size: 1.05rem;
+    color: #d8ddff;
+    line-height: 1.6;
+    margin: 0;
 }
-
-.courseHeader section {
+.courseRatingRow {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
-    margin-top: 4rem;
+    font-weight: 600;
+}
+.ratingStars {
+    display: inline-flex;
+    gap: 0.1rem;
 }
 
-.courseHeader section p {
+.ratingStars svg {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.ratingValue {
+    color: #fff;
+}
+
+.ratingCount {
+    color: #b9c3ff;
+    font-size: 0.9rem;
+}
+
+.ratingEmpty {
+    color: #96a3d9;
+    font-size: 0.95rem;
+}
+
+.courseMetaChips {
     display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+.metaChip {
+    display: inline-flex;
     align-items: center;
     gap: 0.3rem;
     margin: 0;
-    font-size: 0.7rem;
-    background-color: rgba(255, 255, 255, 0.2);
-    padding: 0.2rem 0.6rem;
-    border-radius: 5px;
+    font-size: 0.8rem;
+    background-color: rgba(255, 255, 255, 0.08);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.metaChip strong {
+    color: #fff;
 }
 
 .courseVideoIntroduction {
     width: 350px;
-    height: auto;
-    background-color: #ffffff;
-    /* position: sticky; */
-    /* top: 60px; */
-    /* z-index: 10; */
-    /* contenedor de todo */
-    box-shadow: 0 8px 20px rgba(0, 0, 50, 0.2);
-    border-radius: 3px;
-    padding: 0.4rem;
-    overflow: hidden;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 1.4rem;
+    box-shadow: 0 24px 60px rgba(7, 18, 55, 0.25);
+    border: 1px solid rgba(3, 15, 38, 0.08);
     display: flex;
     flex-direction: column;
-    /* para que el contenido adicional vaya debajo */
-    align-items: center;
-    /* transition: all 0.3s ease; */
+    gap: 1rem;
+    align-items: stretch;
 }
 
 .stickyVideo {
@@ -86,66 +122,58 @@
     /* ahora es relativo, no fijo */
     width: 90%;
     max-width: 350px;
-    z-index: 1;
+    z-index: 999;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .imageWrapper {
     position: relative;
     width: 100%;
-    flex: 0 0 auto;
-    /* que no crezca ni se encoja */
+    border-radius: 18px;
+    overflow: hidden;
 }
 
 
 .courseImage {
     width: 100%;
     height: auto;
-    object-fit: contain;
-    border-radius: 5px;
     display: block;
 }
 
 .overlay {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    pointer-events: auto;
-    /* asegúrate de que el overlay reciba eventos */
+    justify-content: center;
+    gap: 0.4rem;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0.45));
 }
 
 .startButton {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background-color: #313131;
+    background-color: rgba(255, 255, 255, 0.95);
     border: none;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    pointer-events: auto;
-    /* aseguramos que el botón reciba el hover */
-    overflow: hidden;
-    /* asegura que nada sobresalga del borde circular */
 }
 
 .startButton svg {
     width: 100%;
     height: 100%;
-    fill: #fff;
+    fill: #0c1d4f;
 }
 
 .startButton:hover {
-    transform: scale(1.2);
-    /* escala todo el botón */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
 }
 
 .previewText {
@@ -153,74 +181,60 @@
     font-size: 0.9rem;
     background-color: rgba(0, 0, 0, 0.5);
     padding: 0.2rem 0.6rem;
-    border-radius: 5px;
-    transform: translateY(30px);
+    border-radius: 999px;
 }
 
 
 /* Contenido adicional debajo de la imagen */
 .courseExtraContent {
-    margin-top: 0.5rem;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
 .coursePrice {
-    font-size: 1.5rem;
-    padding-left: 1rem;
-    font-weight: bold;
-    color: #000032;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #040f3a;
+    margin: 0;
+}
+
+.courseAccessNote {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5d678f;
 }
 
 .buyCourseButton {
-    width: calc(100% - 2rem);
-    margin: 1rem;
-    padding: 0.8rem;
-    background-color: #055293;
-    font-weight: bold;
-    color: #fff;
-    border-radius: 3px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.buyCourseButton:hover {
-    background-color: #0173d0;
-}
-
-.courseExtraContent {
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     width: 100%;
-}
-
-.buyCourseButton {
-    margin-top: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    background-color: #055293;
+    margin-top: 0.3rem;
+    padding: 0.9rem 1rem;
+    background: linear-gradient(120deg, #1f73ff, #0a4cbf);
+    font-weight: 600;
     color: #fff;
+    border-radius: 14px;
+    font-size: 1rem;
     border: none;
-    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 14px 35px rgba(17, 92, 210, 0.35);
 }
 
 .buyCourseButton:hover {
-    background-color: #03396b;
+    transform: translateY(-2px);
 }
 
 .courseIncludes {
     margin-top: 0.5rem;
     width: 100%;
     padding: 1rem 1.2rem;
-    border-radius: 12px;
+    border-radius: 18px;
+    background: #f7f8fd;
+    border: 1px dashed rgba(6, 26, 78, 0.2);
 }
 
 .courseIncludes h3 {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
     font-size: 1rem;
     font-weight: bold;
     color: #000032;
@@ -228,13 +242,16 @@
 
 .courseIncludes ul {
     list-style: disc;
-    padding-left: 1.5rem;
+    padding-left: 1.2rem;
+    color: #4d5574;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
 }
 
 .courseIncludes li {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #333;
+    margin: 0;
 }
 
 .shareCourseBtn {
@@ -242,21 +259,23 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #055293;
-    padding: 0.5rem 1rem;
-    border-radius: 24px;
+    margin-top: 0.8rem;
+    margin-bottom: 0.3rem;
+    border: 1px solid rgba(12, 28, 69, 0.25);
+    padding: 0.55rem 1.2rem;
+    border-radius: 999px;
     cursor: pointer;
     font-size: 0.9rem;
     color: #055293;
     font-weight: bold;
-    transition: all 0.2s ease;
+    background: #fff;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .shareCourseBtn:hover {
-    background-color: #055293;
-    color: #fff;
+    background-color: rgba(15, 58, 142, 0.08);
+    color: #055293;
+    transform: translateY(-1px);
 }
 
 /* WHAT YOU WILL LEARN SECTION */

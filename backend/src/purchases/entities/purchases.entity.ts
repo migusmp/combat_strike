@@ -6,7 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Course } from 'src/courses/entities/course.entity';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 
 /**
  * Entidad que representa una compra de curso dentro del sistema.

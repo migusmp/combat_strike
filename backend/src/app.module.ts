@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { MailService } from './mail/mail.service';
 import { CoursesModule } from './courses/courses.module';
 import { PurchasesModule } from './purchases/purchases.module';
+import { UsersController } from './users/users.controller';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -28,15 +30,16 @@ import { PurchasesModule } from './purchases/purchases.module';
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_NAME'),
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: true, // solo en desarrollo
         };
       },
     }),
     AuthModule,
     CoursesModule,
-    PurchasesModule, // módulo de autenticación
+    PurchasesModule,
+    UsersModule, // módulo de autenticación
   ],
-  controllers: [AppController],
+  controllers: [AppController, UsersController],
   providers: [AppService, MailService],
   exports: [MailService],
 })
