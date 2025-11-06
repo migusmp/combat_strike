@@ -17,6 +17,11 @@ export default function LandingPage2() {
     const [assistantVisible, setAssistantVisible] = useState(false);
     const { courses, isLoading, error } = useCourses();
     const featuredCourses = (courses ?? []).slice(0, 3);
+    const heroStats = [
+        // { value: "4.8", suffix: "/5", label: "Valoración media" },
+        { value: "+6", suffix: "", label: "Cursos disponibles" },
+        { value: "24/7", suffix: "", label: "Acceso a prácticas" },
+    ];
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -43,34 +48,47 @@ export default function LandingPage2() {
 
     return (
         <>
-            <section className={styles.container}>
-                <div className={styles.textContainer}>
-                    <h1 className={styles.title}>COMBAT STRIKE</h1>
-                    <p className={styles.description}>
-                        DL Combat Strike es una marca de deportes de contacto enfocada en la
-                        seguridad personal y basada en técnicas de krav maga. Cuya
-                        misión es permitir que las personas tengan la oportunidad de saber
-                        defenderse y tener conocimientos básicos de defensa basada en
-                        situaciones reales. La marca atrae a una comunidad única llena de
-                        actitud de quienes buscan aprender y convertirse en luchadores.
-                    </p>
-                    <div className={styles.btnContainer}>
-                        <Link href="/register" className={styles.btnUnirse}>Únete ahora</Link>
-                        <Link href="/cursos" className={styles.btnExplorarCursos}>Explorar Cursos</Link>
+            <section className={styles.hero}>
+                <div className={styles.heroInner}>
+                    <div className={styles.heroContent}>
+                        <h1 className={styles.heroTitle}>Prepárate para reaccionar <br /> antes de la primera amenaza</h1>
+                        <p className={styles.heroDescription}>
+                            DL Combat Strike es una marca de deportes de contacto enfocada en la seguridad personal y basada en
+                            técnicas de Krav Maga. Nuestra misión es enseñarte a responder ante situaciones reales, dotándote de
+                            reflejos, estrategia y carácter para convertirte en tu primera línea de defensa.
+                        </p>
+                        <div className={styles.heroActions}>
+                            <Link href="/register" className={styles.heroPrimaryCTA}>Empieza hoy</Link>
+                            <Link href="/cursos" className={styles.heroSecondaryCTA}>Explorar cursos</Link>
+                        </div>
+                        <div className={styles.heroStats}>
+                            {heroStats.map(stat => (
+                                <div key={stat.label} className={styles.heroStatCard}>
+                                    <strong>
+                                        {stat.value}
+                                        <span>{stat.suffix}</span>
+                                    </strong>
+                                    <span>{stat.label}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <Link href="/login" className={styles.ctaBtn}>
-                        Empieza aquí
-                    </Link>
-                </div>
-                <div className={styles.imageContainer}>
-                    <Image
-                        src="/assets/logo-blanco-sin-texto.webp"
-                        width={600}
-                        height={600}
-                        alt="DL Combat Strike logo"
-                        className={styles.image}
-                        priority={true}
-                    />
+                    <div className={styles.heroVisual}>
+                        <div className={styles.heroBadge}>Formación 2025</div>
+                        <Image
+                            src="/assets/imagen_principal.jpg"
+                            alt="Entrenamiento táctico Combat Strike"
+                            fill
+                            priority
+                            className={styles.heroImage}
+                        />
+                        <div className={styles.heroOverlayCard}>
+                            <span>Ruta destacada</span>
+                            <h3>Pack Defensa Personal</h3>
+                            <p>Incluye cursos presenciales y online para dominar respuestas tácticas desde el primer mes.</p>
+                            <Link href="/cursos">Ver cursos →</Link>
+                        </div>
+                    </div>
                 </div>
             </section>
 

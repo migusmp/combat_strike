@@ -1,40 +1,157 @@
 .header {
-    width: 100%;
-    height: 85px;
-    backdrop-filter: blur(8px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 999;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(4, 12, 32, 0.58);
+    border-bottom: 1px solid rgba(124, 242, 255, 0.1);
+    backdrop-filter: blur(18px) saturate(135%);
+    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    height: 85px;
 }
 
-.buttons {
+.scrolled {
+    background: rgba(4, 12, 32, 0.88);
+    border-color: rgba(124, 242, 255, 0.22);
+    box-shadow: 0 18px 45px rgba(2, 12, 38, 0.45);
+}
+
+.inner {
+    width: min(1180px, 92%);
+    margin: 0 auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 1.5rem;
-    position: relative;
+    padding: 0 0;
+    height: 85px;
 }
 
-.icons {
+.brand {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 0.9rem;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+}
+
+.logoGlow {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.brandCopy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    text-align: left;
+}
+
+.brandTitle {
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(124, 242, 255, 0.85);
+}
+
+.brandTagline {
+    font-size: 1.05rem;
+    font-weight: 650;
+    color: transparent;
+    background: linear-gradient(120deg, #ffffff 10%, #94c9ff 55%, #52f5cb 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+}
+
+.navLink {
     position: relative;
-    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(224, 235, 255, 0.82);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    padding: 0.45rem 0;
+    transition: color 0.25s ease;
 }
 
-.bellIcon {
-    color: rgba(255, 255, 255, 0.8);
-    transition: color 0.3s ease, transform 0.3s ease;
+.navLink::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #52f5cb, #94c9ff);
+    box-shadow: 0 8px 16px rgba(82, 245, 203, 0.35);
+    transition: width 0.25s ease;
 }
 
-.bellIcon:hover {
-    color: #55aaff;
+.navLink:hover {
+    color: #ffffff;
+}
+
+.navLink:hover::after {
+    width: 100%;
+}
+
+.navLinkActive {
+    color: #ffffff;
+}
+
+.navLinkActive::after {
+    width: 100%;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconCluster {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #f5f9ff;
+}
+
+.iconButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    border: 1px solid rgba(124, 242, 255, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.iconButton:hover {
     transform: translateY(-2px);
+    border-color: rgba(124, 242, 255, 0.45);
+    background: rgba(124, 242, 255, 0.15);
 }
 
 .profileContainer {
@@ -44,364 +161,254 @@
 }
 
 .userImage {
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    border: 2px solid transparent;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease, border-color 0.3s ease,
-        box-shadow 0.3s ease;
+    box-shadow: 0 12px 28px rgba(36, 123, 255, 0.22);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.profileContainer:hover .userImage,
-.profileContainer:focus-within .userImage {
-    transform: translateY(-2px) scale(1.03);
-    border-color: rgba(85, 170, 255, 0.6);
-    box-shadow: 0 10px 26px rgba(85, 170, 255, 0.35);
+.profileContainer:hover .userImage {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 18px 42px rgba(36, 123, 255, 0.32);
 }
 
-.buttons nav {
+.ctaGroup {
     display: flex;
     align-items: center;
-    font-size: 1.3rem;
-    margin-right: 50px;
-    color: #fff;
-    gap: 50px;
+    gap: 0.75rem;
 }
 
-.buttons nav a,
-.headerMobile nav a {
-    position: relative;
-    color: #fff;
+.ctaGhost,
+.ctaPrimary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.45rem;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 0.92rem;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
 }
 
-/* efecto hover: subrayado animado */
-.buttons nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: #055293;
-    transition: width 0.3s ease;
+.ctaGhost {
+    border: 1px solid rgba(124, 242, 255, 0.3);
+    color: #e6f4ff;
+    background: rgba(255, 255, 255, 0.06);
 }
 
-.buttons nav a:hover {
-    color: #55aaff;
+.ctaGhost:hover {
+    transform: translateY(-2px);
+    border-color: rgba(124, 242, 255, 0.6);
+    background: rgba(124, 242, 255, 0.15);
 }
 
-.buttons nav a:hover::after {
-    width: 100%;
-}
-
-/* ruta activa */
-.active {
-    color: #55aaff !important;
-}
-
-.active::after {
-    content: "";
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: #55aaff;
-}
-
-.telephoneSvg {
-    display: none;
-}
-
-.headerMobile {
-    display: none;
-}
-.divider {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* botones */
-/* Botón Iniciar sesión */
-.loginBtn {
-    background: #055293;
-    color: #fff;
-    padding: 13px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+.ctaPrimary {
     border: none;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease, transform 0.2s ease;
+    background: linear-gradient(120deg, #5ad6ff, #52f5cb);
+    color: #031930;
+    box-shadow: 0 20px 45px rgba(82, 245, 203, 0.4);
 }
 
-.loginBtn:hover {
-    background: linear-gradient(135deg, #111, #333);
-    color: #fff;
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 16px rgba(85, 170, 255, 0.4);
-}
-
-/* Botón Registrarse */
-.registerBtn {
-    background: transparent;
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 6px;
-    border: 2px solid #fff;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease, transform 0.2s ease;
-}
-
-.registerBtn:hover {
-    background: #fff;
-    border-color: #fff;
-    color: #000;
-    transform: translateY(-2px) scale(1.03);
-}
-
-.userIcon {
-    display: none;
-}
-
-
-.userMenu {
-    position: absolute;
-    top: 50px;
-    /* debajo del header */
-    right: 20px;
-    /* alinea con el icono de usuario */
-    background-color: rgba(0, 0, 0, 0.95);
-    color: #fff;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    min-width: 200px;
-    /* ancho consistente */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    gap: 10px;
-    /* espacio entre botones */
-}
-
-/* Botón Iniciar sesión dentro del dropdown */
-.loginBtnDropdown {
-    width: 100%;
-    /* mismo tamaño que registrarse */
-    background: linear-gradient(135deg, #ffffff, #e6e6e6);
-    color: #000;
-    padding: 13px 20px;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease, transform 0.2s ease;
-}
-
-.loginBtnDropdown:hover {
-    background: linear-gradient(135deg, #111, #333);
-    color: #fff;
-    transform: translateY(-2px) scale(1.03);
-}
-
-/* Botón Registrarse dentro del dropdown */
-.registerBtnDropdown {
-    width: 100%;
-    /* mismo tamaño que login */
-    background-color: #055293;
-    /* diferente color para destacarlo */
-    color: #fff;
-    padding: 13px 20px;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease, transform 0.2s ease;
-}
-
-.registerBtnDropdown:hover {
-    background-color: #03396c;
-    /* tono más oscuro al pasar el cursor */
-    transform: translateY(-2px) scale(1.03);
+.ctaPrimary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 26px 58px rgba(82, 245, 203, 0.45);
 }
 
 .hamburger {
     display: none;
     flex-direction: column;
-    justify-content: space-between;
-    width: 35px;
-    height: 25px;
+    justify-content: center;
+    align-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    border: 1px solid rgba(124, 242, 255, 0.18);
+    background: rgba(255, 255, 255, 0.05);
     cursor: pointer;
-    background: none;
-    border: none;
-    z-index: 1001;
+    gap: 6px;
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.hamburger:hover {
+    background: rgba(124, 242, 255, 0.15);
+    border-color: rgba(124, 242, 255, 0.45);
+}
+
+.hamburgerOpen {
+    background: rgba(124, 242, 255, 0.15);
+    border-color: rgba(124, 242, 255, 0.45);
 }
 
 .bar {
-    height: 3px;
-    width: 100%;
-    background-color: white;
-    border-radius: 10px;
-    transition: 0.4s;
+    width: 20px;
+    height: 2px;
+    background: #f5f9ff;
+    border-radius: 999px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.bar1 {
-    transform: rotate(-45deg) translate(-5px, 6px);
+.hamburgerOpen .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
 }
 
-.bar2 {
+.hamburgerOpen .bar:nth-child(2) {
     opacity: 0;
 }
 
-.bar3 {
-    transform: rotate(45deg) translate(-5px, -6px);
+.hamburgerOpen .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.userMenu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    background: rgba(4, 12, 36, 0.92);
+    color: #f5f9ff;
+    border-radius: 18px;
+    border: 1px solid rgba(124, 242, 255, 0.2);
+    min-width: 220px;
+    box-shadow: 0 24px 60px rgba(3, 9, 28, 0.55);
+    backdrop-filter: blur(18px);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 1000;
+}
+
+.loginBtnDropdown,
+.registerBtnDropdown {
+    width: 100%;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.loginBtnDropdown {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f3f6ff;
+}
+
+.loginBtnDropdown:hover {
+    transform: translateY(-2px);
+    background: rgba(124, 242, 255, 0.2);
+    box-shadow: 0 12px 24px rgba(124, 242, 255, 0.25);
+}
+
+.registerBtnDropdown {
+    background: linear-gradient(120deg, #5ad6ff, #52f5cb);
+    color: #031930;
+}
+
+.registerBtnDropdown:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(82, 245, 203, 0.35);
 }
 
 .mobileMenu {
     position: fixed;
     top: 85px;
     right: 0;
-    width: 250px;
+    width: min(320px, 90vw);
     height: calc(100vh - 85px);
-    background: rgba(0, 0, 0, 0.95);
-    color: white;
-    display: none;
+    background: rgba(4, 12, 36, 0.94);
+    color: #f5f9ff;
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
-    padding: 2rem;
+    gap: 1.6rem;
+    padding: 2rem 1.8rem;
     transform: translateX(100%);
-    transition: transform 0.4s ease;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    transition: transform 0.35s ease;
+    box-shadow: -10px 0 35px rgba(2, 10, 32, 0.45);
+    z-index: 950;
 }
 
-.mobileMenu.open {
+.mobileMenuOpen {
     transform: translateX(0);
 }
 
 .mobileMenu nav {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.4rem;
 }
 
 .mobileLink {
-    padding: 0.8rem 0;
-    width: 100%;
-    text-align: left;
-    font-size: 1.1rem;
-    color: white;
+    font-size: 1.05rem;
+    color: rgba(224, 235, 255, 0.85);
     text-decoration: none;
-    transition: color 0.2s;
+    letter-spacing: 0.03em;
+    transition: color 0.2s ease;
 }
 
 .mobileLink:hover {
-    color: #55aaff;
+    color: #ffffff;
+}
+
+.loginBtnMobile,
+.registerBtnMobile {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .loginBtnMobile {
-    width: 100%;
-    padding: 13px 20px;
-    background: #055293;
-    color: #fff;
-    border-radius: 6px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease, transform 0.2s ease;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
 }
 
 .loginBtnMobile:hover {
-    background: linear-gradient(135deg, #111, #333);
-    transform: translateY(-2px) scale(1.03);
+    transform: translateY(-2px);
+    background: rgba(124, 242, 255, 0.2);
+    box-shadow: 0 14px 30px rgba(124, 242, 255, 0.25);
 }
 
 .registerBtnMobile {
-    width: 100%;
-    padding: 13px 20px;
-    background: transparent;
-    border: 2px solid #fff;
-    border-radius: 6px;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease, transform 0.2s ease;
+    background: linear-gradient(120deg, #5ad6ff, #52f5cb);
+    color: #031930;
 }
 
 .registerBtnMobile:hover {
-    background: #fff;
-    color: #000;
-    transform: translateY(-2px) scale(1.03);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(82, 245, 203, 0.35);
 }
 
-@media (max-width: 985px) {
-    .desktopNav {
+@media (max-width: 1080px) {
+    .nav {
         display: none;
     }
 
-    .buttons nav {
-        font-size: 1.3rem;
-        margin-right: 50px;
-        color: #fff;
-        gap: 30px;
-    }
-
-    .loginBtn,
-    .registerBtn {
+    .ctaGroup {
         display: none;
     }
 
-    .userIcon {
-        display: block;
-        position: absolute;
-        right: 3%;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-    }
-}
-
-@media (max-width: 685px) {
     .hamburger {
         display: flex;
     }
-
-    .mobileMenu {
-        display: flex;
-    }
-
-    .buttons nav {
-        display: none;
-    }
-
-    .logoCombatStrike {
-        width: 55px;
-        height: 55px;
-
-    }
-
-    .userIcon {
-        display: none;
-    }
-
-    .icons div {
-        display: none;
-    }
-
-    .userIcon {
-        position: absolute;
-        right: 4%;
-        top: 50%;
-        transform: translateY(-50%);
-    }
 }
 
-@media (max-width: 450px) {
-    .telephoneSvg {
-        display: block;
+@media (max-width: 640px) {
+    .inner {
+        gap: 1rem;
+    }
+
+    .brandTagline {
+        font-size: 0.95rem;
+    }
+
+    .logoGlow {
+        width: 42px;
+        height: 42px;
     }
 }
