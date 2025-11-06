@@ -147,6 +147,8 @@
     border-radius: 26px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     padding: clamp(1.2rem, 3vw, 1.8rem);
+    width: min(1180px, 92%);
+    margin: 0 auto;
 }
 
 .actionsSection {
@@ -189,15 +191,52 @@
 .sectionHeader {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    margin-bottom: 1.2rem;
+    gap: 0.4rem;
+    margin-bottom: 1.6rem;
+    position: relative;
 }
 
 .sectionEyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.25em;
-    font-size: 0.68rem;
-    color: #7fd4ff;
+    letter-spacing: 0.28em;
+    font-size: 0.58rem;
+    color: #a5e8ff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sectionEyebrow::before {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124, 242, 255, 0.8));
+}
+
+.sectionHeader h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #f5f9ff;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.sectionHeader h2::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(124, 242, 255, 0.9), transparent);
+    opacity: 0.7;
+}
+
+.sectionHeader p {
+    margin: 0;
+    color: rgba(174, 197, 238, 0.78);
+    font-size: 0.88rem;
 }
 
 .badgesSection {
@@ -206,6 +245,8 @@
     padding: clamp(1.4rem, 3vw, 2rem);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 18px 50px rgba(6, 10, 40, 0.55);
+    width: min(1180px, 92%);
+    margin: 0 auto;
 }
 
 .badgesGrid {
@@ -248,27 +289,81 @@
     box-shadow: 0 22px 55px rgba(3, 6, 18, 0.6);
 }
 
+.discoverySubhead {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.discoveryEyebrow {
+    letter-spacing: 0.35em;
+    color: #a9f4ff;
+    font-size: 0.65rem;
+}
+
+.discoveryPulse {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #7cf2ff;
+    box-shadow: 0 0 12px rgba(124, 242, 255, 0.8);
+    animation: pulse 2s ease infinite;
+}
+
+.discoveryTitle {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    background: linear-gradient(120deg, #ffffff 15%, #a0f3ff 55%, #62b0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 8px 30px rgba(98, 176, 255, 0.35);
+    position: relative;
+    padding-bottom: 0.35rem;
+}
+
+.discoveryTitle::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, #7cf2ff, transparent);
+}
+
+.discoveryDescription {
+    font-size: 1rem;
+    color: rgba(209, 223, 255, 0.85);
+}
+
 .discoveryGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 280px));
+    gap: 1.1rem;
+    justify-content: flex-start;
 }
 
 .discoveryCard {
     border-radius: 24px;
-    background: rgba(6, 14, 36, 0.9);
+    background: rgba(6, 14, 36, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow: 0 18px 40px rgba(2, 6, 16, 0.55);
+    box-shadow: 0 18px 40px rgba(2, 6, 16, 0.5);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 0;
+    max-width: 300px;
+    min-height: 350px;
 }
 
 .discoveryMedia {
     position: relative;
     width: 100%;
-    height: 280px;
+    height: 200px;
     overflow: hidden;
 }
 
@@ -282,27 +377,31 @@
     left: 1rem;
     padding: 0.35rem 0.9rem;
     border-radius: 999px;
-    background: rgba(3, 10, 24, 0.82);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(3, 10, 24, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     font-size: 0.78rem;
     letter-spacing: 0.08em;
+    box-shadow: 0 10px 25px rgba(2, 6, 16, 0.5);
 }
 
 .discoveryBody {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 1.3rem;
+    gap: 0.45rem;
+    padding: 1.1rem 1.2rem 1.2rem;
+    flex: 1;
 }
 
 .discoveryBody h3 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.05rem;
+    color: #f5f6ff;
 }
 
 .discoveryBody p {
     margin: 0;
-    color: rgba(200, 214, 240, 0.85);
+    color: rgba(200, 214, 240, 0.78);
+    font-size: 0.9rem;
 }
 
 .discoveryBody footer {
@@ -311,7 +410,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.8rem;
-    color: rgba(175, 194, 232, 0.9);
+    color: rgba(175, 194, 232, 0.85);
+    font-size: 0.85rem;
 }
 
 .discoveryBody footer a {
@@ -337,6 +437,21 @@
     font-size: 0.92rem;
 }
 
+@keyframes pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0.5;
+    }
+}
+
 @media (max-width: 768px) {
     .heroSection {
         grid-template-columns: 1fr;
@@ -345,5 +460,9 @@
     .heroActions {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .discoveryGrid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
 }

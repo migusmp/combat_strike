@@ -1,8 +1,7 @@
 // app/page.tsx
 "use client";
 import GuestHome from './components/Home/GuestHome';
-import LoggedHome from './components/LoggedHome/LoggedHome';
-import NewUserHome from './components/LoggedHome/NewUserHome';
+import HomeExperience from './components/LoggedHome/HomeExperience';
 import { useAuthContext } from './context/AuthContext';
 
 export default function Home() {
@@ -11,7 +10,7 @@ export default function Home() {
   // Opcional: puedes mostrar distinto contenido según esté logueado
   return (
     <>
-      {isAuthenticated ? <NewUserHome /> : <GuestHome />}
+      {isAuthenticated ? <HomeExperience /> : <GuestHome />}
     </>
   );
 }

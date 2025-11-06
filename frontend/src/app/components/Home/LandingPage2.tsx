@@ -248,7 +248,7 @@ export default function LandingPage2() {
                                 </ul>
                                 <footer>
                                     <span>Próxima fecha: 12 Abril</span>
-                                    <Link href="/contacto">Reservar plaza</Link>
+                                    <Link href="/contact">Reservar plaza</Link>
                                 </footer>
                             </div>
                         </article>
