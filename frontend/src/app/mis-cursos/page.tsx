@@ -103,126 +103,130 @@ export default function MyCoursesPage() {
     return (
         <>
             <div className={styles.wrapper}>
-                <section className={styles.hero}>
-                    <div className={styles.heroContent}>
-                        <span className={styles.heroEyebrow}>Tu entrenamiento</span>
-                        <h1>Mis cursos activos ⚡</h1>
-                        <p>
-                            Continúa donde lo dejaste, celebra tus logros y desbloquea nuevas misiones avanzando a tu
-                            ritmo.
-                        </p>
-                        <div className={styles.heroActions}>
-                            <Link href="/cursos" className={styles.heroPrimary}>
-                                Explorar catálogo
-                            </Link>
-                            <Link href="/agenda" className={styles.heroSecondary}>
-                                Ver agenda táctica
-                            </Link>
-                        </div>
-                    </div>
-                    <div className={styles.progressSummary}>
-                        <h3>Estado general</h3>
-                        <div className={styles.summaryGrid}>
-                            <div className={styles.summaryCard}>
-                                <span>Cursos en progreso</span>
-                                <strong>{summary.active}</strong>
-                            </div>
-                            <div className={styles.summaryCard}>
-                                <span>Completados</span>
-                                <strong>{summary.completed}</strong>
-                            </div>
-                            <div className={styles.summaryCard}>
-                                <span>Total adquiridos</span>
-                                <strong>{summary.total}</strong>
-                            </div>
-                            <div className={styles.summaryCard}>
-                                <span>Horas registradas</span>
-                                <strong>{summary.hours}</strong>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Siguiendo ahora</h2>
-                        <small>Completa tus misiones activas antes de 72h para retener elasticidad.</small>
-                    </div>
-                    {isLoading && <p className={styles.emptyState}>Sincronizando tus cursos...</p>}
-                    {error && !isLoading && <p className={styles.emptyState}>No pudimos cargar tus cursos. Inténtalo más tarde.</p>}
-                    {!isLoading && inProgress.length === 0 && (
-                        <p className={styles.emptyState}>
-                            No tienes cursos en marcha. Revisa el catálogo para iniciar un nuevo entrenamiento.
-                        </p>
-                    )}
-                    {!isLoading && inProgress.length > 0 && (
-                        <div className={styles.courseGrid}>
-                            {inProgress.map((course) => (
-                                <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
-                                    <div className={styles.courseThumb}>
-                                        <Image
-                                            src={course.image}
-                                            alt={course.title}
-                                            fill
-                                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
-                                        />
-                                    </div>
-                                    <h3>{course.title}</h3>
-                                    <div className={styles.metaRow}>
-                                        <span>{course.category}</span>
-                                        <span>{course.progress}%</span>
-                                    </div>
-                                    <div className={styles.progressBar}>
-                                        <div className={styles.progressFill} style={{ width: `${course.progress}%` }} />
-                                    </div>
-                                    <div className={styles.courseFooter}>
-                                        <span>Siguiente: {course.nextLesson}</span>
-                                        <span>Continuar →</span>
-                                    </div>
+                <div className={styles.content}>
+                    <section className={styles.hero}>
+                        <div className={styles.heroContent}>
+                            <span className={styles.heroEyebrow}>Tu entrenamiento</span>
+                            <h1>Mis cursos activos ⚡</h1>
+                            <p>
+                                Continúa donde lo dejaste, celebra tus logros y desbloquea nuevas misiones avanzando a tu
+                                ritmo.
+                            </p>
+                            <div className={styles.heroActions}>
+                                <Link href="/cursos" className={styles.heroPrimary}>
+                                    Explorar catálogo
                                 </Link>
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Completados</h2>
-                        <small>Revisa el contenido clave o comparte tus logros con tu equipo.</small>
-                    </div>
-                    {completed.length === 0 ? (
-                        <p className={styles.emptyState}>
-                            Aún no tienes cursos completados. Mantén tu ritmo y desbloquea tu primera insignia.
-                        </p>
-                    ) : (
-                        <div className={styles.courseGrid}>
-                            {completed.map((course) => (
-                                <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
-                                    <div className={styles.courseThumb}>
-                                        <Image
-                                            src={course.image}
-                                            alt={course.title}
-                                            fill
-                                            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
-                                        />
-                                    </div>
-                                    <h3>{course.title}</h3>
-                                    <div className={styles.metaRow}>
-                                        <span>{course.category}</span>
-                                        <span>100%</span>
-                                    </div>
-                                    <div className={styles.progressBar}>
-                                        <div className={styles.progressFill} style={{ width: "100%" }} />
-                                    </div>
-                                    <div className={styles.courseFooter}>
-                                        <span>Lección final: {course.lastLesson}</span>
-                                        <span>Revisar →</span>
-                                    </div>
+                                <Link href="/agenda" className={styles.heroSecondary}>
+                                    Ver agenda táctica
                                 </Link>
-                            ))}
+                            </div>
                         </div>
-                    )}
-                </section>
+                        <div className={styles.progressSummary}>
+                            <h3>Estado general</h3>
+                            <div className={styles.summaryGrid}>
+                                <div className={styles.summaryCard}>
+                                    <span>Cursos en progreso</span>
+                                    <strong>{summary.active}</strong>
+                                </div>
+                                <div className={styles.summaryCard}>
+                                    <span>Completados</span>
+                                    <strong>{summary.completed}</strong>
+                                </div>
+                                <div className={styles.summaryCard}>
+                                    <span>Total adquiridos</span>
+                                    <strong>{summary.total}</strong>
+                                </div>
+                                <div className={styles.summaryCard}>
+                                    <span>Horas registradas</span>
+                                    <strong>{summary.hours}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <h2>Siguiendo ahora</h2>
+                            <small>Completa tus misiones activas antes de 72h para retener elasticidad.</small>
+                        </div>
+                        {isLoading && <p className={styles.emptyState}>Sincronizando tus cursos...</p>}
+                        {error && !isLoading && (
+                            <p className={styles.emptyState}>No pudimos cargar tus cursos. Inténtalo más tarde.</p>
+                        )}
+                        {!isLoading && inProgress.length === 0 && (
+                            <p className={styles.emptyState}>
+                                No tienes cursos en marcha. Revisa el catálogo para iniciar un nuevo entrenamiento.
+                            </p>
+                        )}
+                        {!isLoading && inProgress.length > 0 && (
+                            <div className={styles.courseGrid}>
+                                {inProgress.map((course) => (
+                                    <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
+                                        <div className={styles.courseThumb}>
+                                            <Image
+                                                src={course.image}
+                                                alt={course.title}
+                                                fill
+                                                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
+                                            />
+                                        </div>
+                                        <h3>{course.title}</h3>
+                                        <div className={styles.metaRow}>
+                                            <span>{course.category}</span>
+                                            <span>{course.progress}%</span>
+                                        </div>
+                                        <div className={styles.progressBar}>
+                                            <div className={styles.progressFill} style={{ width: `${course.progress}%` }} />
+                                        </div>
+                                        <div className={styles.courseFooter}>
+                                            <span>Siguiente: {course.nextLesson}</span>
+                                            <span>Continuar →</span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+
+                    <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <h2>Completados</h2>
+                            <small>Revisa el contenido clave o comparte tus logros con tu equipo.</small>
+                        </div>
+                        {completed.length === 0 ? (
+                            <p className={styles.emptyState}>
+                                Aún no tienes cursos completados. Mantén tu ritmo y desbloquea tu primera insignia.
+                            </p>
+                        ) : (
+                            <div className={styles.courseGrid}>
+                                {completed.map((course) => (
+                                    <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
+                                        <div className={styles.courseThumb}>
+                                            <Image
+                                                src={course.image}
+                                                alt={course.title}
+                                                fill
+                                                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
+                                            />
+                                        </div>
+                                        <h3>{course.title}</h3>
+                                        <div className={styles.metaRow}>
+                                            <span>{course.category}</span>
+                                            <span>100%</span>
+                                        </div>
+                                        <div className={styles.progressBar}>
+                                            <div className={styles.progressFill} style={{ width: "100%" }} />
+                                        </div>
+                                        <div className={styles.courseFooter}>
+                                            <span>Lección final: {course.lastLesson}</span>
+                                            <span>Revisar →</span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                </div>
             </div>
             <Footer />
         </>

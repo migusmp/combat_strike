@@ -1,12 +1,17 @@
 .wrapper {
     width: 100%;
     min-height: calc(100vh - 120px);
-    padding: clamp(1.8rem, 5vw, 4rem) clamp(1.4rem, 6vw, 4.5rem) 3.5rem;
+    padding: clamp(1.8rem, 4.5vw, 3.5rem) clamp(1.2rem, 4vw, 3rem) 3.2rem;
     background:
         radial-gradient(circle at 18% 0%, rgba(71, 132, 255, 0.2), transparent 55%),
         radial-gradient(circle at 82% 0%, rgba(81, 230, 200, 0.16), transparent 50%),
         #050917;
     color: #f4f7ff;
+}
+
+.content {
+    width: clamp(320px, 78vw, 1100px);
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: clamp(1.6rem, 3vw, 2.6rem);
@@ -100,16 +105,31 @@
     background: rgba(5, 16, 40, 0.8);
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 1.4rem;
+    padding: 1.6rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.4rem;
+    justify-content: center;
+}
+
+.progressSummary h3 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 650;
+    letter-spacing: 0.05em;
+    color: transparent;
+    background: linear-gradient(120deg, #ffffff 20%, #a5c7ff 60%, #64c5ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-transform: uppercase;
 }
 
 .summaryGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 0.8rem;
+    align-items: stretch;
 }
 
 .summaryCard {

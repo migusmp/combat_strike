@@ -174,82 +174,84 @@ export default function AccountPage() {
     return (
         <>
             <div className={styles.accountWrapper}>
-                <section className={styles.profileHero}>
-                    <div className={styles.profileInfo}>
-                        <span className={styles.accountStatus}>Cuenta activa</span>
-                        <h1>Hola, {user?.name ?? "Combatiente"} ⚡</h1>
-                        <p className={styles.profileSubtitle}>
-                            Gestiona tu identidad, tus accesos y tus próximos objetivos desde un solo lugar.
-                        </p>
-                        <div className={styles.badgeRow}>
-                            <span className={styles.badge}>{maskEmail(user?.email)}</span>
+                <div className={styles.accountContent}>
+                    <section className={styles.profileHero}>
+                        <div className={styles.profileInfo}>
+                            <span className={styles.accountStatus}>Cuenta activa</span>
+                            <h1>Hola, {user?.name ?? "Combatiente"} ⚡</h1>
+                            <p className={styles.profileSubtitle}>
+                                Gestiona tu identidad, tus accesos y tus próximos objetivos desde un solo lugar.
+                            </p>
+                            <div className={styles.badgeRow}>
+                                <span className={styles.badge}>{maskEmail(user?.email)}</span>
+                            </div>
+                            <div className={styles.actionsRow}>
+                                <button type="button" className={styles.primaryAction} onClick={handleOpenEdit}>
+                                    Actualizar perfil
+                                </button>
+                                <button type="button" className={styles.secondaryAction}>
+                                    Ajustes de seguridad
+                                </button>
+                            </div>
                         </div>
-                        <div className={styles.actionsRow}>
-                            <button type="button" className={styles.primaryAction} onClick={handleOpenEdit}>
-                                Actualizar perfil
-                            </button>
-                            <button type="button" className={styles.secondaryAction}>
-                                Ajustes de seguridad
-                            </button>
+                        <div className={styles.statsPanel}>
+                            <h3>Resumen táctico</h3>
+                            <div className={styles.statsGrid}>
+                                {stats.map((item) => (
+                                    <div key={item.label} className={styles.statCard}>
+                                        <span>{item.label}</span>
+                                        <strong>{item.value}</strong>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                    <div className={styles.statsPanel}>
-                        <h3>Resumen táctico</h3>
-                        <div className={styles.statsGrid}>
-                            {stats.map((item) => (
-                                <div key={item.label} className={styles.statCard}>
-                                    <span>{item.label}</span>
-                                    <strong>{item.value}</strong>
+                    </section>
+
+                    <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <h2>Preferencias</h2>
+                            <small>Personaliza cómo quieres entrenar y recibir recordatorios.</small>
+                        </div>
+                        <div className={styles.preferenceList}>
+                            {preferences.map((pref) => (
+                                <div key={pref.label} className={styles.preferenceItem}>
+                                    <span>{pref.label}</span>
+                                    <button type="button">{pref.action}</button>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Preferencias</h2>
-                        <small>Personaliza cómo quieres entrenar y recibir recordatorios.</small>
-                    </div>
-                    <div className={styles.preferenceList}>
-                        {preferences.map((pref) => (
-                            <div key={pref.label} className={styles.preferenceItem}>
-                                <span>{pref.label}</span>
-                                <button type="button">{pref.action}</button>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                    <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <h2>Seguridad</h2>
+                            <small>Control de acceso y dispositivos vinculados.</small>
+                        </div>
+                        <div className={styles.preferenceList}>
+                            {security.map((item) => (
+                                <div key={item.label} className={styles.preferenceItem}>
+                                    <span>{item.label}</span>
+                                    <strong>{item.status}</strong>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
 
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Seguridad</h2>
-                        <small>Control de acceso y dispositivos vinculados.</small>
-                    </div>
-                    <div className={styles.preferenceList}>
-                        {security.map((item) => (
-                            <div key={item.label} className={styles.preferenceItem}>
-                                <span>{item.label}</span>
-                                <strong>{item.status}</strong>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Actividad reciente</h2>
-                        <small>Últimos movimientos de tu cuenta.</small>
-                    </div>
-                    <div className={styles.activityList}>
-                        {activity.map((log) => (
-                            <div key={log.label} className={styles.activityCard}>
-                                <span>{log.label}</span>
-                                <button type="button">{log.time}</button>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                    <section className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <h2>Actividad reciente</h2>
+                            <small>Últimos movimientos de tu cuenta.</small>
+                        </div>
+                        <div className={styles.activityList}>
+                            {activity.map((log) => (
+                                <div key={log.label} className={styles.activityCard}>
+                                    <span>{log.label}</span>
+                                    <button type="button">{log.time}</button>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
             </div>
             <Footer />
             {isEditModalOpen && (
