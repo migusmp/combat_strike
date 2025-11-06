@@ -30,6 +30,7 @@ export default function CoursePreviewModal({
 }: CoursePreviewModalProps) {
     // 🎥 Crea una referencia al elemento <video> para manipularlo directamente.
     const videoRef = useRef<HTMLVideoElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     // ⚙️ useEffect: se ejecuta cada vez que cambia "show" o "videoSrc"
     useEffect(() => {
         let hls: Hls | null = null; // Variable para guardar la instancia de Hls
@@ -74,6 +75,18 @@ export default function CoursePreviewModal({
     }, [show, videoSrc]);
     // 👆 Dependencias: se ejecuta cada vez que "show" o "videoSrc" cambian
 
+    useEffect(() => {
+        if (!show) return;
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        containerRef.current?.focus();
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [show, onClose]);
+
     if (!show) {
         return null;
     }
@@ -81,53 +94,76 @@ export default function CoursePreviewModal({
 
     // 🧱 Renderizado del modal
     return (
-        <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
+        <div
+            className={styles.modalOverlay}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Vista previa del curso"
+            onClick={onClose}
+        >
+            <div
+                className={styles.modalContent}
+                onClick={(event) => event.stopPropagation()}
+                tabIndex={-1}
+                ref={containerRef}
+            >
+                <button onClick={onClose} className={styles.closeBtn} aria-label="Cerrar vista previa">
+                    ×
+                </button>
 
-                {/* 🏷️ Header del modal con el título y el botón de cierre */}
-                <div className={styles.modalHeader}>
-                    <p className={styles.previewLabel}>Vista previa del curso</p>
-                    <button onClick={onClose} className={styles.closeBtn}>×</button>
-                </div>
+                <div className={styles.modalBody}>
+                    <section className={styles.mediaSection}>
+                        <p className={styles.previewLabel}>Vista previa del curso</p>
+                        <div className={styles.videoWrapper}>
+                            <video
+                                controls
+                                crossOrigin="anonymous"
+                                ref={videoRef}
+                                className={styles.videoPlayer}
+                            >
+                                {course?.previewSubtitles?.map((sub, i) => (
+                                    <track
+                                        key={i}
+                                        kind="subtitles"
+                                        src={`${API_URL}/courses/${course.id}/preview/subtitles/${sub.file}`}
+                                        srcLang={sub.lang}
+                                        label={sub.label}
+                                        default={sub.lang === "es"}
+                                    />
+                                ))}
+                            </video>
+                        </div>
+                        <div className={styles.mediaMeta}>
+                            <h3>{courseTitle}</h3>
+                            <p>Explora algunos clips antes de comenzar.</p>
+                        </div>
+                    </section>
 
-                {/* 🎥 Contenedor principal del video */}
-                <div className={styles.videoWrapper}>
-                    <video
-                        controls
-                        crossOrigin="anonymous"
-                        ref={videoRef}
-                        className={styles.videoPlayer}
-                    >
-                        {course?.previewSubtitles?.map((sub, i) => (
-                            <track
-                                key={i}
-                                kind="subtitles"
-                                src={`${API_URL}/courses/${course.id}/preview/subtitles/${sub.file}`}
-                                srcLang={sub.lang}
-                                label={sub.label}
-                                default={sub.lang === "es"} // Español por defecto
-                            />
-                        ))}
-                    </video>
-                </div>
-
-                {/* 📌 Título principal del curso */}
-                <h3 className={styles.courseTitle}>{courseTitle}</h3>
-
-
-                {/* 🎞️ Lista de videos gratuitos que se muestran debajo */}
-                <div className={styles.videoList}>
-                    <p className={styles.listHeader}>Videos de ejemplo gratuitos:</p>
-                    <ul>
-                        {videos.map((v, i) => (
-                            <li key={i}>
-                                <div>
-                                    <h4>{v.title}</h4>      {/* Título del video */}
-                                    <span>{v.duration}</span> {/* Duración */}
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    <section className={styles.listSection} aria-label="Lista de clips de vista previa">
+                        <p className={styles.listHeader}>Clips incluidos</p>
+                        <ul>
+                            {videos.map((clip, index) => (
+                                <li key={`${clip.title}-${index}`}>
+                                    <span className={styles.listIndex}>{index + 1}</span>
+                                    <div className={styles.listCopy}>
+                                        <p>{clip.title}</p>
+                                        {clip.duration && <small>{clip.duration}</small>}
+                                    </div>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                        viewBox="0 0 16 16"
+                                    >
+                                        <path d="M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z" />
+                                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm1 0a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" />
+                                    </svg>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
                 </div>
             </div>
         </div>

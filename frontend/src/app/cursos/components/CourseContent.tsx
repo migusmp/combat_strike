@@ -64,34 +64,23 @@ export default function CourseContent({ courseId }: CourseContentProps) {
 
     return (
         <section className={styles.courseContentSection}>
-            <h2>Contenido del curso</h2>
-
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "1rem",
-                }}
-            >
-                <p style={{ color: "#7f7f7fff", fontSize: "0.9rem" }}>
-                    {totalSections} secciones • {totalClasses} clases •{" "}
-                    {totalDuration.hours} h {totalDuration.minutes} min de duración total
-                </p>
-                <button
-                    onClick={toggleAllSections}
-                    style={{
-                        cursor: "pointer",
-                        background: "#055293",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        padding: "0.3rem 0.6rem",
-                        fontSize: "0.85rem",
-                    }}
-                >
-                    {openSections.every(Boolean) ? "Contraer todas" : "Ampliar todas"}
-                </button>
+            <div className={styles.courseContentHeader}>
+                <div>
+                    <p className={styles.contentEyebrow}>Plan de estudio</p>
+                    <h2>Contenido del curso</h2>
+                </div>
+                <div className={styles.courseContentSummary}>
+                    <p className={styles.courseContentMeta}>
+                        {totalSections} secciones · {totalClasses} clases ·{" "}
+                        {totalDuration.hours} h {totalDuration.minutes} min totales
+                    </p>
+                    <button
+                        onClick={toggleAllSections}
+                        className={styles.expandAllButton}
+                    >
+                        {openSections.every(Boolean) ? "Contraer todas" : "Ampliar todas"}
+                    </button>
+                </div>
             </div>
 
             {course.content.map((section, idx) => (

@@ -11,10 +11,8 @@ interface CourseVideoIntroductionProps {
     course: Course;
     isSticky: boolean;
     setShowShare: (show: boolean) => void;
-
-    // Nuevas props para el modal de vista previa
     setShowPreviewModal: (val: boolean) => void;
-    showPreviewModal: boolean
+    showPreviewModal: boolean;
 }
 
 export default function CourseVideoIntroduction({
@@ -36,11 +34,7 @@ export default function CourseVideoIntroduction({
 
     return (
         <>
-            <div
-                className={`${styles.courseVideoIntroduction} ${isSticky ? styles.stickyVideo : ""
-                    }`}
-            >
-                {/* Imagen con botón de reproducir */}
+            <div className={`${styles.courseVideoIntroduction} ${isSticky ? styles.stickyVideo : ""}`}>
                 <div className={styles.imageWrapper}>
                     <Image
                         src={course.image}
@@ -68,13 +62,12 @@ export default function CourseVideoIntroduction({
                     </div>
                 </div>
 
-                {/* Contenido extra debajo */}
                 <div className={styles.courseExtraContent}>
                     <p className={styles.coursePrice}>{course.price} €</p>
+                    <p className={styles.courseAccessNote}>Acceso de por vida al contenido</p>
                     <button className={styles.buyCourseButton}>Comprar ahora</button>
                 </div>
 
-                {/* Lista de contenidos del curso */}
                 <section className={styles.courseIncludes}>
                     <h3>Este curso incluye:</h3>
                     <ul>
@@ -84,7 +77,6 @@ export default function CourseVideoIntroduction({
                     </ul>
                 </section>
 
-                {/* Botón para compartir */}
                 <button
                     className={styles.shareCourseBtn}
                     onClick={() => setShowShare(true)}
@@ -102,7 +94,6 @@ export default function CourseVideoIntroduction({
                 </button>
             </div>
 
-            {/* Modal de vista previa del curso */}
             {showPreviewModal && (
                 <CoursePreviewModal
                     show={true}
