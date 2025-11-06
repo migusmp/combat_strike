@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -37,16 +41,32 @@ export class UsersService {
     });
   }
 
-  async findOne(id: number) {
-    const user = await this.usersRepository.findOne({ where: { id } });
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      select: ['id', 'email', 'name', 'second_name', 'isVerified', 'role'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return user;
+  }
+
+  async findOneByIdAndEmail(id: number, email: string) {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'isVerified', 'role'],
+    });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    // Si se intenta cambiar la contraseña, la volvemos a hashear
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
@@ -57,6 +77,8 @@ export class UsersService {
 
   async remove(id: number) {
     const user = await this.findOne(id);
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
     await this.usersRepository.remove(user);
     return { message: 'Usuario eliminado correctamente' };
   }

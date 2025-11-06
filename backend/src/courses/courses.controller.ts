@@ -31,11 +31,9 @@ import {
   FileInterceptor,
 } from '@nestjs/platform-express';
 import { PurchasesService } from 'src/purchases/purchases.service';
+import { RequestUser } from 'src/types/request';
 
-type RequestUser = {
-  id: number;
-  role?: string;
-};
+
 
 /**
  * --- CONTROLADOR DE VIDEOS DE PREVISUALIZACIÓN ---
