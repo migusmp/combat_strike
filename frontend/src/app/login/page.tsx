@@ -81,14 +81,6 @@ export default function Login() {
     return (
         <GuestGuard>
             <div className={styles.container}>
-                <div className={styles.backgroundLogo}>
-                    <Image
-                        src="/assets/logo-blanco-sin-texto.webp"
-                        alt="Logo fondo"
-                        width={1000}
-                        height={1000}
-                    />
-                </div>
 
                 <div className={styles.formBox}>
                     <div className={styles.logoWrapper}>

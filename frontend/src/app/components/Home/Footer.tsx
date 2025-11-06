@@ -1,57 +1,108 @@
+import Link from "next/link";
 import styles from "../../css/Home.module.css";
 
 export default function Footer() {
+    const currentYear = new Date().getFullYear();
+
     return (
         <footer className={styles.footer}>
+            <div className={styles.footerGlow} />
             <div className={styles.footerContent}>
-                {/* LOGO / COPYRIGHT */}
                 <div className={styles.footerBrand}>
                     <span className={styles.footerLogo}>DL Combat Strike</span>
-                    <p>© {new Date().getFullYear()} Todos los derechos reservados</p>
-                    {/* CORREO DE CONTACTO */}
-                    <p className={styles.footerContact}>📧 contacto@dlcombatstrike.com</p>
-                    {/* FRASE / ESLOGAN */}
                     <p className={styles.footerMotto}>
-                        La defensa personal es el arte de proteger lo que más importa.
+                        Operativa moderna, mentalidad táctica y defensa personal avanzada para quienes protegen lo que importa.
                     </p>
+                    <div className={styles.footerContactBlock}>
+                        <p>📧 contacto@dlcombatstrike.com</p>
+                        <p>📍 Operamos en toda España</p>
+                    </div>
                 </div>
 
-                {/* NAVEGACIÓN */}
-                <nav aria-label="Navegación del pie de página" className={styles.footerNav}>
-                    <a href="#about">Sobre nosotros</a>
-                    <a href="#cursos">Cursos</a>
-                    <a href="#tienda">Tienda</a>
-                    <a href="#valores">Valores</a>
-                    <a href="#contact">Contacto</a>
-                </nav>
-                {/* REDES SOCIALES */}
+                <div className={styles.footerCTA}>
+                    <p className={styles.footerCTAOverline}>Entrena con propósito</p>
+                    <h3>Activa tu modo defensa</h3>
+                    <p>
+                        Programas presenciales y online con instructores especializados en protección civil y operativa.
+                    </p>
+                    <div className={styles.footerCTAActions}>
+                        <Link href="/register" className={styles.footerButtonPrimary}>
+                            Empieza hoy
+                        </Link>
+                        <Link href="/contact" className={styles.footerButtonGhost}>
+                            Habla con nosotros
+                        </Link>
+                    </div>
+                </div>
+
+                <div className={styles.footerNavBlock}>
+                    <p className={styles.footerNavLabel}>Navegación</p>
+                    <nav aria-label="Navegación del pie de página" className={styles.footerNav}>
+                        <a href="#about">Sobre nosotros</a>
+                        <a href="#cursos">Cursos</a>
+                        <a href="#tienda">Tienda</a>
+                        <a href="#valores">Valores</a>
+                        <a href="#contact">Contacto</a>
+                    </nav>
+                </div>
+
                 <div className={styles.footerSocial}>
-                    {/* Instagram */}
-                    <a
-                        href="https://instagram.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Instagram"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-instagram" viewBox="0 0 16 16">
-                            <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" />
-                        </svg>
-                    </a>
+                    <p className={styles.footerNavLabel}>Síguenos</p>
+                    <div className={styles.footerSocialIcons}>
+                        <a
+                            href="https://instagram.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Instagram"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                <path
+                                    d="M16 3H8A5 5 0 0 0 3 8v8a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5V8a5 5 0 0 0-5-5z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <path
+                                    d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <path
+                                    d="M17.5 6.5h.01"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </a>
 
-                    {/* TikTok */}
-                    <a
-                        href="https://tiktok.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="TikTok"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-tiktok" viewBox="0 0 16 16">
-                            <path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z" />
-                        </svg>
-                    </a>
+                        <a
+                            href="https://tiktok.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="TikTok"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                <path
+                                    d="M15 3h2.5c.2 1.1.81 2.47 1.85 3.74C20.33 7.9 21.7 8.8 23 8.8V11c-2.5 0-4.38-1.13-5.5-2.47V18a6.5 6.5 0 1 1-6.5-6.5V14a3.5 3.5 0 1 0 3.5 3.5z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
+            </div>
+            <div className={styles.footerBottom}>
+                <span>© {currentYear} DL Combat Strike · Todos los derechos reservados</span>
+                <span>Listos 24/7</span>
             </div>
         </footer>
     );
 }
-

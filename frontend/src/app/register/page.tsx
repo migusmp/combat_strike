@@ -69,15 +69,6 @@ export default function Register() {
     return (
         <GuestGuard>
             <div className={styles.container}>
-                {/* Fondo con logo en transparencia */}
-                <div className={styles.backgroundLogo}>
-                    <Image
-                        src="/assets/logo-blanco-sin-texto.webp"
-                        alt="Logo fondo"
-                        width={1000}
-                        height={1000}
-                    />
-                </div>
 
                 {/* Formulario */}
                 <div className={styles.formBox}>

@@ -626,128 +626,222 @@ html {
 }
 
 /* FOOTER SECTION CSS */
-/* =============================
-   FOOTER BASE
-============================= */
 .footer {
-    background-color: #000032;
-    color: #fff;
-    padding: 1.5rem 4%;
-    /* menos padding */
+    position: relative;
+    background: linear-gradient(135deg, #020511, #050f2e 55%, #011b52);
+    color: #f5f6ff;
+    padding: 3.5rem clamp(1.5rem, 4vw, 5rem);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.footerGlow {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% -10%, rgba(0, 153, 255, 0.35), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(252, 86, 146, 0.3), transparent 40%);
+    filter: blur(20px);
+    opacity: 0.85;
+    pointer-events: none;
 }
 
 .footerContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    /* menos gap */
-    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2.5rem;
+    align-items: flex-start;
 }
 
-/* =============================
-   MARCA / COPYRIGHT / CONTACTO
-============================= */
 .footerBrand {
-    flex: 1 1 auto;
-    /* flex más flexible */
-    min-width: 180px;
-    /* para que no se haga demasiado pequeño */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 220px;
 }
 
 .footerLogo {
-    font-size: 1.4rem;
-    /* un poco más pequeño */
-    font-weight: bold;
-    display: block;
-    margin-bottom: 0.3rem;
-}
-
-.footerContact {
-    margin-top: 0.2rem;
-    font-size: 0.9rem;
-    color: #ccc;
+    font-size: 1.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 .footerMotto {
-    margin-top: 0.3rem;
-    font-size: 0.85rem;
-    font-style: italic;
-    color: #aaa;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #c7d2ff;
 }
 
-/* =============================
-   NAVEGACIÓN
-============================= */
-.footerNav {
-    flex: 1 1 auto;
+.footerContactBlock {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    color: #97a4d8;
+}
+
+.footerCTA {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 1.8rem;
+    box-shadow: 0 20px 50px rgba(2, 8, 25, 0.7);
+    backdrop-filter: blur(6px);
+}
+
+.footerCTAOverline {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    color: #7cc6ff;
+}
+
+.footerCTA h3 {
+    margin: 0.5rem 0;
+    font-size: 1.6rem;
+}
+
+.footerCTA p {
+    color: #dfe6ff;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.footerCTAActions {
+    display: flex;
+    gap: 0.8rem;
     flex-wrap: wrap;
-    gap: 1rem;
-    /* menos gap */
-    margin-top: 0.3rem;
+    margin-top: 1rem;
+}
+
+.footerButtonPrimary {
+    background: linear-gradient(120deg, #7cc6ff, #4ee1c1);
+    color: #030a1f;
+    font-weight: 600;
+    padding: 0.75rem 1.6rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 20px rgba(76, 226, 193, 0.25);
+}
+
+.footerButtonPrimary:hover {
+    transform: translateY(-2px);
+}
+
+.footerButtonGhost {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #f5f6ff;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.footerButtonGhost:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.footerNavBlock {
+    min-width: 180px;
+}
+
+.footerNavLabel {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #7a85ba;
+    margin-bottom: 0.6rem;
+}
+
+.footerNav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 0.7rem 1rem;
 }
 
 .footerNav a {
-    color: #bbb;
-    font-size: 1.1rem;
+    color: #cad2ff;
+    font-size: 1rem;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .footerNav a:hover {
-    color: #fff;
+    color: #ffffff;
+    transform: translateX(4px);
 }
 
-/* =============================
-   REDES SOCIALES
-============================= */
 .footerSocial {
-    flex: 1 1 auto;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
     gap: 0.8rem;
-    /* menos gap */
-    margin-top: 0.3rem;
 }
 
-.footerSocial a {
-    color: #bbb;
-    transition: color 0.2s ease;
+.footerSocialIcons {
+    display: flex;
+    gap: 0.8rem;
 }
 
-.footerSocial a:hover {
-    color: #fff;
+.footerSocialIcons a {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* =============================
-   RESPONSIVE
-============================= */
-@media (max-width: 1024px) {
-    .footerContent {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.8rem;
-        /* menos espacio entre bloques */
+.footerSocialIcons a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-3px);
+}
+
+.footerBottom {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    color: #94a1d6;
+}
+
+@media (max-width: 900px) {
+    .footerCTA {
+        grid-column: 1 / -1;
     }
 
     .footerNav {
-        justify-content: center;
-        margin: 0.5rem 0;
-        /* menos margen */
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
     }
 
-    .footerSocial {
-        justify-content: center;
-        margin: 0.5rem 0;
-        /* menos margen */
+    .footerBottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .footerContent {
+        grid-template-columns: 1fr;
     }
 
-    .footerBrand {
-        margin-bottom: 0.5rem;
-        /* menos margen */
+    .footerCTAActions {
+        flex-direction: column;
+    }
+
+    .footerBottom {
+        font-size: 0.85rem;
     }
 }
 

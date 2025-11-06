@@ -72,24 +72,6 @@
   animation-delay: 4s;
 }
 
-.backgroundLogo {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.12;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  z-index: 0;
-}
-
-.backgroundLogo :global(img) {
-  width: min(85vw, 600px);
-  height: auto;
-  filter: drop-shadow(0 22px 45px rgba(5, 82, 147, 0.2));
-}
-
 .formBox {
   position: relative;
   z-index: 2;
@@ -357,9 +339,6 @@
 }
 
 @media (max-width: 640px) {
-  .backgroundLogo :global(img) {
-    width: min(95vw, 460px);
-  }
 
   .formBox {
     border-radius: 1.2rem;
