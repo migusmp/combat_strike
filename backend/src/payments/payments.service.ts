@@ -5,11 +5,6 @@ import {
   Environment,
   OrdersController,
 } from '@paypal/paypal-server-sdk';
-import * as dotenv from 'dotenv';
-
-// ✅ Carga las variables de entorno desde el archivo .env
-// (donde tendrás PAYPAL_CLIENT_ID y PAYPAL_CLIENT_SECRET)
-dotenv.config();
 
 @Injectable()
 export class PaymentsService {

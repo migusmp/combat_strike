@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
+  Column,
   JoinColumn,
 } from 'typeorm';
 import { Course } from 'src/courses/entities/course.entity';
@@ -11,21 +12,21 @@ import { User } from 'src/users/entities/user.entity';
 /**
  * Entidad que representa una compra de curso dentro del sistema.
  *
- * Cada registro en esta tabla indica que un usuario ha adquirido un curso determinado.
- * 
+ * Cada registro indica que un usuario ha adquirido un curso determinado.
+ *
  * 🔹 Relaciones:
  * - Un usuario puede tener muchas compras.
  * - Un curso puede ser comprado por muchos usuarios.
- * 
- * Por tanto, esta entidad actúa como una **tabla intermedia (many-to-many implícita)**
- * entre `User` y `Course`, pero con su propia información adicional (fecha de compra).
+ *
+ * Incluye campos adicionales para registrar transacciones
+ * provenientes de pasarelas externas como PayPal o Revolut.
  */
 @Entity('purchases')
 export class Purchase {
   /**
    * Identificador único de la compra.
    *
-   * Se genera automáticamente usando un UUID (un identificador global único).
+   * Se genera automáticamente usando un UUID.
    */
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -33,10 +34,8 @@ export class Purchase {
   /**
    * Relación con el usuario que realizó la compra.
    *
-   * - `ManyToOne`: muchos registros de `Purchase` pueden pertenecer al mismo `User`.
-   * - `onDelete: 'CASCADE'`: si el usuario es eliminado, también se borran sus compras.
-   *
-   * La columna en la base de datos se llamará `user_id`.
+   * - `ManyToOne`: muchos registros pueden pertenecer al mismo usuario.
+   * - `onDelete: 'CASCADE'`: si el usuario es eliminado, se borran sus compras.
    */
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
@@ -45,20 +44,42 @@ export class Purchase {
   /**
    * Relación con el curso comprado.
    *
-   * - `ManyToOne`: muchos registros de `Purchase` pueden referirse al mismo `Course`.
-   * - `onDelete: 'CASCADE'`: si el curso es eliminado, también se eliminan las compras asociadas.
-   *
-   * La columna en la base de datos se llamará `course_id`.
+   * - `ManyToOne`: muchos registros pueden referirse al mismo curso.
+   * - `onDelete: 'CASCADE'`: si el curso se elimina, se borran las compras asociadas.
    */
   @ManyToOne(() => Course, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'course_id' })
   course!: Course;
 
   /**
-   * Fecha y hora exacta en la que se registró la compra.
+   * ID de la orden en la pasarela de pago (PayPal, Revolut, etc.)
+   * Ejemplo: "8P12345678901234K"
+   */
+  @Column({ name: 'external_order_id', nullable: true })
+  externalOrderId?: string;
+
+  /**
+   * Monto total pagado por el usuario.
    *
-   * `@CreateDateColumn` hace que TypeORM asigne automáticamente
-   * la fecha actual (`CURRENT_TIMESTAMP`) al crear el registro.
+   * Ejemplo: 59.99 (decimal con 2 dígitos)
+   */
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  amount?: number;
+
+  /**
+   * Estado de la compra (ej: COMPLETED, PENDING, FAILED).
+   */
+  @Column({ default: 'COMPLETED' })
+  status!: string;
+
+  /**
+   * Nombre del proveedor de pago (ej: paypal, revolut, stripe).
+   */
+  @Column({ default: 'manual' })
+  provider!: string;
+
+  /**
+   * Fecha y hora en la que se registró la compra.
    */
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
