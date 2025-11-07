@@ -107,7 +107,7 @@ export default function CourseCheckoutPage() {
 
             <section className={styles.checkoutGrid}>
                 <div className={styles.summaryCard}>
-                    <h2>Resumen de tu pedido</h2>
+                    <p className={styles.sectionTitle}>Resumen de tu pedido</p>
                     <div className={styles.summaryRow}>
                         <span>{course.title}</span>
                         <strong>{coursePrice.toFixed(2)} €</strong>
@@ -125,7 +125,7 @@ export default function CourseCheckoutPage() {
 
                 <div className={styles.paymentCard}>
                     <div className={styles.paymentHeader}>
-                        <span>Métodos disponibles</span>
+                        <p className={styles.sectionTitle}>Métodos disponibles</p>
                         <p>Selecciona una pasarela para completar tu compra.</p>
                     </div>
                     <div className={styles.methodsList}>

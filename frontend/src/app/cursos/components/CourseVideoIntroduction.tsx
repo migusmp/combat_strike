@@ -73,7 +73,7 @@ export default function CourseVideoIntroduction({
             Acceso de por vida al contenido
           </p>
           <Link
-            href={`/cursos/${course.id}/comprar`}
+            href={`/cursos/${course.id}/checkout`}
             className={styles.buyCourseButton}
           >
             Comprar ahora

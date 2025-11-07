@@ -203,7 +203,7 @@ export default function LargeScreenCourseLayout({
                 <p className={stylesLarge.videoAccess}>
                   Acceso de por vida al contenido
                 </p>
-                <Link href={`/cursos/${course.id}/comprar`} className={stylesLarge.primaryCTA}>
+                <Link href={`/cursos/${course.id}/checkout`} className={stylesLarge.primaryCTA}>
                     Comprar ahora
                 </Link>
 
