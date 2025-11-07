@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@paypal/react-paypal-js": "^8.9.2",
     "hls.js": "^1.6.13",
     "js-cookie": "^3.0.5",
     "next": "15.5.2",
