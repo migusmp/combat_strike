@@ -9,6 +9,7 @@ import { CoursesModule } from './courses/courses.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     CoursesModule,
     PurchasesModule,
-    UsersModule, // módulo de autenticación
+    UsersModule,
+    PaymentsModule, // módulo de autenticación
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, MailService],
