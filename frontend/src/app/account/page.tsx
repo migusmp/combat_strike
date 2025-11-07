@@ -146,7 +146,7 @@ export default function AccountPage() {
     ];
 
     const preferences = [
-        { label: "Plan táctico semanal", action: "Editar" },
+        { label: "Plan semanal", action: "Editar" },
         { label: "Alertas de progreso", action: "Configurar" },
         { label: "Notificaciones push", action: "Administrar" },
     ];
@@ -158,7 +158,7 @@ export default function AccountPage() {
     ];
 
     const activity = [
-        { label: "Actualizaste tu perfil táctico", time: "Hace 4 horas" },
+        { label: "Actualizaste tu perfil", time: "Hace 4 horas" },
         { label: "Completaste módulo 'Respuestas rápidas'", time: "Ayer" },
         { label: "Compraste 'Uso seguro de sprays'", time: "Hace 5 días" },
     ];
@@ -195,7 +195,7 @@ export default function AccountPage() {
                             </div>
                         </div>
                         <div className={styles.statsPanel}>
-                            <h3>Resumen táctico</h3>
+                            <h3>Resumen</h3>
                             <div className={styles.statsGrid}>
                                 {stats.map((item) => (
                                     <div key={item.label} className={styles.statCard}>
