@@ -1,6 +1,11 @@
 // src/courses/courses.module.ts
 
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  RequestMethod,
+  forwardRef,
+} from '@nestjs/common';
 import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { AuthCookieMiddleware } from './auth-cookie.middleware';
@@ -33,7 +38,7 @@ import { PurchasesModule } from 'src/purchases/purchases.module';
    */
   imports: [
     TypeOrmModule.forFeature([Course]),
-    PurchasesModule,
+    forwardRef(() => PurchasesModule),
   ],
 
   /**
@@ -47,6 +52,7 @@ import { PurchasesModule } from 'src/purchases/purchases.module';
    * contienen la lógica de negocio y de persistencia.
    */
   providers: [CoursesService, CoursesRepository],
+  exports: [CoursesService, TypeOrmModule], // útil si luego lo usas en otros módulos
 })
 export class CoursesModule {
   /**

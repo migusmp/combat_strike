@@ -10,6 +10,7 @@ import { PurchasesModule } from './purchases/purchases.module';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
+import { InvoicesModule } from './invoices/invoices.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { PaymentsModule } from './payments/payments.module';
     CoursesModule,
     PurchasesModule,
     UsersModule,
-    PaymentsModule, // módulo de autenticación
+    PaymentsModule,
+    InvoicesModule, // módulo de autenticación
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, MailService],

@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PurchasesRepository } from './purchases.repository';
 import { Purchase } from './entities/purchases.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Course } from 'src/courses/entities/course.entity';
+import { Repository } from 'typeorm';
 
 /**
  * Servicio encargado de manejar toda la lógica relacionada con las compras de cursos.
@@ -10,7 +13,12 @@ import { Purchase } from './entities/purchases.entity';
  */
 @Injectable()
 export class PurchasesService {
-  constructor(private readonly purchasesRepo: PurchasesRepository) {}
+  constructor(
+    private readonly purchasesRepo: PurchasesRepository,
+    // 👇 Inyectamos el repositorio de cursos para obtener detalles al generar facturas
+    @InjectRepository(Course)
+    private readonly coursesRepo: Repository<Course>,
+  ) {}
 
   /**
    * Verifica si un usuario ya ha comprado un curso específico.
@@ -68,5 +76,39 @@ export class PurchasesService {
       status: data.status,
       provider: data.provider,
     });
+  }
+  /**
+   * 📘 Obtiene la información básica de un curso para generar facturas.
+   *
+   * Este método busca el curso por su ID y devuelve solo los datos esenciales
+   * (título y precio) para no sobrecargar la respuesta.
+   *
+   * @param courseId - ID del curso que se desea consultar.
+   * @returns Un objeto con `title` y `price` del curso.
+   *
+   * @throws `NotFoundException` si el curso no existe.
+   *
+   * @example
+   * ```ts
+   * const course = await purchasesService.getCourseDetails(5);
+   * console.log(course.title); // "Krav Maga: Defensa Personal Intensiva"
+   * ```
+   */
+  async getCourseDetails(
+    courseId: number,
+  ): Promise<{ title: string; price: number }> {
+    const course = await this.coursesRepo.findOne({
+      where: { id: courseId },
+      select: ['title', 'price'],
+    });
+
+    if (!course) {
+      throw new NotFoundException(`No se encontró el curso con ID ${courseId}`);
+    }
+
+    return {
+      title: course.title,
+      price: Number(course.price),
+    };
   }
 }

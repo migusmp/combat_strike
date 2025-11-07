@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurchasesRepository } from './purchases.repository';
 import { PurchasesService } from './purchases.service';
 import { Purchase } from './entities/purchases.entity';
+import { Course } from 'src/courses/entities/course.entity';
+import { CoursesModule } from 'src/courses/courses.module';
 
 /**
  * Módulo que agrupa toda la funcionalidad relacionada con las compras de cursos.
@@ -25,7 +27,10 @@ import { Purchase } from './entities/purchases.entity';
    * permitiendo a NestJS inyectar automáticamente el repositorio
    * de TypeORM dentro de `PurchasesRepository`.
    */
-  imports: [TypeOrmModule.forFeature([Purchase])],
+  imports: [
+    TypeOrmModule.forFeature([Purchase, Course]),
+    forwardRef(() => CoursesModule),
+  ],
 
   /**
    * Define los proveedores que estarán disponibles dentro de este módulo:

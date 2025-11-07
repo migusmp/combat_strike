@@ -6,22 +6,31 @@ import {
   Req,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { PurchasesService } from 'src/purchases/purchases.service'; // ✅ importa el servicio de compras
+import { PurchasesService } from 'src/purchases/purchases.service';
+import { InvoicesService } from 'src/invoices/invoices.service';
 import { RequestUser } from 'src/types/request';
 import type { Request } from 'express';
+import { MailService } from 'src/mail/mail.service';
 
 /**
- * Controlador HTTP que expone los endpoints relacionados con pagos.
- * Se comunica con el servicio `PaymentsService` para interactuar con PayPal
- * y con `PurchasesService` para registrar las compras en la base de datos.
+ * Controlador HTTP para gestionar los flujos de pago:
+ * - Creación de órdenes (PayPal o mock)
+ * - Captura del pago
+ * - Registro de la compra en la BD
+ * - Generación y envío de factura PDF
  */
 @Controller('payments')
 export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
-    private readonly purchasesService: PurchasesService, // ✅ inyectar servicio de compras
+    private readonly purchasesService: PurchasesService,
+    private readonly invoicesService: InvoicesService,
+    private readonly mailService: MailService,
   ) {}
 
+  /**
+   * Permite desactivar endpoints de prueba en producción.
+   */
   private ensureMockAccess() {
     const allowMocks =
       process.env.NODE_ENV !== 'production' ||
@@ -35,8 +44,8 @@ export class PaymentsController {
   }
 
   /**
-   * 📦 Crea una orden de PayPal (se ejecuta cuando el usuario inicia el pago)
-   * Devuelve el `orderId` y los `links` que PayPal genera.
+   * 📦 Crea una orden de PayPal.
+   * Se ejecuta cuando el usuario inicia el flujo de pago desde el frontend.
    */
   @Post('create-order')
   async createOrder(
@@ -50,6 +59,7 @@ export class PaymentsController {
       total,
       currency || 'EUR',
     );
+
     return {
       id: order.id,
       status: order.status,
@@ -58,7 +68,7 @@ export class PaymentsController {
   }
 
   /**
-   * 🧪 Endpoint de prueba: crea una orden falsa sin llamar a PayPal.
+   * 🧪 Crea una orden falsa para pruebas locales (sin PayPal real).
    */
   @Post('mock/create-order')
   createMockOrder(
@@ -79,7 +89,8 @@ export class PaymentsController {
   }
 
   /**
-   * 💳 Captura la orden y registra la compra en la BD.
+   * 💳 Captura la orden tras la aprobación del pago en PayPal.
+   * Registra la compra en la BD, genera la factura y la envía por email.
    */
   @Post('capture-order')
   async captureOrder(
@@ -95,7 +106,7 @@ export class PaymentsController {
     // 1️⃣ Capturar el pago en PayPal
     const capture = await this.paymentsService.captureOrder(orderId);
 
-    // 2️⃣ Validar que el pago se completó correctamente
+    // 2️⃣ Verificar estado del pago
     if (capture.status === 'COMPLETED') {
       const user = req.user as RequestUser;
       const userId = user?.id;
@@ -105,26 +116,49 @@ export class PaymentsController {
           'No se pudo obtener el usuario autenticado.',
         );
 
-      // 3️⃣ Registrar la compra
-      await this.purchasesService.registerExternalPurchase({
+      // 3️⃣ Registrar la compra en la base de datos
+      const paidAmount =
+        Number(
+          capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value ??
+            0,
+        ) || 0;
+
+      const purchase = await this.purchasesService.registerExternalPurchase({
         userId,
         courseId,
         paypalOrderId: capture.id,
-        amount:
-          capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value ||
-          0,
+        amount: paidAmount,
         status: 'COMPLETED',
         provider: 'paypal',
       });
 
-      return { message: 'Compra registrada correctamente ✅', capture };
+      // 4️⃣ Generar factura PDF
+      const course = await this.purchasesService.getCourseDetails(courseId);
+      const pdfPath = await this.invoicesService.generateInvoice({
+        user: { name: user.name, email: user.email },
+        course: { title: course.title, price: Number(course.price) },
+        purchase: {
+          id: purchase.id,
+          amount: Number(purchase.amount ?? paidAmount),
+          createdAt: purchase.createdAt,
+        },
+      });
+
+      // 5️⃣ Enviar factura por email
+      await this.mailService.sendInvoiceEmail(user.email, pdfPath);
+
+      return {
+        message: 'Compra registrada y factura enviada correctamente ✅',
+        capture,
+      };
     }
 
+    // ❌ Si el pago no fue completado
     return { message: 'Pago no completado ❌', capture };
   }
 
   /**
-   * 🧪 Endpoint de prueba: simula la captura sin registrar compra.
+   * 🧪 Captura mock (sin PayPal real, solo pruebas locales).
    */
   @Post('mock/capture-order')
   async captureMockOrder(
@@ -148,7 +182,7 @@ export class PaymentsController {
     });
 
     if (capture.status === 'COMPLETED' && courseId && userId) {
-      const paidAmount = amount ?? 0;
+      const paidAmount = typeof amount === 'number' ? amount : 0;
       await this.purchasesService.registerExternalPurchase({
         userId,
         courseId,
@@ -157,6 +191,21 @@ export class PaymentsController {
         status: 'COMPLETED',
         provider: 'paypal-mock',
       });
+
+      // También puedes generar y enviar factura de prueba
+      const pdfPath = await this.invoicesService.generateInvoice({
+        user: {
+          name: user?.name ?? 'Usuario de prueba',
+          email: 'test@example.com',
+        },
+        course: { title: 'Curso de prueba', price: paidAmount },
+        purchase: {
+          id: capture.id,
+          amount: paidAmount,
+          createdAt: new Date(),
+        },
+      });
+      await this.mailService.sendInvoiceEmail('test@example.com', pdfPath);
     }
 
     return capture;

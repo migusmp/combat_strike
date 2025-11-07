@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import * as fs from 'fs';
 
 @Injectable()
 export class MailService {
@@ -74,6 +75,30 @@ export class MailService {
         </p>
       </div>
     `,
+    });
+  }
+
+  /**
+   * 🔹 Envía una factura PDF al usuario después de la compra.
+   */
+  async sendInvoiceEmail(to: string, pdfPath: string) {
+    await this.transporter.sendMail({
+      from: `"DL Combat Strike" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: 'Tu factura de compra 🧾',
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h1 style="color: #055293;">Gracias por tu compra en DL Combat Strike</h1>
+          <p>Adjuntamos tu factura en formato PDF. ¡Guárdala para tus registros!</p>
+          <p style="font-size: 0.9rem; color: #555;">Si tienes cualquier duda, contáctanos a soporte@combatstrike.es.</p>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: pdfPath.split('/').pop(),
+          content: fs.createReadStream(pdfPath),
+        },
+      ],
     });
   }
 }

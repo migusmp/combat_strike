@@ -2,11 +2,15 @@ import { BadRequestException } from '@nestjs/common';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { PurchasesService } from 'src/purchases/purchases.service';
+import { InvoicesService } from 'src/invoices/invoices.service';
+import { MailService } from 'src/mail/mail.service';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
   let paymentsService: jest.Mocked<PaymentsService>;
   let purchasesService: jest.Mocked<PurchasesService>;
+  let invoicesService: jest.Mocked<InvoicesService>;
+  let mailService: jest.Mocked<MailService>;
 
   beforeEach(() => {
     paymentsService = {
@@ -18,10 +22,24 @@ describe('PaymentsController', () => {
 
     purchasesService = {
       registerExternalPurchase: jest.fn(),
+      getCourseDetails: jest.fn(),
     } as unknown as jest.Mocked<PurchasesService>;
 
+    invoicesService = {
+      generateInvoice: jest.fn(),
+    } as unknown as jest.Mocked<InvoicesService>;
+
+    mailService = {
+      sendInvoiceEmail: jest.fn(),
+    } as unknown as jest.Mocked<MailService>;
+
     process.env.NODE_ENV = 'test';
-    controller = new PaymentsController(paymentsService, purchasesService);
+    controller = new PaymentsController(
+      paymentsService,
+      purchasesService,
+      invoicesService,
+      mailService,
+    );
   });
 
   describe('createOrder', () => {
@@ -52,7 +70,7 @@ describe('PaymentsController', () => {
 
   describe('captureOrder', () => {
     const baseRequest = {
-      user: { id: 7 },
+      user: { id: 7, name: 'User Test', email: 'user@test.com' },
     } as any;
 
     it('should capture order and register purchase when completed', async () => {
@@ -72,6 +90,17 @@ describe('PaymentsController', () => {
         ],
       } as any);
 
+      purchasesService.registerExternalPurchase.mockResolvedValueOnce({
+        id: 'PURCHASE1',
+        amount: 59.99,
+        createdAt: new Date('2024-01-01'),
+      } as any);
+      purchasesService.getCourseDetails.mockResolvedValueOnce({
+        title: 'Curso X',
+        price: 59.99,
+      });
+      invoicesService.generateInvoice.mockResolvedValueOnce('/tmp/inv.pdf');
+
       const response = await controller.captureOrder(
         'ORDER1',
         10,
@@ -83,10 +112,24 @@ describe('PaymentsController', () => {
         userId: 7,
         courseId: 10,
         paypalOrderId: 'CAPTURE1',
-        amount: '59.99',
+        amount: 59.99,
         status: 'COMPLETED',
         provider: 'paypal',
       });
+      expect(purchasesService.getCourseDetails).toHaveBeenCalledWith(10);
+      expect(invoicesService.generateInvoice).toHaveBeenCalledWith({
+        user: { name: 'User Test', email: 'user@test.com' },
+        course: { title: 'Curso X', price: 59.99 },
+        purchase: {
+          id: 'PURCHASE1',
+          amount: 59.99,
+          createdAt: new Date('2024-01-01'),
+        },
+      });
+      expect(mailService.sendInvoiceEmail).toHaveBeenCalledWith(
+        'user@test.com',
+        '/tmp/inv.pdf',
+      );
       expect(response).toMatchObject({
         message: expect.stringContaining('Compra registrada'),
       });
@@ -105,6 +148,7 @@ describe('PaymentsController', () => {
       );
 
       expect(purchasesService.registerExternalPurchase).not.toHaveBeenCalled();
+      expect(invoicesService.generateInvoice).not.toHaveBeenCalled();
       expect(response).toMatchObject({
         message: 'Pago no completado ❌',
       });
@@ -158,6 +202,8 @@ describe('PaymentsController', () => {
         status: 'COMPLETED',
         provider: 'paypal-mock',
       });
+      expect(invoicesService.generateInvoice).toHaveBeenCalled();
+      expect(mailService.sendInvoiceEmail).toHaveBeenCalled();
       expect(response).toEqual({
         id: 'TEST-1',
         status: 'COMPLETED',
