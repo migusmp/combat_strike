@@ -10,6 +10,7 @@ import CourseReviews from "./CourseReviews";
 import CoursePreviewModal from "./CoursePreviewModal";
 import { Course } from "@/app/interfaces/courses";
 import { buildPreviewClips } from "../utils/previewClips";
+import Link from "next/link";
 
 interface DesktopCourseLayoutProps {
   course: Course;
@@ -202,9 +203,10 @@ export default function LargeScreenCourseLayout({
                 <p className={stylesLarge.videoAccess}>
                   Acceso de por vida al contenido
                 </p>
-                <button className={stylesLarge.primaryCTA}>
-                  Comprar ahora
-                </button>
+                <Link href={`/cursos/${course.id}/comprar`} className={stylesLarge.primaryCTA}>
+                    Comprar ahora
+                </Link>
+
                 <button
                   className={stylesLarge.secondaryCTA}
                   onClick={() => setShowShare(true)}

@@ -18,8 +18,8 @@ export default function RecommendationsSection({ courses }: Props) {
         <section className={styles.recommendSection}>
             <div className={styles.sectionHeader}>
                 <span className={styles.sectionEyebrow}>Sigue aprendiendo</span>
-                <h2>Selección hecha para ti</h2>
-                <p>Curado según tu ritmo y las habilidades que ya dominaste.</p>
+                <h2>Recomendados para ti</h2>
+                <p>Basado en tu ritmo y cursos anteriores.</p>
             </div>
             <div className={styles.recommendGrid}>
                 {courses.map((course) => (

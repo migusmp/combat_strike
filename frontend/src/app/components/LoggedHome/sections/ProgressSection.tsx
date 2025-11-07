@@ -18,8 +18,8 @@ export default function ProgressSection({ courses }: Props) {
         <section className={styles.progressSection}>
             <div className={styles.sectionHeader}>
                 <span className={styles.sectionEyebrow}>Tu avance</span>
-                <h2>Entrenamiento en marcha</h2>
-                <p>Retoma misiones pendientes y mantén la constancia táctica.</p>
+                <h2>Cursos en progreso</h2>
+                <p>Retoma los módulos pendientes y mantén la constancia.</p>
             </div>
             <div className={styles.courseList}>
                 {courses.map((course) => (
