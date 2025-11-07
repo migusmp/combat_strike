@@ -6,13 +6,13 @@ describe('PurchasesService', () => {
   let service: PurchasesService;
   let repoMock: {
     findUserPurchase: jest.Mock;
-    createPurchase: jest.Mock;
+    createBasicPurchase: jest.Mock;
   };
 
   beforeEach(async () => {
     repoMock = {
       findUserPurchase: jest.fn(),
-      createPurchase: jest.fn(),
+      createBasicPurchase: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -52,11 +52,11 @@ describe('PurchasesService', () => {
   describe('registerPurchase', () => {
     it('delegates creation to the repository', async () => {
       const savedPurchase = { id: 'uuid', user: { id: 5 }, course: { id: 9 } };
-      repoMock.createPurchase.mockResolvedValue(savedPurchase);
+      repoMock.createBasicPurchase.mockResolvedValue(savedPurchase);
 
       const result = await service.registerPurchase(5, 9);
 
-      expect(repoMock.createPurchase).toHaveBeenCalledWith(5, 9);
+      expect(repoMock.createBasicPurchase).toHaveBeenCalledWith(5, 9);
       expect(result).toBe(savedPurchase);
     });
   });

@@ -22,6 +22,18 @@ export class PaymentsController {
     private readonly purchasesService: PurchasesService, // ✅ inyectar servicio de compras
   ) {}
 
+  private ensureMockAccess() {
+    const allowMocks =
+      process.env.NODE_ENV !== 'production' ||
+      process.env.ALLOW_PAYMENT_MOCKS === 'true';
+
+    if (!allowMocks) {
+      throw new BadRequestException(
+        'Los endpoints de prueba están deshabilitados en producción.',
+      );
+    }
+  }
+
   /**
    * 📦 Crea una orden de PayPal (se ejecuta cuando el usuario inicia el pago)
    * Devuelve el `orderId` y los `links` que PayPal genera.
@@ -43,6 +55,27 @@ export class PaymentsController {
       status: order.status,
       links: order.links,
     };
+  }
+
+  /**
+   * 🧪 Endpoint de prueba: crea una orden falsa sin llamar a PayPal.
+   */
+  @Post('mock/create-order')
+  createMockOrder(
+    @Body('total') total: string,
+    @Body('currency') currency?: string,
+    @Body('courseId') courseId?: number,
+    @Req() req?: Request,
+  ) {
+    this.ensureMockAccess();
+    if (!total)
+      throw new BadRequestException('El campo "total" es obligatorio');
+
+    const userId = (req?.user as RequestUser)?.id || 1;
+    return this.paymentsService.createMockOrder(total, currency || 'EUR', {
+      userId,
+      courseId,
+    });
   }
 
   /**
@@ -88,5 +121,44 @@ export class PaymentsController {
     }
 
     return { message: 'Pago no completado ❌', capture };
+  }
+
+  /**
+   * 🧪 Endpoint de prueba: simula la captura sin registrar compra.
+   */
+  @Post('mock/capture-order')
+  async captureMockOrder(
+    @Body('orderId') orderId: string,
+    @Body('courseId') courseId?: number,
+    @Body('amount') amount?: number,
+    @Body('userId') overrideUserId?: number,
+    @Req() req?: Request,
+  ) {
+    this.ensureMockAccess();
+    if (!orderId)
+      throw new BadRequestException('El campo "orderId" es obligatorio');
+
+    const user = req?.user as RequestUser;
+    const userId = overrideUserId ?? user?.id ?? 1;
+
+    const capture = this.paymentsService.captureMockOrder(orderId, {
+      courseId,
+      userId,
+      amount,
+    });
+
+    if (capture.status === 'COMPLETED' && courseId && userId) {
+      const paidAmount = amount ?? 0;
+      await this.purchasesService.registerExternalPurchase({
+        userId,
+        courseId,
+        paypalOrderId: capture.id,
+        amount: paidAmount,
+        status: 'COMPLETED',
+        provider: 'paypal-mock',
+      });
+    }
+
+    return capture;
   }
 }

@@ -110,4 +110,50 @@ export class PaymentsService {
     // }
     return capture;
   }
+
+  /**
+   * 🧪 Genera una orden falsa para pruebas locales sin contactar con PayPal.
+   */
+  createMockOrder(
+    total: string,
+    currency = 'EUR',
+    context?: { userId?: number; courseId?: number },
+  ) {
+    const mockOrderId = `TEST-${Math.random()
+      .toString(36)
+      .slice(2, 10)
+      .toUpperCase()}`;
+
+    return {
+      id: mockOrderId,
+      status: 'CREATED',
+      intent: 'CAPTURE',
+      test: true,
+      amount: {
+        value: total,
+        currency_code: currency,
+      },
+      links: [],
+      createdAt: new Date().toISOString(),
+      message: 'Orden simulada. Cambia a entorno real para contactar con PayPal.',
+      metadata: context,
+    };
+  }
+
+  /**
+   * 🧪 Simula la captura de una orden para pruebas sin PayPal.
+   */
+  captureMockOrder(
+    orderId: string,
+    data: { courseId?: number; userId?: number; amount?: number },
+  ) {
+    return {
+      id: orderId,
+      status: 'COMPLETED',
+      test: true,
+      ...data,
+      captureTime: new Date().toISOString(),
+      message: 'Captura simulada correctamente.',
+    };
+  }
 }
