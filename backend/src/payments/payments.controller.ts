@@ -52,12 +52,12 @@ export class PaymentsController {
     @Body('total') total: string,
     @Body('currency') currency?: string,
   ) {
-    if (!total)
-      throw new BadRequestException('El campo "total" es obligatorio');
+    const normalizedTotal = this.normalizeAmount(total);
+    const normalizedCurrency = this.normalizeCurrency(currency);
 
     const order = await this.paymentsService.createOrder(
-      total,
-      currency || 'EUR',
+      normalizedTotal,
+      normalizedCurrency,
     );
 
     return {
@@ -78,14 +78,18 @@ export class PaymentsController {
     @Req() req?: Request,
   ) {
     this.ensureMockAccess();
-    if (!total)
-      throw new BadRequestException('El campo "total" es obligatorio');
+    const normalizedTotal = this.normalizeAmount(total);
+    const normalizedCurrency = this.normalizeCurrency(currency);
 
     const userId = (req?.user as RequestUser)?.id || 1;
-    return this.paymentsService.createMockOrder(total, currency || 'EUR', {
-      userId,
-      courseId,
-    });
+    return this.paymentsService.createMockOrder(
+      normalizedTotal,
+      normalizedCurrency,
+      {
+        userId,
+        courseId,
+      },
+    );
   }
 
   /**
@@ -98,13 +102,15 @@ export class PaymentsController {
     @Body('courseId') courseId: number,
     @Req() req: Request,
   ) {
-    if (!orderId)
+    if (!orderId?.trim())
       throw new BadRequestException('El campo "orderId" es obligatorio');
-    if (!courseId)
-      throw new BadRequestException('El campo "courseId" es obligatorio');
+    const normalizedCourseId = this.ensurePositiveNumber(
+      courseId,
+      'courseId',
+    );
 
     // 1️⃣ Capturar el pago en PayPal
-    const capture = await this.paymentsService.captureOrder(orderId);
+    const capture = await this.paymentsService.captureOrder(orderId.trim());
 
     // 2️⃣ Verificar estado del pago
     if (capture.status === 'COMPLETED') {
@@ -117,15 +123,11 @@ export class PaymentsController {
         );
 
       // 3️⃣ Registrar la compra en la base de datos
-      const paidAmount =
-        Number(
-          capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value ??
-            0,
-        ) || 0;
+      const paidAmount = this.extractPaidAmount(capture);
 
       const purchase = await this.purchasesService.registerExternalPurchase({
         userId,
-        courseId,
+        courseId: normalizedCourseId,
         paypalOrderId: capture.id,
         amount: paidAmount,
         status: 'COMPLETED',
@@ -133,7 +135,17 @@ export class PaymentsController {
       });
 
       // 4️⃣ Generar factura PDF
-      const course = await this.purchasesService.getCourseDetails(courseId);
+      const course = await this.purchasesService.getCourseDetails(
+        normalizedCourseId,
+      );
+      if (!course)
+        throw new BadRequestException('No se encontró el curso solicitado.');
+
+      if (!user.email)
+        throw new BadRequestException(
+          'El usuario no tiene un email definido para enviar la factura.',
+        );
+
       const pdfPath = await this.invoicesService.generateInvoice({
         user: { name: user.name, email: user.email },
         course: { title: course.title, price: Number(course.price) },
@@ -193,10 +205,11 @@ export class PaymentsController {
       });
 
       // También puedes generar y enviar factura de prueba
+      const mockEmail = user?.email ?? 'testing@example.com';
       const pdfPath = await this.invoicesService.generateInvoice({
         user: {
           name: user?.name ?? 'Usuario de prueba',
-          email: user.email,
+          email: mockEmail,
         },
         course: { title: 'Curso de prueba', price: paidAmount },
         purchase: {
@@ -205,9 +218,62 @@ export class PaymentsController {
           createdAt: new Date(),
         },
       });
-      await this.mailService.sendInvoiceEmail(user.email, pdfPath);
+
+      if (user?.email) {
+        await this.mailService.sendInvoiceEmail(user.email, pdfPath);
+      }
     }
 
     return capture;
+  }
+
+  private normalizeAmount(amount?: string) {
+    if (!amount?.trim())
+      throw new BadRequestException('El campo "total" es obligatorio');
+
+    const normalized = amount.trim();
+    if (!/^\d+(\.\d{1,2})?$/.test(normalized)) {
+      throw new BadRequestException(
+        'El importe debe tener formato numérico (ej: 9.99).',
+      );
+    }
+    return normalized;
+  }
+
+  private normalizeCurrency(currency?: string) {
+    if (!currency) return 'EUR';
+    const normalized = currency.trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(normalized)) {
+      throw new BadRequestException('El código de moneda debe tener 3 letras.');
+    }
+    return normalized;
+  }
+
+  private ensurePositiveNumber(
+    value: number | string | undefined,
+    field: string,
+  ) {
+    const parsed = typeof value === 'string' ? Number(value) : value;
+    if (!Number.isFinite(parsed) || parsed! <= 0) {
+      throw new BadRequestException(
+        `El campo "${field}" debe ser un número positivo.`,
+      );
+    }
+    return parsed!;
+  }
+
+  private extractPaidAmount(capture: any) {
+    const rawValue =
+      capture?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value;
+    const amount =
+      typeof rawValue === 'string' ? Number(rawValue) : rawValue ?? 0;
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new BadRequestException(
+        'No se pudo determinar el importe capturado en PayPal.',
+      );
+    }
+
+    return amount;
   }
 }

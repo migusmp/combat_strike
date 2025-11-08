@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import {
   CheckoutPaymentIntent,
   Client,
@@ -8,6 +12,7 @@ import {
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
   // 🔹 Cliente principal que maneja las credenciales y el entorno (sandbox/live)
   private client: Client;
 
@@ -15,6 +20,18 @@ export class PaymentsService {
   private orders: OrdersController;
 
   constructor() {
+    const clientId = process.env.PAYPAL_CLIENT_ID;
+    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      this.logger.error(
+        'PAYPAL_CLIENT_ID o PAYPAL_CLIENT_SECRET no están definidos.',
+      );
+      throw new Error(
+        'Credenciales de PayPal no configuradas. Revisa tus variables de entorno.',
+      );
+    }
+
     /**
      * Inicializa el cliente PayPal con tus credenciales.
      * PayPal usa OAuth2 internamente, así que el SDK se encarga
@@ -22,8 +39,8 @@ export class PaymentsService {
      */
     this.client = new Client({
       clientCredentialsAuthCredentials: {
-        oAuthClientId: process.env.PAYPAL_CLIENT_ID!,     // ID de cliente PayPal
-        oAuthClientSecret: process.env.PAYPAL_CLIENT_SECRET!, // Secreto de cliente PayPal
+        oAuthClientId: clientId, // ID de cliente PayPal
+        oAuthClientSecret: clientSecret, // Secreto de cliente PayPal
       },
 
       // Determina si usamos entorno sandbox o producción según NODE_ENV
@@ -51,33 +68,35 @@ export class PaymentsService {
    * 3. El frontend usará ese ID para redirigir al usuario o mostrar el botón PayPal.
    */
   async createOrder(total: string, currency = 'EUR') {
-    // Llamada a la API de PayPal para crear una orden
-    const response = await this.orders.createOrder({
-      body: {
-        intent: CheckoutPaymentIntent.Capture, // ✅ modo "captura" (no solo autorización)
+    try {
+      // Llamada a la API de PayPal para crear una orden
+      const response = await this.orders.createOrder({
+        body: {
+          intent: CheckoutPaymentIntent.Capture, // ✅ modo "captura" (no solo autorización)
 
-        // ✅ Lista de unidades de compra (puedes incluir más datos como descripción, items, etc.)
-        purchaseUnits: [
-          {
-            amount: {
-              currencyCode: currency, // 🪙 Código de moneda (ej: "EUR" o "USD")
-              value: total,           // 💰 Monto total
+          // ✅ Lista de unidades de compra (puedes incluir más datos como descripción, items, etc.)
+          purchaseUnits: [
+            {
+              amount: {
+                currencyCode: currency, // 🪙 Código de moneda (ej: "EUR" o "USD")
+                value: total, // 💰 Monto total
+              },
             },
-          },
-        ],
-      },
-    });
+          ],
+        },
+      });
 
-    // La respuesta viene como string, así que la convertimos a JSON
-    const order = JSON.parse(response.body as unknown as string);
-
-    // Ejemplo de respuesta:
-    // {
-    //   id: "8P12345678901234K",
-    //   status: "CREATED",
-    //   links: [{ rel: "approve", href: "...", method: "GET" }]
-    // }
-    return order;
+      // La respuesta viene como string, así que la convertimos a JSON
+      return this.safeParseResponse(response.body);
+    } catch (error) {
+      this.logger.error(
+        'Error creando orden de PayPal',
+        error instanceof Error ? error.stack : undefined,
+      );
+      throw new InternalServerErrorException(
+        'No se pudo crear la orden de pago. Inténtalo más tarde.',
+      );
+    }
   }
 
   /**
@@ -92,23 +111,69 @@ export class PaymentsService {
    * 3. Este método llama a la API de PayPal para ejecutar la transacción.
    */
   async captureOrder(orderId: string) {
-    // Llamada a PayPal para capturar (finalizar) el pago
-    const response = await this.orders.captureOrder({
-      id: orderId,
-      body: {}, // Requerido por el SDK, aunque esté vacío
-    });
+    try {
+      // Llamada a PayPal para capturar (finalizar) el pago
+      const response = await this.orders.captureOrder({
+        id: orderId,
+        body: {}, // Requerido por el SDK, aunque esté vacío
+      });
 
-    // Parseamos el resultado (string -> objeto)
-    const capture = JSON.parse(response.body as unknown as string);
+      // Parseamos el resultado (string -> objeto)
+      return this.safeParseResponse(response.body);
+    } catch (error) {
+      this.logger.error(
+        `Error capturando orden de PayPal ${orderId}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+      throw new InternalServerErrorException(
+        'No se pudo capturar la orden. Verifica el pago.',
+      );
+    }
+  }
 
-    // Ejemplo de respuesta:
-    // {
-    //   id: "8P12345678901234K",
-    //   status: "COMPLETED",
-    //   purchase_units: [...],
-    //   payer: { name, email_address }
-    // }
-    return capture;
+  private safeParseResponse(body: unknown): Record<string, any> {
+    if (body && typeof body === 'object' && !this.isBufferLike(body)) {
+      return body as Record<string, any>;
+    }
+
+    const serialized = this.serializeBody(body);
+
+    try {
+      return JSON.parse(serialized);
+    } catch (error) {
+      this.logger.error(
+        'Respuesta de PayPal inválida',
+        error instanceof Error ? error.stack : undefined,
+      );
+      throw new InternalServerErrorException(
+        'Respuesta inesperada del proveedor de pagos.',
+      );
+    }
+  }
+
+  private serializeBody(body: unknown) {
+    if (typeof body === 'string') return body;
+    if (typeof body === 'number') return body.toString();
+    if (body instanceof ArrayBuffer)
+      return Buffer.from(body).toString('utf-8');
+    if (body && typeof Buffer !== 'undefined' && Buffer.isBuffer(body))
+      return body.toString('utf-8');
+    if (
+      body &&
+      typeof (body as NodeJS.ReadableStream)?.read === 'function'
+    ) {
+      throw new InternalServerErrorException(
+        'El proveedor devolvió un flujo no soportado.',
+      );
+    }
+    return JSON.stringify(body ?? {});
+  }
+
+  private isBufferLike(value: unknown) {
+    return (
+      value instanceof ArrayBuffer ||
+      (typeof Buffer !== 'undefined' && Buffer.isBuffer(value))
+    );
   }
 
   /**
