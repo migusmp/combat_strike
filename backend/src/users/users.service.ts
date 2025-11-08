@@ -9,12 +9,15 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Purchase } from 'src/purchases/entities/purchases.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(Purchase)
+    private readonly purchasesRepository: Repository<Purchase>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -81,5 +84,29 @@ export class UsersService {
 
     await this.usersRepository.remove(user);
     return { message: 'Usuario eliminado correctamente' };
+  }
+
+  /**
+   * Obtiene los cursos que el usuario ha comprado.
+   *
+   * @param userId ID del usuario autenticado.
+   * @returns Listado de compras con la información del curso asociado.
+   */
+  async getPurchasedCourses(userId: number) {
+    const purchases = await this.purchasesRepository.find({
+      where: { user: { id: userId } },
+      relations: ['course'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return purchases.map((purchase) => ({
+      purchaseId: purchase.id,
+      purchasedAt: purchase.createdAt,
+      provider: purchase.provider,
+      status: purchase.status,
+      amount: purchase.amount ? Number(purchase.amount) : null,
+      externalOrderId: purchase.externalOrderId ?? null,
+      course: purchase.course,
+    }));
   }
 }

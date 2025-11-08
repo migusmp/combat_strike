@@ -72,6 +72,22 @@ export class UsersController {
     }
   }
 
+  /**
+   * Obtiene los cursos comprados por el usuario autenticado.
+   *
+   * @route GET /users/me/courses
+   */
+  @Get('me/courses')
+  async getPurchasedCourses(@Req() req: Request) {
+    const loggedUser = req.user as RequestUser | undefined;
+
+    if (!loggedUser) {
+      throw new ForbiddenException('No autorizado');
+    }
+
+    return this.usersService.getPurchasedCourses(loggedUser.id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);

@@ -7,52 +7,30 @@ import { useRouter } from "next/navigation";
 import Footer from "../components/Home/Footer";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuthContext } from "../context/AuthContext";
-import useCourses from "../hooks/useCourses";
+import usePurchasedCourses from "../hooks/usePurchasedCourses";
 import styles from "./MyCourses.module.css";
 
-const FALLBACK_COURSES = [
-    {
-        id: 1,
-        title: "Krav Maga: Defensa Personal Intensiva",
-        category: "Defensa Personal",
-        image: "/assets/foto-curso-krav-maga.png",
-        lastLesson: "Bloque 3 · Técnicas de escape",
-        nextLesson: "Práctica guiada de respuestas rápidas",
-        progress: 72,
-    },
-    {
-        id: 2,
-        title: "Uso Seguro de Sprays de Defensa",
-        category: "Sprays",
-        image: "/assets/foto-curso-gas-pimienta.png",
-        lastLesson: "Mecánica de activación",
-        nextLesson: "Escenario urbano",
-        progress: 35,
-    },
-    {
-        id: 3,
-        title: "Autoprotección Urbana Avanzada",
-        category: "Defensa Personal",
-        image: "/assets/foto-curso-krav-maga-avanzado.png",
-        lastLesson: "Rutinas de evasión",
-        nextLesson: "Simulación nocturna",
-        progress: 100,
-    },
-    {
-        id: 4,
-        title: "Respuestas rápidas en casa",
-        category: "Entrenamiento",
-        image: "/assets/foto-curso-krav-maga.png",
-        lastLesson: "Sesión 2 · Elasticidad",
-        nextLesson: "Sesión 3 · Fuerza explosiva",
-        progress: 18,
-    },
-];
+const FALLBACK_IMAGE = "/assets/foto-curso-krav-maga.png";
+
+const formatDate = (isoDate?: string) => {
+    if (!isoDate) return "—";
+    const parsed = new Date(isoDate);
+    if (Number.isNaN(parsed.getTime())) return "—";
+    return parsed.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+};
 
 export default function MyCoursesPage() {
     const router = useRouter();
     const { isAuthenticated, checkingAuth } = useAuthContext();
-    const { courses, isLoading, error } = useCourses();
+    const {
+        courses: purchasedCourses,
+        isLoading,
+        error,
+    } = usePurchasedCourses();
 
     useEffect(() => {
         if (!checkingAuth && !isAuthenticated) {
@@ -69,26 +47,30 @@ export default function MyCoursesPage() {
     }
 
     const enrichedCourses = useMemo(() => {
-        const source = courses && courses.length > 0 ? courses.slice(0, 6) : FALLBACK_COURSES;
-        return source.map((course, index) => {
-            const fallback = FALLBACK_COURSES[index % FALLBACK_COURSES.length];
-            const progress = "progress" in course ? (course as any).progress ?? fallback.progress : fallback.progress;
-            const lastLesson = (course as any).lastLesson ?? fallback.lastLesson;
-            const nextLesson = (course as any).nextLesson ?? fallback.nextLesson;
-            const image = (course as any).image ?? fallback.image;
-            const category = (course as any).category ?? fallback.category;
-            const normalizedProgress = Math.min(100, Math.max(0, Math.round(Number(progress) ?? fallback.progress)));
-            return {
-                id: course.id ?? fallback.id,
-                title: course.title ?? fallback.title,
-                category,
-                image,
-                progress: normalizedProgress,
-                lastLesson,
-                nextLesson,
-            };
-        });
-    }, [courses]);
+        if (!purchasedCourses || purchasedCourses.length === 0) return [];
+
+        return purchasedCourses
+            .filter((purchase) => purchase.course)
+            .map((purchase) => {
+                const course = purchase.course!;
+                const rawProgress = (course as any).progress;
+                const normalizedProgress =
+                    typeof rawProgress === "number"
+                        ? Math.min(100, Math.max(0, Math.round(rawProgress)))
+                        : 0;
+
+                return {
+                    id: course.id ?? purchase.purchaseId,
+                    title: course.title ?? "Curso sin título",
+                    category: course.category ?? "Curso táctico",
+                    image: course.image ?? FALLBACK_IMAGE,
+                    progress: normalizedProgress,
+                    description: course.description ?? "",
+                    purchaseDate: purchase.purchasedAt,
+                    paymentStatus: purchase.status ?? "Pago completado",
+                };
+            });
+    }, [purchasedCourses]);
 
     const inProgress = enrichedCourses.filter((course) => course.progress < 100);
     const completed = enrichedCourses.filter((course) => course.progress >= 100);
@@ -97,7 +79,7 @@ export default function MyCoursesPage() {
         active: inProgress.length,
         completed: completed.length,
         total: enrichedCourses.length,
-        hours: "48 h",
+        hours: enrichedCourses.length > 0 ? `${Math.max(1, enrichedCourses.length * 5)} h aprox` : "—",
     };
 
     return (
@@ -151,9 +133,9 @@ export default function MyCoursesPage() {
                         </div>
                         {isLoading && <p className={styles.emptyState}>Sincronizando tus cursos...</p>}
                         {error && !isLoading && (
-                            <p className={styles.emptyState}>No pudimos cargar tus cursos. Inténtalo más tarde.</p>
+                            <p className={styles.emptyState}>{error}</p>
                         )}
-                        {!isLoading && inProgress.length === 0 && (
+                        {!isLoading && !error && inProgress.length === 0 && (
                             <p className={styles.emptyState}>
                                 No tienes cursos en marcha. Revisa el catálogo para iniciar un nuevo entrenamiento.
                             </p>
@@ -179,8 +161,8 @@ export default function MyCoursesPage() {
                                             <div className={styles.progressFill} style={{ width: `${course.progress}%` }} />
                                         </div>
                                         <div className={styles.courseFooter}>
-                                            <span>Siguiente: {course.nextLesson}</span>
-                                            <span>Continuar →</span>
+                                            <span>Comprado: {formatDate(course.purchaseDate)}</span>
+                                            <span>Pago: {course.paymentStatus}</span>
                                         </div>
                                     </Link>
                                 ))}
@@ -218,8 +200,8 @@ export default function MyCoursesPage() {
                                             <div className={styles.progressFill} style={{ width: "100%" }} />
                                         </div>
                                         <div className={styles.courseFooter}>
-                                            <span>Lección final: {course.lastLesson}</span>
-                                            <span>Revisar →</span>
+                                            <span>Comprado: {formatDate(course.purchaseDate)}</span>
+                                            <span>Pago: {course.paymentStatus}</span>
                                         </div>
                                     </Link>
                                 ))}
