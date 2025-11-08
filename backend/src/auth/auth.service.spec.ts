@@ -198,7 +198,7 @@ describe('AuthService', () => {
       const loginDto = { email: 'notfound@test.com', password: '1234' };
 
       await expect(service.login(loginDto)).rejects.toThrow(
-        'No existe ninguna cuenta con este correo',
+        'Correo o contraseña incorrectos',
       );
     });
 
