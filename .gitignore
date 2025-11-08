@@ -21,10 +21,7 @@ backend/dist/
 .vscode/
 .idea/
 
-# Videos de los cursos
-<<<<<<< HEAD
-backend/videos/*
-backend/uploads/*
-=======
+# Assets subidos
 backend/videos/
->>>>>>> 1c8f63b (gitignore)
+backend/uploads/
+backend/invoices/

@@ -2,31 +2,43 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import PDFDocument from 'pdfkit';
+import { Invoice } from './entities/invoice.entity';
+import { InvoicesRepository } from './invoices.repository';
 
 @Injectable()
 export class InvoicesService {
   private readonly logger = new Logger(InvoicesService.name);
+  constructor(private readonly invoicesRepo: InvoicesRepository) {}
+
   /**
    * Genera una factura en PDF con los datos del usuario, curso y compra.
-   * @returns la ruta local del PDF generado.
+   * Registra el documento en la base de datos y devuelve el registro.
    */
   async generateInvoice({
     user,
     course,
     purchase,
   }: {
-    user: { name: string; email: string };
-    course: { title: string; price: number };
+    user: { id: number; name: string; email: string };
+    course: { id?: number | null; title: string; price: number };
     purchase: { id: string; amount: number; createdAt: Date };
-  }): Promise<string> {
+  }): Promise<Invoice> {
+    if (!user?.id)
+      throw new BadRequestException(
+        'No se proporcionó un identificador de usuario válido para la factura.',
+      );
+
     const invoiceDir = path.join(process.cwd(), 'invoices');
     await fs.promises.mkdir(invoiceDir, { recursive: true });
 
-    const filePath = path.join(invoiceDir, `invoice-${purchase.id}.pdf`);
+    const fileName = `invoice-${purchase.id}.pdf`;
+    const filePath = path.join(invoiceDir, fileName);
+    const storedPath = path.join('invoices', fileName);
     const currencyCode = process.env.INVOICE_CURRENCY ?? 'EUR';
 
     try {
@@ -267,7 +279,16 @@ export class InvoicesService {
       doc.end();
       await streamFinished;
 
-      return filePath;
+      return this.invoicesRepo.createFromPurchase({
+        invoiceNumber,
+        userId: user.id,
+        courseId: course.id ?? undefined,
+        purchaseId: purchase.id,
+        total: totalPaid,
+        currency: currencyCode,
+        pdfPath: storedPath,
+        issuedAt: issueDate,
+      });
     } catch (error) {
       await fs.promises.unlink(filePath).catch(() => undefined);
       this.logger.error(
@@ -312,5 +333,9 @@ export class InvoicesService {
   private parseDate(value: Date | string) {
     const date = value instanceof Date ? value : new Date(value);
     return Number.isNaN(date.getTime()) ? new Date() : date;
+  }
+
+  async markInvoiceAsEmailed(id: string, sentAt = new Date()) {
+    await this.invoicesRepo.markAsEmailed(id, sentAt);
   }
 }

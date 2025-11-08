@@ -4,6 +4,7 @@ import { PaymentsService } from './payments.service';
 import { PurchasesService } from 'src/purchases/purchases.service';
 import { InvoicesService } from 'src/invoices/invoices.service';
 import { MailService } from 'src/mail/mail.service';
+import { UsersService } from 'src/users/users.service';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -11,6 +12,7 @@ describe('PaymentsController', () => {
   let purchasesService: jest.Mocked<PurchasesService>;
   let invoicesService: jest.Mocked<InvoicesService>;
   let mailService: jest.Mocked<MailService>;
+  let usersService: jest.Mocked<UsersService>;
 
   beforeEach(() => {
     paymentsService = {
@@ -27,11 +29,15 @@ describe('PaymentsController', () => {
 
     invoicesService = {
       generateInvoice: jest.fn(),
+      markInvoiceAsEmailed: jest.fn(),
     } as unknown as jest.Mocked<InvoicesService>;
 
     mailService = {
       sendInvoiceEmail: jest.fn(),
     } as unknown as jest.Mocked<MailService>;
+    usersService = {
+      findOne: jest.fn(),
+    } as unknown as jest.Mocked<UsersService>;
 
     process.env.NODE_ENV = 'test';
     controller = new PaymentsController(
@@ -39,6 +45,7 @@ describe('PaymentsController', () => {
       purchasesService,
       invoicesService,
       mailService,
+      usersService,
     );
   });
 
@@ -74,6 +81,17 @@ describe('PaymentsController', () => {
     } as any;
 
     it('should capture order and register purchase when completed', async () => {
+      usersService.findOne.mockResolvedValueOnce({
+        id: 7,
+        name: 'User Test',
+        second_name: 'Last',
+        email: 'updated@test.com',
+      } as any);
+      const purchaseRecord = {
+        id: 'PURCHASE1',
+        amount: 59.99,
+        createdAt: new Date('2024-01-01'),
+      };
       paymentsService.captureOrder.mockResolvedValueOnce({
         id: 'CAPTURE1',
         status: 'COMPLETED',
@@ -90,16 +108,17 @@ describe('PaymentsController', () => {
         ],
       } as any);
 
-      purchasesService.registerExternalPurchase.mockResolvedValueOnce({
-        id: 'PURCHASE1',
-        amount: 59.99,
-        createdAt: new Date('2024-01-01'),
-      } as any);
+      purchasesService.registerExternalPurchase.mockResolvedValueOnce(
+        purchaseRecord as any,
+      );
       purchasesService.getCourseDetails.mockResolvedValueOnce({
         title: 'Curso X',
         price: 59.99,
       });
-      invoicesService.generateInvoice.mockResolvedValueOnce('/tmp/inv.pdf');
+      invoicesService.generateInvoice.mockResolvedValueOnce({
+        id: 'INV-1',
+        pdfPath: '/tmp/inv.pdf',
+      } as any);
 
       const response = await controller.captureOrder(
         'ORDER1',
@@ -118,18 +137,20 @@ describe('PaymentsController', () => {
       });
       expect(purchasesService.getCourseDetails).toHaveBeenCalledWith(10);
       expect(invoicesService.generateInvoice).toHaveBeenCalledWith({
-        user: { name: 'User Test', email: 'user@test.com' },
-        course: { title: 'Curso X', price: 59.99 },
+        user: { id: 7, name: 'User Test Last', email: 'updated@test.com' },
+        course: { id: 10, title: 'Curso X', price: 59.99 },
         purchase: {
           id: 'PURCHASE1',
           amount: 59.99,
-          createdAt: new Date('2024-01-01'),
+          createdAt: purchaseRecord.createdAt,
         },
       });
       expect(mailService.sendInvoiceEmail).toHaveBeenCalledWith(
-        'user@test.com',
+        'updated@test.com',
         '/tmp/inv.pdf',
       );
+      expect(invoicesService.markInvoiceAsEmailed).toHaveBeenCalledWith('INV-1');
+      expect(usersService.findOne).toHaveBeenCalledWith(7);
       expect(response).toMatchObject({
         message: expect.stringContaining('Compra registrada'),
       });
@@ -149,6 +170,8 @@ describe('PaymentsController', () => {
 
       expect(purchasesService.registerExternalPurchase).not.toHaveBeenCalled();
       expect(invoicesService.generateInvoice).not.toHaveBeenCalled();
+      expect(invoicesService.markInvoiceAsEmailed).not.toHaveBeenCalled();
+      expect(usersService.findOne).not.toHaveBeenCalled();
       expect(response).toMatchObject({
         message: 'Pago no completado ❌',
       });
@@ -173,9 +196,31 @@ describe('PaymentsController', () => {
     });
 
     it('should capture mock order and register purchase', async () => {
+      usersService.findOne.mockResolvedValueOnce({
+        id: 9,
+        name: 'Mock User',
+        second_name: 'Updated',
+        email: 'updated@test.com',
+      } as any);
+      const mockPurchaseRecord = {
+        id: 'PURCHASE-MOCK',
+        amount: 20,
+        createdAt: new Date('2024-01-02'),
+      };
       paymentsService.captureMockOrder.mockReturnValueOnce({
         id: 'TEST-1',
         status: 'COMPLETED',
+      } as any);
+      purchasesService.getCourseDetails.mockResolvedValueOnce({
+        title: 'Curso real',
+        price: 20,
+      });
+      purchasesService.registerExternalPurchase.mockResolvedValueOnce(
+        mockPurchaseRecord as any,
+      );
+      invoicesService.generateInvoice.mockResolvedValueOnce({
+        id: 'INV-MOCK',
+        pdfPath: '/tmp/mock.pdf',
       } as any);
 
       const response = await controller.captureMockOrder(
@@ -183,7 +228,7 @@ describe('PaymentsController', () => {
         5,
         20,
         9,
-        { user: { id: 3 } } as any,
+        { user: { id: 3, email: 'mock@test.com', name: 'Mock User' } } as any,
       );
 
       expect(paymentsService.captureMockOrder).toHaveBeenCalledWith(
@@ -202,8 +247,26 @@ describe('PaymentsController', () => {
         status: 'COMPLETED',
         provider: 'paypal-mock',
       });
-      expect(invoicesService.generateInvoice).toHaveBeenCalled();
-      expect(mailService.sendInvoiceEmail).toHaveBeenCalled();
+      expect(purchasesService.getCourseDetails).toHaveBeenCalledWith(5);
+      expect(invoicesService.generateInvoice).toHaveBeenCalledWith({
+        user: {
+          id: 9,
+          name: 'Mock User Updated',
+          email: 'updated@test.com',
+        },
+        course: { id: 5, title: 'Curso real', price: 20 },
+        purchase: {
+          id: 'PURCHASE-MOCK',
+          amount: 20,
+          createdAt: mockPurchaseRecord.createdAt,
+        },
+      });
+      expect(mailService.sendInvoiceEmail).toHaveBeenCalledWith(
+        'updated@test.com',
+        '/tmp/mock.pdf',
+      );
+      expect(invoicesService.markInvoiceAsEmailed).toHaveBeenCalledWith('INV-MOCK');
+      expect(usersService.findOne).toHaveBeenCalledWith(9);
       expect(response).toEqual({
         id: 'TEST-1',
         status: 'COMPLETED',

@@ -138,6 +138,7 @@ export default function CourseCheckoutPage() {
 
       const res = await fetch(createOrderEndpoint, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ total: totalToSend }),
       });
@@ -197,6 +198,7 @@ export default function CourseCheckoutPage() {
       try {
         const res = await fetch(captureOrderEndpoint, {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, courseId: course?.id }),
         });

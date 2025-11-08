@@ -5,12 +5,15 @@ import {
   BadRequestException,
   Req,
 } from '@nestjs/common';
+import * as path from 'path';
 import { PaymentsService } from './payments.service';
 import { PurchasesService } from 'src/purchases/purchases.service';
 import { InvoicesService } from 'src/invoices/invoices.service';
 import { RequestUser } from 'src/types/request';
 import type { Request } from 'express';
 import { MailService } from 'src/mail/mail.service';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
 
 /**
  * Controlador HTTP para gestionar los flujos de pago:
@@ -26,7 +29,8 @@ export class PaymentsController {
     private readonly purchasesService: PurchasesService,
     private readonly invoicesService: InvoicesService,
     private readonly mailService: MailService,
-  ) {}
+    private readonly usersService: UsersService,
+  ) { }
 
   /**
    * Permite desactivar endpoints de prueba en producción.
@@ -81,7 +85,7 @@ export class PaymentsController {
     const normalizedTotal = this.normalizeAmount(total);
     const normalizedCurrency = this.normalizeCurrency(currency);
 
-    const userId = (req?.user as RequestUser)?.id || 1;
+    const userId = (req?.user as RequestUser).id;
     return this.paymentsService.createMockOrder(
       normalizedTotal,
       normalizedCurrency,
@@ -114,8 +118,8 @@ export class PaymentsController {
 
     // 2️⃣ Verificar estado del pago
     if (capture.status === 'COMPLETED') {
-      const user = req.user as RequestUser;
-      const userId = user?.id;
+      const sessionUser = req.user as RequestUser;
+      const userId = sessionUser.id;
 
       if (!userId)
         throw new BadRequestException(
@@ -141,14 +145,19 @@ export class PaymentsController {
       if (!course)
         throw new BadRequestException('No se encontró el curso solicitado.');
 
-      if (!user.email)
-        throw new BadRequestException(
-          'El usuario no tiene un email definido para enviar la factura.',
-        );
+      const freshUser = await this.getFreshUserSnapshot(userId);
 
-      const pdfPath = await this.invoicesService.generateInvoice({
-        user: { name: user.name, email: user.email },
-        course: { title: course.title, price: Number(course.price) },
+      const invoice = await this.invoicesService.generateInvoice({
+        user: {
+          id: userId,
+          name: this.buildUserFullName(freshUser),
+          email: freshUser.email,
+        },
+        course: {
+          id: normalizedCourseId,
+          title: course.title,
+          price: Number(course.price),
+        },
         purchase: {
           id: purchase.id,
           amount: Number(purchase.amount ?? paidAmount),
@@ -156,8 +165,10 @@ export class PaymentsController {
         },
       });
 
-      // 5️⃣ Enviar factura por email
-      await this.mailService.sendInvoiceEmail(user.email, pdfPath);
+      // 5️⃣ Enviar factura por email y marcarla como enviada
+      const absolutePdfPath = this.resolveInvoicePath(invoice.pdfPath);
+      await this.mailService.sendInvoiceEmail(freshUser.email, absolutePdfPath);
+      await this.invoicesService.markInvoiceAsEmailed(invoice.id);
 
       return {
         message: 'Compra registrada y factura enviada correctamente ✅',
@@ -170,8 +181,8 @@ export class PaymentsController {
   }
 
   /**
-   * 🧪 Captura mock (sin PayPal real, solo pruebas locales).
-   */
+ * 🧪 Captura mock (sin PayPal real, solo pruebas locales).
+ */
   @Post('mock/capture-order')
   async captureMockOrder(
     @Body('orderId') orderId: string,
@@ -181,47 +192,72 @@ export class PaymentsController {
     @Req() req?: Request,
   ) {
     this.ensureMockAccess();
+
     if (!orderId)
       throw new BadRequestException('El campo "orderId" es obligatorio');
 
     const user = req?.user as RequestUser;
-    const userId = overrideUserId ?? user?.id ?? 1;
+    const userId = overrideUserId ?? user?.id;
+
+    if (!userId) {
+      throw new BadRequestException(
+        'No se pudo obtener el usuario autenticado. Debes iniciar sesión para registrar la compra.',
+      );
+    }
+    if (!courseId) {
+      throw new BadRequestException(
+        'Debes proporcionar el "courseId" para emitir la factura de prueba.',
+      );
+    }
+    const normalizedCourseId = this.ensurePositiveNumber(
+      courseId,
+      'courseId',
+    );
 
     const capture = this.paymentsService.captureMockOrder(orderId, {
-      courseId,
+      courseId: normalizedCourseId,
       userId,
       amount,
     });
 
-    if (capture.status === 'COMPLETED' && courseId && userId) {
-      const paidAmount = typeof amount === 'number' ? amount : 0;
-      await this.purchasesService.registerExternalPurchase({
+    if (capture.status === 'COMPLETED' && userId) {
+      const course = await this.purchasesService.getCourseDetails(
+        normalizedCourseId,
+      );
+      const paidAmount =
+        typeof amount === 'number' ? amount : Number(course.price);
+      const freshUser = await this.getFreshUserSnapshot(userId);
+      const purchase = await this.purchasesService.registerExternalPurchase({
         userId,
-        courseId,
+        courseId: normalizedCourseId,
         paypalOrderId: capture.id,
         amount: paidAmount,
         status: 'COMPLETED',
         provider: 'paypal-mock',
       });
 
-      // También puedes generar y enviar factura de prueba
-      const mockEmail = user?.email ?? 'testing@example.com';
-      const pdfPath = await this.invoicesService.generateInvoice({
+      // Generar y enviar factura con datos reales
+      const invoice = await this.invoicesService.generateInvoice({
         user: {
-          name: user?.name ?? 'Usuario de prueba',
-          email: mockEmail,
+          id: userId,
+          name: this.buildUserFullName(freshUser),
+          email: freshUser.email,
         },
-        course: { title: 'Curso de prueba', price: paidAmount },
+        course: {
+          id: normalizedCourseId,
+          title: course.title,
+          price: Number(course.price),
+        },
         purchase: {
-          id: capture.id,
-          amount: paidAmount,
-          createdAt: new Date(),
+          id: purchase.id,
+          amount: Number(purchase.amount ?? paidAmount),
+          createdAt: purchase.createdAt,
         },
       });
 
-      if (user?.email) {
-        await this.mailService.sendInvoiceEmail(user.email, pdfPath);
-      }
+      const absolutePdfPath = this.resolveInvoicePath(invoice.pdfPath);
+      await this.mailService.sendInvoiceEmail(freshUser.email, absolutePdfPath);
+      await this.invoicesService.markInvoiceAsEmailed(invoice.id);
     }
 
     return capture;
@@ -275,5 +311,31 @@ export class PaymentsController {
     }
 
     return amount;
+  }
+
+  private async getFreshUserSnapshot(userId: number): Promise<User> {
+    const user = await this.usersService.findOne(userId);
+    if (!user.email?.trim()) {
+      throw new BadRequestException(
+        'El usuario no tiene un email definido para enviar la factura.',
+      );
+    }
+    return user;
+  }
+
+  private buildUserFullName(user: Pick<User, 'name' | 'second_name'>) {
+    const parts = [user.name, user.second_name]
+      .map((part) => part?.trim())
+      .filter(Boolean);
+    if (parts.length === 0) {
+      return 'Cliente Combat Strike';
+    }
+    return parts.join(' ');
+  }
+
+  private resolveInvoicePath(pdfPath: string) {
+    return path.isAbsolute(pdfPath)
+      ? pdfPath
+      : path.join(process.cwd(), pdfPath);
   }
 }
