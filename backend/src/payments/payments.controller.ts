@@ -196,7 +196,7 @@ export class PaymentsController {
       const pdfPath = await this.invoicesService.generateInvoice({
         user: {
           name: user?.name ?? 'Usuario de prueba',
-          email: 'test@example.com',
+          email: user.email,
         },
         course: { title: 'Curso de prueba', price: paidAmount },
         purchase: {
@@ -205,7 +205,7 @@ export class PaymentsController {
           createdAt: new Date(),
         },
       });
-      await this.mailService.sendInvoiceEmail('test@example.com', pdfPath);
+      await this.mailService.sendInvoiceEmail(user.email, pdfPath);
     }
 
     return capture;
