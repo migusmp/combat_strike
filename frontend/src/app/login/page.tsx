@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import styles from "../css/Login.module.css";
+import styles from "../css/AuthModern.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../context/AuthContext";
@@ -80,77 +80,120 @@ export default function Login() {
             }
         } catch (err) {
             setAlert({ message: "Error de conexión.", type: "error" });
+            console.error(err);
         }
     };
 
     return (
         <GuestGuard>
-            <div className={styles.container}>
-
-                <div className={styles.formBox}>
-                    <div className={styles.logoWrapper}>
-                        <Image
-                            src="/assets/logo-blanco-sin-texto.webp"
-                            alt="Logo"
-                            width={100}
-                            height={100}
-                        />
-                    </div>
-
-                    {/* ALERTA con colores dinámicos */}
-                    {alert.message && (
-                        <div
-                            className={`${styles.alertVisible} ${alert.type === "success" ? styles.alertGreen : styles.alertRed
-                                }`}
-                        >
-                            {alert.message}
-                        </div>
-                    )}
-
-                    {/* Botón para reenviar verificación */}
-                    {canResend && (
-                        <button onClick={handleResend} className={styles.resendButtonVerification}>
-                            Reenviar correo de verificación
-                        </button>
-                    )}
-
-                    <form className={styles.form} onSubmit={handleSubmit}>
-                        <div className={styles.field}>
-                            <label htmlFor="email">Correo electrónico</label>
-                            <input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="tuemail@ejemplo.com"
-                                required
-                            />
-                        </div>
-
-                        <div className={styles.field}>
-                            <label htmlFor="password">Contraseña</label>
-                            <input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="********"
-                                required
-                            />
-                        </div>
-
-                        <p className={styles.forgotPassword}>
-                            <Link href="/forgot-password">¿Has olvidado la contraseña?</Link>
+            <div className={styles.page}>
+                <div className={styles.card}>
+                    <section className={styles.brandPanel}>
+                        <span className={styles.badge}>Combat Strike</span>
+                        <h1 className={styles.brandTitle}>Conecta con tu hub de entrenamiento</h1>
+                        <p className={styles.brandCopy}>
+                            Retoma tus cursos, desbloquea nuevos retos y lleva un registro claro de tu progreso en tiempo
+                            real. Todo desde un panel que prioriza tu ritmo y motivación.
                         </p>
+                        <ul className={styles.accentList}>
+                            <li className={styles.accentItem}>
+                                <span className={styles.accentIcon}>01</span>
+                                Mentorías impartidas por instructores activos con experiencia de campo.
+                            </li>
+                            <li className={styles.accentItem}>
+                                <span className={styles.accentIcon}>02</span>
+                                Panel con métricas claras y certificados descargables en segundos.
+                            </li>
+                            <li className={styles.accentItem}>
+                                <span className={styles.accentIcon}>03</span>
+                                Comunidad privada para resolver dudas y compartir estrategias.
+                            </li>
+                        </ul>
+                        <div className={styles.footNote}>
+                            <span className={styles.pulse} aria-hidden="true" />
+                            <p className={styles.footText}>
+                                Más de 2.400 operadores han fortalecido sus habilidades desde nuestra plataforma.
+                            </p>
+                        </div>
+                    </section>
 
-                        <button type="submit" className={styles.button}>
-                            Entrar
-                        </button>
-                    </form>
+                    <section className={styles.formPanel}>
+                        <div className={styles.logoRow}>
+                            <Image
+                                src="/assets/logo-blanco-sin-texto.webp"
+                                alt="Logo Combat Strike"
+                                width={60}
+                                height={60}
+                                priority
+                            />
+                            <span>Inicia sesión para sincronizar tu progreso y desbloquear tus cursos activos.</span>
+                        </div>
 
-                    <p className={styles.registerText}>
-                        ¿No tienes cuenta? <Link href="/register">Regístrate</Link>
-                    </p>
+                        {alert.message && (
+                            <div
+                                className={`${styles.alert} ${alert.type === "success" ? styles.alertSuccess : styles.alertError
+                                    }`}
+                            >
+                                {alert.message}
+                            </div>
+                        )}
+
+                        {canResend && (
+                            <button type="button" onClick={handleResend} className={styles.resendButton}>
+                                Reenviar correo de verificación
+                            </button>
+                        )}
+
+                        <form className={styles.form} onSubmit={handleSubmit}>
+                            <div className={styles.fieldGroup}>
+                                <label htmlFor="email" className={styles.label}>
+                                    Correo electrónico
+                                </label>
+                                <input
+                                    id="email"
+                                    className={styles.input}
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="tuemail@ejemplo.com"
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.fieldGroup}>
+                                <label htmlFor="password" className={styles.label}>
+                                    Contraseña
+                                </label>
+                                <input
+                                    id="password"
+                                    className={styles.input}
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.helperRow}>
+                                <span>¿Olvidaste la clave?</span>
+                                <Link href="/forgot-password" className={styles.link}>
+                                    Recuperar acceso
+                                </Link>
+                            </div>
+
+                            <button type="submit" className={styles.primaryButton}>
+                                Entrar
+                            </button>
+                        </form>
+
+                        <p className={styles.footLink}>
+                            ¿No tienes cuenta?{" "}
+                            <Link href="/register" className={styles.link}>
+                                Regístrate ahora
+                            </Link>
+                        </p>
+                    </section>
                 </div>
             </div>
         </GuestGuard>
