@@ -1,9 +1,10 @@
 import styles from "../css/Carrusel.module.css";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import useCourses from "@/app/hooks/useCourses";
 import { Course } from "@/app/interfaces/courses";
+import { useAuthContext } from "@/app/context/AuthContext";
 
 /**
  * Componente Carrusel
@@ -22,6 +23,17 @@ export default function Carrusel() {
 
   // Hook personalizado para obtener los cursos desde el backend
   const { courses, isLoading, error } = useCourses();
+  const { isAuthenticated, purchasedCourses } = useAuthContext();
+
+  const ownedCourseIds = useMemo(() => {
+    if (!purchasedCourses) return new Set<number>();
+
+    return new Set(
+      purchasedCourses
+        .map((purchase) => purchase.course?.id)
+        .filter((id): id is number => typeof id === "number"),
+    );
+  }, [purchasedCourses]);
 
   // Pestañas disponibles en el carrusel
   const tabs = ["Todos", "Krav Maga", "Sprays"];
@@ -60,6 +72,30 @@ export default function Carrusel() {
   if (!courses || courses.length === 0)
     return <p className={styles.empty}>No hay cursos disponibles.</p>;
 
+  const renderCourseCard = (course: Course) => {
+    const isOwned = isAuthenticated && ownedCourseIds.has(course.id);
+
+    return (
+      <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
+        <div className={styles.imageWrapper}>
+          <Image
+            src={course.image}
+            alt={course.title}
+            fill
+            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
+            className={styles.courseImage}
+          />
+        </div>
+        <h3 className={styles.courseTitle}>{course.title}</h3>
+        <p className={styles.courseAuthor}>{course.description}</p>
+        <div className={styles.courseMeta}>
+          <p className={styles.coursePrice}>{course.price} €</p>
+          {isOwned && <span className={styles.ownedBadge}>Obtenido</span>}
+        </div>
+      </Link>
+    );
+  };
+
   return (
     <div className={styles.carruselContainer}>
       {/* Menú de Tabs */}
@@ -85,47 +121,13 @@ export default function Carrusel() {
       </h2>
 
       {/* 📚 Cursos filtrados según la pestaña */}
-      <div className={styles.coursesGrid}>
-        {filteredCourses.map((course) => (
-          <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
-            <div className={styles.imageWrapper}>
-              <Image
-                src={course.image}
-                alt={course.title}
-                fill
-                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
-                className={styles.courseImage}
-              />
-            </div>
-            <h3 className={styles.courseTitle}>{course.title}</h3>
-            <p className={styles.courseAuthor}>{course.description}</p>
-            <p className={styles.coursePrice}>{course.price} €</p>
-          </Link>
-        ))}
-      </div>
+      <div className={styles.coursesGrid}>{filteredCourses.map(renderCourseCard)}</div>
 
       {/* 🥋 Cursos de Defensa Personal */}
       {personalDefenseCourses && personalDefenseCourses.length > 0 && (
         <div className={styles.newCoursesSection}>
           <h2 className={styles.sectionTitle}>Defensa Personal</h2>
-          <div className={styles.coursesGrid}>
-            {personalDefenseCourses.map((course) => (
-              <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={course.image}
-                    alt={course.title}
-                    fill
-                    sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
-                    className={styles.courseImage}
-                  />
-                </div>
-                <h3 className={styles.courseTitle}>{course.title}</h3>
-                <p className={styles.courseAuthor}>{course.description}</p>
-                <p className={styles.coursePrice}>{course.price} €</p>
-              </Link>
-            ))}
-          </div>
+          <div className={styles.coursesGrid}>{personalDefenseCourses.map(renderCourseCard)}</div>
         </div>
       )}
 
@@ -133,24 +135,7 @@ export default function Carrusel() {
       {sprayCourses && sprayCourses.length > 0 && (
         <div className={styles.newCoursesSection}>
           <h2 className={styles.sectionTitle}>Sprays</h2>
-          <div className={styles.coursesGrid}>
-            {sprayCourses.map((course) => (
-              <Link key={course.id} href={`/cursos/${course.id}`} className={styles.courseCard}>
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={course.image}
-                    alt={course.title}
-                    fill
-                    sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 320px"
-                    className={styles.courseImage}
-                  />
-                </div>
-                <h3 className={styles.courseTitle}>{course.title}</h3>
-                <p className={styles.courseAuthor}>{course.description}</p>
-                <p className={styles.coursePrice}>{course.price} €</p>
-              </Link>
-            ))}
-          </div>
+          <div className={styles.coursesGrid}>{sprayCourses.map(renderCourseCard)}</div>
         </div>
       )}
     </div>

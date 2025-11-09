@@ -78,6 +78,10 @@ export class CoursesModule {
         method: RequestMethod.GET,
       },
       {
+        path: 'courses/:courseId/full/:sectionId/:videoId/subtitles/:filename',
+        method: RequestMethod.GET,
+      },
+      {
         path: 'courses/:courseId/full/segment/:segment',
         method: RequestMethod.GET,
       },
