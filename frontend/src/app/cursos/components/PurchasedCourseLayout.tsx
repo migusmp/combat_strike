@@ -3,13 +3,10 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Footer from "@/app/components/Home/Footer";
 import styles from "../css/PurchasedCourse.module.css";
 import { Course } from "@/app/interfaces/courses";
 import { PurchasedCourse } from "@/app/interfaces/purchases";
-import CourseContent from "./CourseContent";
-import WhatYouWillLearn from "./WhatYouWillLearnSection";
-import CourseDescription from "./CourseDescription";
-import CourseRequirements from "./CourseRequirements";
 import CoursePreviewModal from "./CoursePreviewModal";
 import FullCoursePreviewModal from "./FullCoursePreviewModal";
 import { buildPreviewClips } from "../utils/previewClips";
@@ -52,6 +49,14 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
 
     const totalSections = course.content.length;
     const totalClasses = course.content.reduce((sum, section) => sum + section.classes.length, 0);
+    const totalMinutes = course.content.reduce((minutes, section) => {
+        section.classes.forEach((cls) => {
+            minutes += cls.duration.hours * 60 + cls.duration.minutes;
+        });
+        return minutes;
+    }, 0);
+    const durationHours = Math.floor(totalMinutes / 60);
+    const durationMinutes = totalMinutes % 60;
 
     const scrollToContent = () => {
         contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -63,101 +68,161 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
     const fullCourseSrc = `${baseUrl}/courses/${course.id}/full/playlist`;
 
     return (
+        <>
         <div className={styles.wrapper}>
-            <section className={styles.hero}>
-                <div className={styles.mediaColumn}>
-                    <div className={styles.previewMedia}>
-                        <Image
-                            src={course.image}
-                            alt={`Vista previa de ${course.title}`}
-                            fill
-                            sizes="(max-width: 768px) 90vw, 800px"
-                            className={styles.previewImage}
-                        />
-                        <div className={styles.previewOverlay}>
-                            <span className={styles.overlayTag}>Curso completo</span>
-                            <h2>Reproduce las sesiones al instante</h2>
-                            <button
-                                type="button"
-                                className={styles.primaryButton}
-                                onClick={() => setShowFullCourseModal(true)}
-                            >
+            <section className={styles.videoHero}>
+                <div className={styles.videoShell}>
+                    <Image
+                        src={course.image}
+                        alt={`Portada de ${course.title}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 1200px"
+                        className={styles.heroImage}
+                        priority
+                    />
+                    <div className={styles.videoOverlay}>
+                        <span className={styles.badge}>Curso adquirido</span>
+                        <h1>{course.title}</h1>
+                        <p>Reproduce el curso completo, activa subtítulos y cambia de módulo cuando quieras.</p>
+                        <div className={styles.heroButtons}>
+                            <button type="button" className={styles.primaryButtonLarge} onClick={() => setShowFullCourseModal(true)}>
                                 Ver curso completo
                             </button>
-                        </div>
-                    </div>
-                    <div className={styles.previewMeta}>
-                        <p>
-                            Abre el curso completo, navega por todas las secciones y activa subtítulos para repasar cada
-                            detalle. Si prefieres un adelanto, lanza la vista rápida y vuelve a la acción en segundos.
-                        </p>
-                        <div className={styles.previewActions}>
-                            <button type="button" className={styles.secondaryButton} onClick={() => setShowPreviewModal(true)}>
-                                Vista rápida
+                            <button type="button" className={styles.secondaryGhost} onClick={() => setShowPreviewModal(true)}>
+                                Ver vista rápida
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className={styles.heroContent}>
-                    <span className={styles.badge}>Tu entrenamiento</span>
-                    <h1 className={styles.title}>{course.title}</h1>
-                    <p className={styles.subtitle}>
-                        Accede a todo el material del curso, haz seguimiento de tu progreso y retoma las lecciones desde
-                        cualquier dispositivo.
-                    </p>
-                    <div className={styles.heroActions}>
-                        <button type="button" className={styles.primaryButton} onClick={scrollToContent}>
-                            Ver contenido
-                        </button>
-                        <Link href="/mis-cursos" className={styles.secondaryButton}>
-                            Volver a mis cursos
-                        </Link>
-                    </div>
-
-                    <div className={styles.progressCard}>
-                        <div className={styles.progressHeader}>
-                            <span>Progreso</span>
-                            <strong>{progress}%</strong>
-                        </div>
-                        <div className={styles.progressBar}>
-                            <span className={styles.progressValue} style={{ width: `${progress}%` }} />
-                        </div>
-                        <p className={styles.progressFooter}>
-                            {totalSections} secciones · {totalClasses} lecciones
-                        </p>
-                    </div>
-
-                    <div className={styles.purchaseSummary}>
-                        <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>Fecha de compra</span>
-                            <strong>{purchaseDate}</strong>
-                        </div>
-                        <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>Estado</span>
-                            <strong>{statusLabel}</strong>
-                        </div>
-                        <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>Proveedor</span>
-                            <strong>{providerLabel}</strong>
-                        </div>
-                        <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>Importe</span>
-                            <strong>{amountLabel}</strong>
+                            <button type="button" className={styles.softButton} onClick={scrollToContent}>
+                                Ir al contenido
+                            </button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className={styles.body}>
-                <div className={styles.mainColumn} ref={contentRef}>
-                    <CourseContent courseId={course.id} />
-                    <WhatYouWillLearn points={course.whatYouWillLearn} />
-                    <CourseDescription text={course.longDescription} maxLength={600} />
-                    <CourseRequirements requirements={course.requirements} />
+            <section className={styles.infoGrid}>
+                <article className={styles.infoCardWide}>
+                    <header>
+                        <span>Progreso actual</span>
+                        <strong>{progress}%</strong>
+                    </header>
+                    <div className={styles.progressTrack}>
+                        <span style={{ width: `${progress}%` }} />
+                    </div>
+                    <footer>
+                        {totalSections} secciones · {totalClasses} clases
+                    </footer>
+                </article>
+
+                <article className={styles.infoCardCompact}>
+                    <span>Resumen de compra</span>
+                    <dl>
+                        <div>
+                            <dt>Fecha</dt>
+                            <dd>{purchaseDate}</dd>
+                        </div>
+                        <div>
+                            <dt>Pago</dt>
+                            <dd>{statusLabel}</dd>
+                        </div>
+                        <div>
+                            <dt>Proveedor</dt>
+                            <dd>{providerLabel}</dd>
+                        </div>
+                        <div>
+                            <dt>Importe</dt>
+                            <dd>{amountLabel}</dd>
+                        </div>
+                    </dl>
+                </article>
+
+                <article className={styles.infoCardCompact}>
+                    <span>Acciones rápidas</span>
+                    <div className={styles.quickActions}>
+                        <Link href="/mis-cursos">Volver a mis cursos</Link>
+                        <button type="button" onClick={scrollToContent}>
+                            Ver temario
+                        </button>
+                    </div>
+                </article>
+            </section>
+
+            <section className={styles.trainingPanels} ref={contentRef}>
+                <div className={styles.panelStack}>
+                    <article className={`${styles.panelCard} ${styles.panelGradient}`}>
+                        <header>
+                            <span className={styles.panelTag}>Plan de entrenamiento</span>
+                            <h2>Contenido del curso</h2>
+                            <p>
+                                {totalSections} secciones · {totalClasses} clases · {durationHours} h {durationMinutes} min
+                            </p>
+                        </header>
+                        <ul className={styles.sectionList}>
+                            {course.content.map((section) => (
+                                <li key={section.sectionTitle} className={styles.sectionItem}>
+                                    <details>
+                                        <summary>
+                                            <div>
+                                                <strong>{section.sectionTitle}</strong>
+                                                <span>{section.classes.length} clases</span>
+                                            </div>
+                                            <span aria-hidden="true">▼</span>
+                                        </summary>
+                                        <div className={styles.sectionClasses}>
+                                            {section.classes.map((cls, idx) => (
+                                                <div key={`${section.sectionTitle}-${idx}`}>
+                                                    <p>{cls.title}</p>
+                                                    <span>
+                                                        {cls.duration.hours ? `${cls.duration.hours} h ` : ""}
+                                                        {cls.duration.minutes} min
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </details>
+                                </li>
+                            ))}
+                        </ul>
+                    </article>
+
+                    <article className={styles.panelCard}>
+                        <header>
+                            <span className={styles.panelTag}>Resultados</span>
+                            <h2>Lo que aprenderás</h2>
+                            <p>Competencias clave que consolidarás durante el curso.</p>
+                        </header>
+                        <ul className={styles.learnList}>
+                            {course.whatYouWillLearn?.map((item, index) => (
+                                <li key={index}>
+                                    <span />
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+                    </article>
+
+                    <article className={styles.panelCard}>
+                        <header>
+                            <span className={styles.panelTag}>Antes de comenzar</span>
+                            <h2>Requisitos recomendados</h2>
+                            <p>Prepara tu equipo para aprovechar el entrenamiento.</p>
+                        </header>
+                        <ul className={styles.requireList}>
+                            {course.requirements?.map((req, index) => (
+                                <li key={index}>{req}</li>
+                            ))}
+                        </ul>
+                    </article>
+
+                    <article className={styles.panelCard}>
+                        <header>
+                            <span className={styles.panelTag}>Descripción</span>
+                            <h2>Profundiza en el programa</h2>
+                        </header>
+                        <p className={styles.descriptionCopy}>{course.longDescription}</p>
+                    </article>
                 </div>
 
-                <aside className={styles.sidebar}>
+                <aside className={styles.sidebarStack}>
                     <div className={styles.infoCard}>
                         <h3>Detalles de compra</h3>
                         <dl>
@@ -170,7 +235,7 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
                                 <dd>{providerLabel}</dd>
                             </div>
                             <div>
-                                <dt>Estado</dt>
+                                <dt>Pago</dt>
                                 <dd>{statusLabel}</dd>
                             </div>
                             <div>
@@ -224,5 +289,7 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
                 />
             )}
         </div>
+        <Footer />
+        </>
     );
 }
