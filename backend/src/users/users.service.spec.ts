@@ -2,12 +2,14 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Purchase } from 'src/purchases/entities/purchases.entity';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
   let repository: jest.Mocked<Repository<User>>;
+  let purchasesRepository: jest.Mocked<Repository<Purchase>>;
 
   const createRepositoryMock = (): Partial<Repository<User>> => ({
     findOne: jest.fn(),
@@ -15,6 +17,10 @@ describe('UsersService', () => {
     save: jest.fn(),
     create: jest.fn(),
     remove: jest.fn(),
+  });
+
+  const createPurchasesRepositoryMock = (): Partial<Repository<Purchase>> => ({
+    find: jest.fn(),
   });
 
   beforeEach(async () => {
@@ -25,6 +31,10 @@ describe('UsersService', () => {
           provide: getRepositoryToken(User),
           useValue: createRepositoryMock(),
         },
+        {
+          provide: getRepositoryToken(Purchase),
+          useValue: createPurchasesRepositoryMock(),
+        },
       ],
     }).compile();
 
@@ -32,6 +42,9 @@ describe('UsersService', () => {
     repository = module.get<Repository<User>>(
       getRepositoryToken(User),
     ) as jest.Mocked<Repository<User>>;
+    purchasesRepository = module.get<Repository<Purchase>>(
+      getRepositoryToken(Purchase),
+    ) as jest.Mocked<Repository<Purchase>>;
   });
 
   it('should be defined', () => {
@@ -64,6 +77,62 @@ describe('UsersService', () => {
       repository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('getPurchasedCourses', () => {
+    it('should map purchases result', async () => {
+      const purchaseDate = new Date();
+      const purchases = [
+        {
+          id: 'purchase-1',
+          createdAt: purchaseDate,
+          provider: 'paypal',
+          status: 'COMPLETED',
+          amount: 59.99 as unknown as number,
+          externalOrderId: 'external-123',
+          course: { id: 10, title: 'Course 1' },
+        },
+        {
+          id: 'purchase-2',
+          createdAt: purchaseDate,
+          provider: 'stripe',
+          status: 'PENDING',
+          amount: undefined,
+          externalOrderId: undefined,
+          course: { id: 11, title: 'Course 2' },
+        },
+      ] as Purchase[];
+
+      purchasesRepository.find.mockResolvedValue(purchases);
+
+      const result = await service.getPurchasedCourses(42);
+
+      expect(purchasesRepository.find).toHaveBeenCalledWith({
+        where: { user: { id: 42 } },
+        relations: ['course'],
+        order: { createdAt: 'DESC' },
+      });
+      expect(result).toEqual([
+        {
+          purchaseId: 'purchase-1',
+          purchasedAt: purchaseDate,
+          provider: 'paypal',
+          status: 'COMPLETED',
+          amount: 59.99,
+          externalOrderId: 'external-123',
+          course: { id: 10, title: 'Course 1' },
+        },
+        {
+          purchaseId: 'purchase-2',
+          purchasedAt: purchaseDate,
+          provider: 'stripe',
+          status: 'PENDING',
+          amount: null,
+          externalOrderId: null,
+          course: { id: 11, title: 'Course 2' },
+        },
+      ]);
     });
   });
 });
