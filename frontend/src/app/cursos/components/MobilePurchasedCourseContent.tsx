@@ -70,6 +70,7 @@ export default function MobilePurchasedCourseContent({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [subtitleMenuOpen, setSubtitleMenuOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [selectedSubtitle, setSelectedSubtitle] = useState<"off" | string>(
     "off"
   );
@@ -95,11 +96,14 @@ export default function MobilePurchasedCourseContent({
   const lastTapTsRef = useRef(0);
   const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [seekHint, setSeekHint] = useState<
-    | { side: "left" | "right"; id: number }
-    | null
-  >(null);
-  const pendingNavRef = useRef<{ side: "prev" | "next"; timer: ReturnType<typeof setTimeout> } | null>(null);
+  const [seekHint, setSeekHint] = useState<{
+    side: "left" | "right";
+    id: number;
+  } | null>(null);
+  const pendingNavRef = useRef<{
+    side: "prev" | "next";
+    timer: ReturnType<typeof setTimeout>;
+  } | null>(null);
 
   // Prev/Next class targets
   const nextTarget = useMemo(() => {
@@ -265,7 +269,10 @@ export default function MobilePurchasedCourseContent({
   const seekBy = (deltaSec: number, side: "left" | "right", stamp: number) => {
     const video = videoRef.current;
     if (!video) return;
-    const dur = Number.isFinite(duration) && duration > 0 ? duration : video.duration || 0;
+    const dur =
+      Number.isFinite(duration) && duration > 0
+        ? duration
+        : video.duration || 0;
     let next = (video.currentTime || 0) + deltaSec;
     if (dur > 0) {
       const maxSafe = Math.max(EDGE_GUARD_SECONDS, dur - EDGE_GUARD_SECONDS);
@@ -567,25 +574,64 @@ export default function MobilePurchasedCourseContent({
             className={mobileStyles.mobilePlayerVideo}
             playsInline
             controls={false}
+            onPointerDown={onVideoPointerDown}
             onDoubleClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               return false as unknown as void;
             }}
           >
-          {currentSectionSlug &&
-            currentClassSlug &&
-            currentSubtitles.map((subtitle, idx) => (
-              <track
-                key={`${subtitle.file}-${idx}`}
-                kind="subtitles"
-                src={`${baseUrl}/courses/${course.id}/full/${currentSectionSlug}/${currentClassSlug}/subtitles/${subtitle.file}`}
-                srcLang={subtitle.lang}
-                label={subtitle.label}
-                default={false}
-              />
-            ))}
-        </video>
+            {currentSectionSlug &&
+              currentClassSlug &&
+              currentSubtitles.map((subtitle, idx) => (
+                <track
+                  key={`${subtitle.file}-${idx}`}
+                  kind="subtitles"
+                  src={`${baseUrl}/courses/${course.id}/full/${currentSectionSlug}/${currentClassSlug}/subtitles/${subtitle.file}`}
+                  srcLang={subtitle.lang}
+                  label={subtitle.label}
+                  default={false}
+                />
+              ))}
+          </video>
+          <div className={mobileStyles.ccTopRight}>
+            <button
+              type="button"
+              className={`${mobileStyles.ccButton} ${
+                selectedSubtitle !== "off" ? mobileStyles.ccActive : ""
+              }`}
+              onClick={() => {
+                if (!currentSubtitles?.length) return;
+                // alternar entre activar o desactivar subtítulos rápidos
+                setSelectedSubtitle((prev) =>
+                  prev === "off" ? currentSubtitles[0]?.lang ?? "off" : "off"
+                );
+              }}
+              aria-label="Subtítulos"
+            >
+              CC
+            </button>
+
+            {/* ⚙️ Nuevo botón de ajustes */}
+            <button
+              type="button"
+              className={mobileStyles.settingsButton}
+              onClick={() => setSettingsModalOpen(true)}
+              aria-label="Configuración del video"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="currentColor"
+                className="bi bi-gear"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+              </svg>
+            </button>
+          </div>
 
           {/* Double-tap seek feedback */}
           <div
@@ -659,7 +705,16 @@ export default function MobilePurchasedCourseContent({
                 disabled={!prevTarget || !overlayActive}
                 aria-label="Clase anterior"
               >
-                ‹
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="30"
+                  height="30"
+                  fill="currentColor"
+                  className="bi bi-skip-start-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.54-.313 1.232.066 1.232.696v7.384c0 .63-.692 1.01-1.232.697L5 8.753V12a.5.5 0 0 1-1 0z" />
+                </svg>
               </button>
               <button
                 type="button"
@@ -668,7 +723,29 @@ export default function MobilePurchasedCourseContent({
                 disabled={!overlayActive}
                 aria-label={isPlaying ? "Pausar" : "Reproducir"}
               >
-                {isPlaying ? "❚❚" : "▶"}
+                {isPlaying ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="40"
+                    height="40"
+                    fill="currentColor"
+                    className="bi bi-pause-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5m5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="40"
+                    height="40"
+                    fill="currentColor"
+                    className="bi bi-play-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
+                  </svg>
+                )}
               </button>
               <button
                 type="button"
@@ -697,7 +774,16 @@ export default function MobilePurchasedCourseContent({
                 disabled={!nextTarget || !overlayActive}
                 aria-label="Siguiente clase"
               >
-                ›
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="30"
+                  height="30"
+                  fill="currentColor"
+                  className="bi bi-skip-end-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.693 3.3 4 3.678 4 4.308v7.384c0 .63.692 1.01 1.233.697L11.5 8.753V12a.5.5 0 0 0 1 0z" />
+                </svg>
               </button>
             </div>
 
@@ -748,99 +834,6 @@ export default function MobilePurchasedCourseContent({
                   {formatTimeLabel(currentTime)} / {formatTimeLabel(duration)}
                 </span>
                 <div className={mobileStyles.bottomRight}>
-                  <div className={mobileStyles.volumeGroup}>
-                    <button
-                      type="button"
-                      className={mobileStyles.volumeIcon}
-                      aria-label={volume === 0 ? "Activar sonido" : "Silenciar"}
-                      onClick={toggleMute}
-                    >
-                      {volume === 0 ? "🔇" : volume < 0.5 ? "🔈" : "🔊"}
-                    </button>
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={Math.round(volume * 100)}
-                      onChange={onVolumeChange}
-                      className={mobileStyles.volumeSlider}
-                      aria-label="Volumen"
-                    />
-                  </div>
-                  <div className={mobileStyles.ccDropdown} data-cc-menu>
-                    <button
-                      type="button"
-                      className={`${mobileStyles.ccButton} ${
-                        selectedSubtitle !== "off" ? mobileStyles.ccActive : ""
-                      }`}
-                      onClick={() => {
-                        const next = !subtitleMenuOpen;
-                        setControlsVisible(true);
-                        if (hideTimerRef.current) {
-                          clearTimeout(hideTimerRef.current);
-                          hideTimerRef.current = null;
-                        }
-                        setSubtitleMenuOpen(next);
-                        if (!next && isPlaying) {
-                          hideTimerRef.current = setTimeout(
-                            () => setControlsVisible(false),
-                            HIDE_DELAY_MS
-                          );
-                        }
-                      }}
-                      aria-label="Subtítulos"
-                    >
-                      CC
-                    </button>
-                    {subtitleMenuOpen && (
-                      <ul className={mobileStyles.ccMenu}>
-                        <li>
-                          <button
-                            type="button"
-                            className={
-                              selectedSubtitle === "off"
-                                ? mobileStyles.ccSelected
-                                : ""
-                            }
-                            onClick={() => {
-                              setSelectedSubtitle("off");
-                              setSubtitleMenuOpen(false);
-                            }}
-                          >
-                            Desactivados
-                          </button>
-                        </li>
-                        {currentSubtitles?.map((t) => (
-                          <li key={t.lang}>
-                            <button
-                              type="button"
-                              className={
-                                selectedSubtitle === t.lang
-                                  ? mobileStyles.ccSelected
-                                  : ""
-                              }
-                              onClick={() => {
-                                setSelectedSubtitle(t.lang);
-                                setSubtitleMenuOpen(false);
-                              }}
-                            >
-                              {t.label}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    className={`${mobileStyles.iconButton} ${
-                      isCinema ? mobileStyles.iconActive : ""
-                    }`}
-                    onClick={() => setIsCinema((v) => !v)}
-                    aria-label={isCinema ? "Salir modo cine" : "Modo cine"}
-                  >
-                    ◱
-                  </button>
                   <button
                     type="button"
                     className={mobileStyles.iconButton}
@@ -851,7 +844,29 @@ export default function MobilePurchasedCourseContent({
                         : "Pantalla completa"
                     }
                   >
-                    ⛶
+                    {isFullscreen ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        fill="currentColor"
+                        className="bi bi-fullscreen-exit"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5m5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5M0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5m10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        fill="currentColor"
+                        className="bi bi-fullscreen"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5M.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
@@ -986,6 +1001,68 @@ export default function MobilePurchasedCourseContent({
           </div>
         )}
       </div>
+
+      {settingsModalOpen && (
+        <div
+          className={mobileStyles.settingsModalBackdrop}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSettingsModalOpen(false);
+          }}
+        >
+          <div className={mobileStyles.settingsModal}>
+            <header className={mobileStyles.settingsHeader}>
+              <h3>Configuración del video</h3>
+              <button
+                className={mobileStyles.closeSettings}
+                onClick={() => setSettingsModalOpen(false)}
+                aria-label="Cerrar configuración"
+              >
+                ✕
+              </button>
+            </header>
+
+            <div className={mobileStyles.settingsSection}>
+              <span className={mobileStyles.settingsLabel}>Subtítulos</span>
+              <ul className={mobileStyles.settingsList}>
+                <li>
+                  <button
+                    onClick={() => {
+                      setSelectedSubtitle("off");
+                      setSettingsModalOpen(false);
+                    }}
+                    className={
+                      selectedSubtitle === "off"
+                        ? mobileStyles.settingsActive
+                        : ""
+                    }
+                  >
+                    Desactivados
+                  </button>
+                </li>
+                {currentSubtitles?.map((t) => (
+                  <li key={t.lang}>
+                    <button
+                      onClick={() => {
+                        setSelectedSubtitle(t.lang);
+                        setSettingsModalOpen(false);
+                      }}
+                      className={
+                        selectedSubtitle === t.lang
+                          ? mobileStyles.settingsActive
+                          : ""
+                      }
+                    >
+                      {t.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Puedes añadir más configuraciones aquí, como calidad */}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
