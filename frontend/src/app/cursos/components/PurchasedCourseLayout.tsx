@@ -390,7 +390,6 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
                 />
             )}
         </div>
-        <Footer />
         </>
     );
 }
