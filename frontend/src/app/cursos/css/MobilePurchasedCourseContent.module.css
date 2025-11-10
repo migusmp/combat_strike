@@ -1,0 +1,235 @@
+.mobileCourseLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.mobilePlayerShell {
+  width: 100%;
+  border-radius: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #000;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+}
+
+.mobilePlayerVideo {
+  width: 100%;
+  height: clamp(220px, 45vh, 400px);
+  object-fit: cover;
+  background: #000;
+}
+
+.mobileCourseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0 0.2rem;
+}
+
+.mobileEyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  color: rgba(248, 251, 255, 0.65);
+}
+
+.mobileCourseInfo h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.mobileInstructor {
+  font-size: 0.85rem;
+  color: rgba(248, 251, 255, 0.7);
+}
+
+.mobileTabs {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobileTabs button {
+  background: none;
+  border: none;
+  color: rgba(248, 251, 255, 0.6);
+  padding: 0.5rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mobileTabActive {
+  position: relative;
+  color: #f8fbff !important;
+}
+
+.mobileTabActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #f8fbff;
+  border-radius: 999px;
+}
+
+.mobileSectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobileSectionCard {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.9rem;
+  background: rgba(4, 10, 32, 0.7);
+}
+
+.mobileSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.mobileSectionHeader > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mobileSectionLabel {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  color: rgba(248, 251, 255, 0.6);
+}
+
+.mobileSectionHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.mobileSectionMeta {
+  font-size: 0.85rem;
+  color: rgba(248, 251, 255, 0.6);
+}
+
+.mobileSectionCard ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobileClassButton {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  background: rgba(7, 13, 35, 0.65);
+  color: #f8fbff;
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+}
+
+.mobileClassButton p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mobileClassButton small {
+  color: rgba(248, 251, 255, 0.65);
+  font-size: 0.82rem;
+}
+
+.mobileClassIndex {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: rgba(248, 251, 255, 0.75);
+}
+
+.mobileClassIcon {
+  margin-left: auto;
+  color: rgba(248, 251, 255, 0.5);
+}
+
+.mobileClassButtonActive {
+  border-color: rgba(106, 255, 208, 0.5);
+  background: rgba(106, 255, 208, 0.08);
+}
+
+.mobileMoreContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobileMoreCard {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(7, 13, 35, 0.7);
+  padding: 1rem;
+}
+
+.mobileMoreCard header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: rgba(248, 251, 255, 0.6);
+}
+
+.mobileMoreCard header strong {
+  font-size: 1.1rem;
+  letter-spacing: normal;
+  color: #f8fbff;
+}
+
+.mobileMoreProgress {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.mobileMoreProgress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #64c5ff, #6affd0);
+}
+
+.mobileMoreCard ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: rgba(248, 251, 255, 0.75);
+  font-size: 0.92rem;
+}

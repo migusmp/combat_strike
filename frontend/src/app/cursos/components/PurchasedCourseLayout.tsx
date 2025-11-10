@@ -1,15 +1,16 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import Footer from "@/app/components/Home/Footer";
-import styles from "../css/PurchasedCourse.module.css";
+import styles from "../css/PurchasedCourseLayout.module.css";
 import { Course } from "@/app/interfaces/courses";
 import { PurchasedCourse } from "@/app/interfaces/purchases";
 import CoursePreviewModal from "./CoursePreviewModal";
 import FullCoursePreviewModal from "./FullCoursePreviewModal";
 import { buildPreviewClips } from "../utils/previewClips";
+import { useFullCoursePreview } from "../hooks/useFullCoursePreview";
+import MobilePurchasedCourseContent from "./MobilePurchasedCourseContent";
 
 interface PurchasedCourseLayoutProps {
     course: Course;
@@ -31,6 +32,7 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
     const contentRef = useRef<HTMLDivElement>(null);
     const [showPreviewModal, setShowPreviewModal] = useState(false);
     const [showFullCourseModal, setShowFullCourseModal] = useState(false);
+    const [isCompact, setIsCompact] = useState(false);
 
     const purchaseDate = formatDate(purchase?.purchasedAt);
     const statusLabel = purchase?.status ?? "Pago completado";
@@ -67,38 +69,170 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
     const previewSrc = `${baseUrl}/courses/${course.id}/preview/playlist`;
     const fullCourseSrc = `${baseUrl}/courses/${course.id}/full/playlist`;
 
+    useEffect(() => {
+        const updateCompact = () => {
+            if (typeof window === "undefined") return;
+            setIsCompact(window.innerWidth <= 768);
+        };
+        updateCompact();
+        window.addEventListener("resize", updateCompact);
+        return () => window.removeEventListener("resize", updateCompact);
+    }, []);
+
+    const {
+        sections,
+        selectedSection,
+        selectedClass,
+        currentSection,
+        currentClass,
+        currentSectionSlug,
+        currentClassSlug,
+        currentSubtitles,
+        videoRef,
+        handleSelect,
+    } = useFullCoursePreview({
+        course,
+        masterPlaylistSrc: fullCourseSrc,
+        apiBaseUrl: baseUrl,
+        active: true,
+    });
+
+    const viewerClassName = [styles.viewerBlock, isCompact ? styles.viewerBlockFullBleed : ""]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+
     return (
         <>
         <div className={styles.wrapper}>
-            <section className={styles.videoHero}>
-                <div className={styles.videoShell}>
-                    <Image
-                        src={course.image}
-                        alt={`Portada de ${course.title}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 1200px"
-                        className={styles.heroImage}
-                        priority
+            <div ref={contentRef} className={viewerClassName}>
+                {isCompact ? (
+                    <MobilePurchasedCourseContent
+                        course={course}
+                        sections={sections}
+                        selectedSection={selectedSection}
+                        selectedClass={selectedClass}
+                        currentSection={currentSection}
+                        currentClass={currentClass}
+                        videoRef={videoRef}
+                        currentSectionSlug={currentSectionSlug}
+                        currentClassSlug={currentClassSlug}
+                        currentSubtitles={currentSubtitles}
+                        baseUrl={baseUrl}
+                        onSelect={handleSelect}
+                        progress={progress}
+                        totalSections={totalSections}
+                        totalClasses={totalClasses}
+                        durationHours={durationHours}
+                        durationMinutes={durationMinutes}
                     />
-                    <div className={styles.videoOverlay}>
-                        <span className={styles.badge}>Curso adquirido</span>
-                        <h1>{course.title}</h1>
-                        <p>Reproduce el curso completo, activa subtítulos y cambia de módulo cuando quieras.</p>
-                        <div className={styles.heroButtons}>
-                            <button type="button" className={styles.primaryButtonLarge} onClick={() => setShowFullCourseModal(true)}>
-                                Ver curso completo
-                            </button>
-                            <button type="button" className={styles.secondaryGhost} onClick={() => setShowPreviewModal(true)}>
-                                Ver vista rápida
-                            </button>
-                            <button type="button" className={styles.softButton} onClick={scrollToContent}>
-                                Ir al contenido
-                            </button>
+                ) : (
+                    <section className={styles.fullCourseLayout}>
+                        <div className={styles.playerColumn}>
+                            <div className={styles.playerShell}>
+                                <video
+                                    ref={videoRef}
+                                    controls
+                                    crossOrigin="use-credentials"
+                                    className={styles.playerVideo}
+                                >
+                                    {currentSectionSlug &&
+                                        currentClassSlug &&
+                                        currentSubtitles.map((subtitle, idx) => (
+                                            <track
+                                                key={`${subtitle.file}-${idx}`}
+                                                kind="subtitles"
+                                                src={`${baseUrl}/courses/${course.id}/full/${currentSectionSlug}/${currentClassSlug}/subtitles/${subtitle.file}`}
+                                                srcLang={subtitle.lang}
+                                                label={subtitle.label}
+                                                default={subtitle.lang === "es"}
+                                            />
+                                        ))}
+                                </video>
+                            </div>
+                            <div className={styles.playerMeta}>
+                                <p className={styles.playerEyebrow}>Reproduciendo</p>
+                                <h3>
+                                    {currentSection ? currentSection.sectionTitle : "Sin secciones"}{" "}
+                                    {currentClass ? `· ${currentClass.title}` : ""}
+                                </h3>
+                                {currentClass && (
+                                    <span>
+                                        {currentClass.duration.hours > 0 ? `${currentClass.duration.hours} h ` : ""}
+                                        {currentClass.duration.minutes} min
+                                    </span>
+                                )}
+                            </div>
+                            <div className={styles.playerActions}>
+                                <button type="button" className={styles.secondaryGhost} onClick={() => setShowPreviewModal(true)}>
+                                    Ver vista rápida
+                                </button>
+                                <button type="button" className={styles.softButton} onClick={() => setShowFullCourseModal(true)}>
+                                    Abrir en ventana
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </section>
 
+                        <aside className={styles.sectionSidebar}>
+                            <header>
+                                <span className={styles.panelTag}>Plan de entrenamiento</span>
+                                <h2>Contenido del curso</h2>
+                                <p>
+                                    {totalSections} secciones · {totalClasses} clases · {durationHours} h {durationMinutes} min
+                                </p>
+                            </header>
+                            <div className={styles.sectionModuleList}>
+                                {sections.map((section, sectionIdx) => (
+                                    <div key={section.sectionTitle} className={styles.sectionModule}>
+                                        <button
+                                            type="button"
+                                            className={`${styles.sectionModuleHeader} ${
+                                                selectedSection === sectionIdx ? styles.sectionModuleHeaderActive : ""
+                                            }`}
+                                            onClick={() => handleSelect(sectionIdx, 0)}
+                                        >
+                                            <div>
+                                                <strong>{section.sectionTitle}</strong>
+                                                <span>{section.classes.length} clases</span>
+                                            </div>
+                                            <span className={styles.sectionModuleIcon} aria-hidden="true">
+                                                ▶
+                                            </span>
+                                        </button>
+                                        <ul className={styles.sectionClassList}>
+                                            {section.classes.map((cls, classIdx) => {
+                                                const isActive = selectedSection === sectionIdx && selectedClass === classIdx;
+                                                return (
+                                                    <li key={`${section.sectionTitle}-${classIdx}`}>
+                                                        <button
+                                                            type="button"
+                                                            className={`${styles.sectionClassButton} ${
+                                                                isActive ? styles.sectionClassButtonActive : ""
+                                                            }`}
+                                                            onClick={() => handleSelect(sectionIdx, classIdx)}
+                                                        >
+                                                            <span>{classIdx + 1}.</span>
+                                                            <div>
+                                                                <p>{cls.title}</p>
+                                                                <small>
+                                                                    {cls.duration.hours > 0 ? `${cls.duration.hours} h ` : ""}
+                                                                    {cls.duration.minutes} min
+                                                                </small>
+                                                            </div>
+                                                        </button>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        </aside>
+                    </section>
+                )}
+            </div>
+
+            {!isCompact && (
             <section className={styles.infoGrid}>
                 <article className={styles.infoCardWide}>
                     <header>
@@ -145,45 +279,11 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
                     </div>
                 </article>
             </section>
+            )}
 
-            <section className={styles.trainingPanels} ref={contentRef}>
+            {!isCompact && (
+            <section className={styles.trainingPanels}>
                 <div className={styles.panelStack}>
-                    <article className={`${styles.panelCard} ${styles.panelGradient}`}>
-                        <header>
-                            <span className={styles.panelTag}>Plan de entrenamiento</span>
-                            <h2>Contenido del curso</h2>
-                            <p>
-                                {totalSections} secciones · {totalClasses} clases · {durationHours} h {durationMinutes} min
-                            </p>
-                        </header>
-                        <ul className={styles.sectionList}>
-                            {course.content.map((section) => (
-                                <li key={section.sectionTitle} className={styles.sectionItem}>
-                                    <details>
-                                        <summary>
-                                            <div>
-                                                <strong>{section.sectionTitle}</strong>
-                                                <span>{section.classes.length} clases</span>
-                                            </div>
-                                            <span aria-hidden="true">▼</span>
-                                        </summary>
-                                        <div className={styles.sectionClasses}>
-                                            {section.classes.map((cls, idx) => (
-                                                <div key={`${section.sectionTitle}-${idx}`}>
-                                                    <p>{cls.title}</p>
-                                                    <span>
-                                                        {cls.duration.hours ? `${cls.duration.hours} h ` : ""}
-                                                        {cls.duration.minutes} min
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </details>
-                                </li>
-                            ))}
-                        </ul>
-                    </article>
-
                     <article className={styles.panelCard}>
                         <header>
                             <span className={styles.panelTag}>Resultados</span>
@@ -268,6 +368,7 @@ export default function PurchasedCourseLayout({ course, purchase }: PurchasedCou
                     </div>
                 </aside>
             </section>
+            )}
 
             {showPreviewModal && (
                 <CoursePreviewModal

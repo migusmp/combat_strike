@@ -93,8 +93,14 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Patch('me')
+  async updateMe(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    const loggedUser = req.user as RequestUser;
+
+    if (!loggedUser) {
+      throw new ForbiddenException('No autorizado');
+    }
+
+    return this.usersService.update(loggedUser.id, updateUserDto);
   }
 }

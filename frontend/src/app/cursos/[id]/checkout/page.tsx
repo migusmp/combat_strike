@@ -232,7 +232,7 @@ export default function CourseCheckoutPage() {
       router.push(`/gracias?curso=${course?.id}`);
     } catch (error) {
       console.error("❌ Error en el flujo mock:", error);
-    }
+    }1
   }, [captureOrder, course?.id, handleCreateOrder, router]);
 
   // 🔄 Estados de carga / error / no encontrado
