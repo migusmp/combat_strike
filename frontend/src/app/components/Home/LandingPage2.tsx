@@ -76,7 +76,7 @@ export default function LandingPage2() {
                     <div className={styles.heroVisual}>
                         <div className={styles.heroBadge}>Formación 2025</div>
                         <Image
-                            src="/assets/imagen_principal.jpg"
+                            src="/assets/2T1A0235.JPG"
                             alt="Entrenamiento táctico Combat Strike"
                             fill
                             priority
@@ -99,7 +99,7 @@ export default function LandingPage2() {
                 <div className={`${styles.teamCard} ${styles.trainerCard}`}>
                     <div className={styles.teamVisual}>
                         <Image
-                            src="/assets/valores-foto.JPEG"
+                            src="/assets/2T1A0295.JPG"
                             alt="Damián Gutiérrez Roldán"
                             fill
                             sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 320px"
@@ -140,7 +140,7 @@ export default function LandingPage2() {
                 <div className={`${styles.teamCard} ${styles.assistantCard}`}>
                     <div className={styles.teamVisual}>
                         <Image
-                            src="/assets/valores-foto.JPEG"
+                            src="/assets/2T1A0299.JPG"
                             alt="Llanos Martínez Torres"
                             fill
                             sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 320px"
@@ -246,7 +246,7 @@ export default function LandingPage2() {
                         <article className={styles.presencialCard}>
                             <div className={styles.presencialMedia}>
                                 <Image
-                                    src="/assets/imagen-presencial.jpg"
+                                    src="/assets/2T1A0262.JPG"
                                     alt="Taller intensivo Krav Maga"
                                     fill
                                     className={styles.presencialImage}
@@ -273,7 +273,7 @@ export default function LandingPage2() {
                         <article className={styles.presencialCard}>
                             <div className={styles.presencialMedia}>
                                 <Image
-                                    src="/assets/imagen-presencial-spray.jpg"
+                                    src="/assets/foto-curso-gas-pimienta.png"
                                     alt="Clínica uso de sprays"
                                     fill
                                     className={styles.presencialImage}
