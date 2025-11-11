@@ -33,8 +33,6 @@ import {
 import { PurchasesService } from 'src/purchases/purchases.service';
 import { RequestUser } from 'src/types/request';
 
-
-
 /**
  * --- CONTROLADOR DE VIDEOS DE PREVISUALIZACIÓN ---
  *
@@ -240,6 +238,60 @@ export class CoursesController {
     } catch {
       // Si no se encuentra el archivo, lanza una excepción 404
       throw new NotFoundException(notFoundMessage);
+    }
+  }
+
+  private async sendSubtitleFile(res: Response, filePath: string) {
+    try {
+      // ✅ Verificación temprana: asegura que el archivo exista y sea accesible
+      //    Esto evita abrir streams innecesarios y nos permite responder 404 rápido.
+      await fsp.access(filePath);
+
+      // ─────────────────────────────────────────────────────────────────────────────
+      // 🔐 Seguridad / 🧠 Semántica / 🚀 Perf
+      // ─────────────────────────────────────────────────────────────────────────────
+      // • Content-Type correcto para WebVTT. Incluye charset para evitar
+      //   problemas con acentos y caracteres especiales.
+      res.setHeader('Content-Type', 'text/vtt; charset=utf-8');
+
+      // • Caching conservador: 60s para reducir I/O sin exponer cambios tardíos.
+      //   Ajusta según la frecuencia con la que actualizas los .vtt.
+      res.setHeader('Cache-Control', 'private, max-age=60');
+
+      // • Permite que el recurso se consuma en contextos cross-origin (p. ej. si
+      //   la página y el API no comparten origen). Útil cuando integras con un
+      //   reproductor que incrusta pistas desde otro dominio.
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+
+      // ─────────────────────────────────────────────────────────────────────────────
+      // 🌐 CORS con credenciales (SOLO si hay cross-origin real)
+      // ─────────────────────────────────────────────────────────────────────────────
+      // Importante: no uses '*' si envías cookies; especifica el origen frontend.
+      if (process.env.CROSS_ORIGIN === 'true') {
+        const origin = process.env.FRONTEND_URL || 'http://localhost:3000';
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        // Vary evita cache en proxy/CDN incorrecto cuando cambia el Origin.
+        res.setHeader('Vary', 'Origin');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      }
+
+      // ─────────────────────────────────────────────────────────────────────────────
+      // 📼 Streaming del archivo
+      // ─────────────────────────────────────────────────────────────────────────────
+      // • Usamos createReadStream para no cargar el archivo completo en memoria,
+      //   mejorando el rendimiento en archivos grandes y alta concurrencia.
+      // • El manejo de 'error' garantiza que respondamos 500 si el stream falla.
+      const stream = fs.createReadStream(filePath);
+      stream.on('error', () => res.sendStatus(500));
+      stream.pipe(res);
+
+      // 💡 Opcional avanzado:
+      // - Soportar Range requests para saltos precisos (menos común en .vtt).
+      // - Enviar ETag/Last-Modified y manejar If-None-Match/If-Modified-Since
+      //   para 304 Not Modified y cache HTTP más eficiente.
+    } catch {
+      // 404 explícito si el archivo no existe o no es accesible.
+      throw new NotFoundException('Subtítulo no encontrado');
     }
   }
 
@@ -690,7 +742,7 @@ export class CoursesController {
       videoId,
       filename,
     );
-    await this.sendFileIfExists(res, filePath, 'Subtítulo no encontrado');
+    await this.sendSubtitleFile(res, filePath);
   }
 
   /**
