@@ -35,7 +35,7 @@
     rgba(3, 6, 15, 0.95) 65%,
     rgba(3, 6, 15, 0.7) 100%
   );
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  /* box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); */
   z-index: 2;
 }
 
@@ -45,7 +45,7 @@
   /* overflow: hidden; */
   /* border: 1px solid rgba(255, 255, 255, 0.08); */
   background: #000;
-  box-shadow: 0 35px 65px rgba(0, 0, 0, 0.75);
+  /* box-shadow: 0 35px 65px rgba(0, 0, 0, 0.75); */
   position: relative;
   touch-action: manipulation; /* evita doble-tap zoom y gestos no deseados */
 }
@@ -487,7 +487,8 @@
 .mobileCourseInfo h2 {
   margin: 0;
   padding-left: 0.5rem;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .mobileInstructor {
@@ -604,9 +605,7 @@
   flex-direction: column;
 }
 
-.mobileSectionCard ul li {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
+
 
 .mobileClassButton {
   width: 100%;
