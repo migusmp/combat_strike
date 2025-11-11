@@ -851,7 +851,22 @@
   transform: scale(1.05);
 }
 
-/* 🔹 Subtítulos con buen contraste y espaciado */
+/* 🔼 Subir subtítulos unos píxeles (iOS/Safari/Chrome móvil WebKit) */
+video::-webkit-media-text-track-container {
+  /* antes: bottom: 10px */
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px)) !important;
+  left: 20px !important;
+  right: 20px !important;
+  width: calc(100% - 40px) !important;
+}
+
+/* Empújalos un pelín más hacia arriba para separarlos de la barra de progreso */
+video::-webkit-media-text-track-display {
+  /* antes: translateY(-4px) */
+  transform: translateY(-8px) !important;
+}
+
+/* Mantén estilo/legibilidad */
 video::cue {
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
@@ -862,24 +877,22 @@ video::cue {
   text-align: center;
 }
 
-/* 🔹 Forzar márgenes y posición de subtítulos */
-video::-webkit-media-text-track-container {
-  bottom: 10px !important; /* sube ligeramente del borde */
-  left: 20px !important;
-  right: 20px !important;
-  width: calc(100% - 40px) !important;
-}
-
-/* 🔹 Compatibilidad general */
-video::-webkit-media-text-track-display {
-  transform: translateY(-4px) !important;
-}
-
-/* 🔹 Para navegadores que usen cue-region */
+/* Ancho de región (fallback donde aplica) */
 video::cue-region {
-  width: calc(100% - 40px); /* 20px de margen a cada lado */
+  width: calc(100% - 40px);
   margin: 0 auto;
 }
+
+/* En pantallas muy pequeñas, un poco menos de subida para no tapar contenido */
+@media (max-width: 360px) {
+  video::-webkit-media-text-track-container {
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  video::-webkit-media-text-track-display {
+    transform: translateY(-6px) !important;
+  }
+}
+
 
 .hitbox {
   position: absolute;
