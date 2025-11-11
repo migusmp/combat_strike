@@ -52,34 +52,58 @@
   background: #000; /* barras negras cuando sea necesario */
   touch-action: manipulation;
   pointer-events: none; /* deja pasar el tap a la capa de gestos */
+  z-index: 1;
 }
 
 /* Captura gestos cuando overlay está oculto */
 .gestureLayer {
   position: absolute;
   inset: 0;
-  z-index: 3;            /* por encima del video y cues */
-  pointer-events: auto;  /* recibe los taps siempre */
-  touch-action: manipulation;    /* evita gestos del navegador que “roben” el evento */
+  z-index: 3; /* por encima del video y cues */
+  pointer-events: auto; /* recibe los taps siempre */
+  touch-action: manipulation; /* evita gestos del navegador que “roben” el evento */
   background: transparent;
   cursor: pointer;
+  display: none;
 }
 
 /* Overlay controls */
+/* El overlay NO debe capturar el fondo */
 .overlay {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
-  pointer-events: none;
+  pointer-events: none;     /* <- clave: el fondo no captura */
   opacity: 0;
   transition: opacity 150ms ease;
-  z-index: 4;
+  z-index: 6;
 }
-
 .overlayVisible {
   opacity: 1;
+  /* mantenemos pointer-events:none en el contenedor;
+     solo los hijos “clickables” tendrán pointer-events:auto */
+}
+
+/* Zonas interactivas del overlay sí capturan eventos */
+.overlayCenter,
+.bottomControls,
+.centerPlay,
+.navButton,
+.progress,
+.iconButton {
   pointer-events: auto;
+  z-index: 1;
+}
+
+
+/* 🔹 Fondo clicable cuando overlay está visible */
+.overlayBackdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;        /* recibe el tap */
+  background: transparent;
+  z-index: 0;                  /* por debajo de los botones del overlay */
 }
 
 /* Double-tap seek hint */
@@ -835,4 +859,26 @@ video::-webkit-media-text-track-display {
 video::cue-region {
   width: calc(100% - 40px); /* 20px de margen a cada lado */
   margin: 0 auto;
+}
+
+.hitbox {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+  pointer-events: auto;
+  /* Evita gestos del navegador y eventos duplicados (click sintético) */
+  touch-action: manipulation; /* o 'none' si prefieres */
+  background: transparent;
+}
+.hitboxDisabled {
+  pointer-events: none;
+}
+/* Asegura que solo las zonas interactivas del overlay capturen */
+.overlayCenter,
+.bottomControls,
+.centerPlay,
+.navButton,
+.progress,
+.iconButton {
+  pointer-events: auto;
 }

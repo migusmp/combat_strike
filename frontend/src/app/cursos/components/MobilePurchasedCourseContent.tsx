@@ -12,6 +12,7 @@ import {
   QualityLevelOption,
   QualityPreference,
 } from "../hooks/useFullCoursePreview";
+import VideoHitbox from "./VideoHtiBox";
 
 interface MobilePurchasedCourseContentProps {
   course: Course;
@@ -85,6 +86,7 @@ export default function MobilePurchasedCourseContent({
   const overlayActive = controlsVisible || (!isPlaying && !hideWhilePaused);
   const overlayActiveRef = useRef(overlayActive);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasVisibleBeforeTapRef = useRef(false);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
   const prevWasPlayingRef = useRef(false);
@@ -94,6 +96,8 @@ export default function MobilePurchasedCourseContent({
   } | null>(null);
   const cueLinesRef = useRef<WeakMap<any, any>>(new WeakMap());
   const lastTapTsRef = useRef(0);
+  const lastTapPosRef = useRef<{ x: number; y: number } | null>(null);
+  const MAX_TAP_DIST = 24; // px
   const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seekHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [seekHint, setSeekHint] = useState<{
@@ -139,7 +143,7 @@ export default function MobilePurchasedCourseContent({
     };
     const onPause = () => {
       setIsPlaying(false);
-      setHideWhilePaused(false);
+      // setHideWhilePaused(false);
     };
     const onTime = () => setCurrentTime(video.currentTime || 0);
     const onMeta = () =>
@@ -447,40 +451,77 @@ export default function MobilePurchasedCourseContent({
 
   const onVideoPointerDown = (e: any) => {
     const now = Date.now();
-    const area = shellRef.current || (e.currentTarget as HTMLElement);
-    const rect = area.getBoundingClientRect();
-    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    const y = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
 
-    // Doble tap => buscar dentro de DBL_TAP_MS y hacer seek
-    if (now - lastTapTsRef.current < DBL_TAP_MS) {
+    const prev = lastTapPosRef.current;
+    const isNearPrev =
+      !!prev && Math.hypot(prev.x - x, prev.y - y) <= MAX_TAP_DIST;
+
+    // --- DOBLE TAP ---
+    if (isNearPrev && now - lastTapTsRef.current < DBL_TAP_MS) {
       e.preventDefault?.();
       e.stopPropagation?.();
+
+      // 1) cancelamos el single-tap pendiente (para que no haga toggle)
       if (singleTapTimerRef.current) {
         clearTimeout(singleTapTimerRef.current);
         singleTapTimerRef.current = null;
       }
-      const ratio = rect.width ? (clientX - rect.left) / rect.width : 0.5;
+
+      // 2) hacemos el seek ±5s
+      const area = shellRef.current || (e.currentTarget as HTMLElement);
+      const rect = area.getBoundingClientRect();
+      const ratio = rect.width ? (x - rect.left) / rect.width : 0.5;
       const forward = ratio >= 0.5;
       seekBy(forward ? 5 : -5, forward ? "right" : "left", now);
+
+      // 3) si antes del primer tap el overlay estaba oculto, lo mantenemos oculto
+      if (!wasVisibleBeforeTapRef.current) {
+        setControlsVisible(false);
+        setHideWhilePaused((p) => p); // no tocamos estado de pausa
+      }
+
+      // limpiar estado de doble tap
       lastTapTsRef.current = 0;
+      lastTapPosRef.current = null;
       clearPendingNav();
       return;
     }
 
-    // Single tap: alternar visibilidad inmediatamente
-    if (hideTimerRef.current) {
-      clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = null;
+    // --- PRIMER TAP (posible single) ---
+    // guardamos cómo estaba antes del primer tap
+    wasVisibleBeforeTapRef.current = overlayActiveRef.current;
+
+    // agendamos el single-tap: si no llega un segundo tap a tiempo, hacemos toggle
+    if (singleTapTimerRef.current) {
+      clearTimeout(singleTapTimerRef.current);
     }
-    const currentlyVisible = overlayActiveRef.current;
-    if (currentlyVisible) {
-      setControlsVisible(false);
-      if (!isPlaying) setHideWhilePaused(true);
-    } else {
-      setHideWhilePaused(false);
-      setControlsVisible(true);
-    }
+    singleTapTimerRef.current = setTimeout(() => {
+      // SINGLE TAP efectivo: toggle visibilidad
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+
+      const currentlyVisible = overlayActiveRef.current;
+      if (currentlyVisible) {
+        setControlsVisible(false);
+        if (!isPlaying) setHideWhilePaused(true);
+      } else {
+        setHideWhilePaused(false);
+        setControlsVisible(true);
+        // si está reproduciendo, programa auto-ocultar
+        if (isPlaying && !subtitleMenuOpen) {
+          hideTimerRef.current = setTimeout(
+            () => setControlsVisible(false),
+            HIDE_DELAY_MS
+          );
+        }
+      }
+      singleTapTimerRef.current = null;
+    }, DBL_TAP_MS);
+
+    // marcamos este tap como el "primero" potencial
     lastTapTsRef.current = now;
+    lastTapPosRef.current = { x, y };
   };
 
   // Cleanup timers on unmount
@@ -574,12 +615,12 @@ export default function MobilePurchasedCourseContent({
             className={mobileStyles.mobilePlayerVideo}
             playsInline
             controls={false}
-            onPointerDown={onVideoPointerDown}
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              return false as unknown as void;
-            }}
+            // onPointerDown={onVideoPointerDown}
+            // onDoubleClick={(e) => {
+            //   e.preventDefault();
+            //   e.stopPropagation();
+            //   return false as unknown as void;
+            // }}
           >
             {currentSectionSlug &&
               currentClassSlug &&
@@ -594,6 +635,10 @@ export default function MobilePurchasedCourseContent({
                 />
               ))}
           </video>
+          <VideoHitbox
+            isOverlayVisible={overlayActive}
+            onTap={onVideoPointerDown}
+          />
           <div className={mobileStyles.ccTopRight}>
             <button
               type="button"
@@ -652,30 +697,35 @@ export default function MobilePurchasedCourseContent({
           </div>
 
           {/* Gesture layer for taps/double-taps when controls are ocultos */}
-          <div
+          {/* <div
             className={mobileStyles.gestureLayer}
             onPointerDown={onVideoPointerDown}
             aria-hidden={true}
-          />
+          /> */}
 
           {/* Overlay controls */}
           <div
             className={`${mobileStyles.overlay} ${
               overlayActive ? mobileStyles.overlayVisible : ""
             }`}
-            onPointerDown={(e) => {
-              // Tocar el overlay (fuera de controles) también participa de single/double tap
-              onVideoPointerDown(e);
-            }}
           >
+            {/* 🔹 Fondo clicable cuando el overlay está visible */}
+            <div
+              className={mobileStyles.overlayBackdrop}
+              onPointerDown={(e) => {
+                // este fondo recibe taps para toggle/±5s mientras los controles están visibles
+                e.preventDefault();
+                e.stopPropagation();
+                onVideoPointerDown(e);
+              }}
+              aria-hidden
+            />
             <div
               className={mobileStyles.overlayCenter}
               onPointerDown={(e) => {
                 // Si se pulsa en un botón, no tratar como tap/seek
                 const el = e.target as HTMLElement;
-                if (el.closest("button")) {
-                  e.stopPropagation();
-                }
+                if (el.closest("button")) e.stopPropagation();
               }}
             >
               <button
@@ -791,9 +841,8 @@ export default function MobilePurchasedCourseContent({
               className={mobileStyles.bottomControls}
               onPointerDown={(e) => {
                 const el = e.target as HTMLElement;
-                if (el.closest('button, input, [role="slider"]')) {
+                if (el.closest('button, input, [role="slider"]'))
                   e.stopPropagation();
-                }
               }}
             >
               <div
