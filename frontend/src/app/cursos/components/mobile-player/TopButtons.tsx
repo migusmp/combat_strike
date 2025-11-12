@@ -5,15 +5,17 @@ type Props = {
   ccActive: boolean;
   onQuickToggleCC: () => void;
   onOpenSettings: () => void;
+  hidden?: boolean;
 };
 
 export default function TopButtons({
   ccActive,
   onQuickToggleCC,
   onOpenSettings,
+  hidden = false,
 }: Props) {
   return (
-    <div className={styles.ccTopRight}>
+    <div className={`${styles.ccTopRight} ${hidden ? styles.hidden : styles.visible}`}>
       <button
         type="button"
         className={`${styles.ccButton} ${ccActive ? styles.ccActive : ""}`}

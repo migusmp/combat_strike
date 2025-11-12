@@ -88,11 +88,12 @@ export default function VideoPlayerShell({
       </video>
 
       <VideoHitbox isOverlayVisible={overlayActive} onTap={onTap} />
-
+          
       <TopButtons
         ccActive={selectedSubtitle !== "off"}
         onQuickToggleCC={onQuickToggleCC}
         onOpenSettings={onToggleSettings}
+        hidden={!overlayActive}
       />
 
       {/* HINT de doble tap (+5s/-5s) */}

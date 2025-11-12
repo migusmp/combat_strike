@@ -3,10 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Hls from "hls.js";
 import { Course } from "@/app/interfaces/courses";
+import {
+  applyTextTrackSelection,
+  loadCC,
+  saveCC,
+  SubtitleSelection,
+} from "../utils/subtitles";
 import { loadTime, saveTime, timeKey } from "../utils/videoProgress";
 import { logHls } from "../utils/telemetry";
-
-// ✅ Helpers (asegúrate de tener estos archivos)
 
 interface UseFullCoursePreviewOptions {
   course: Course;
@@ -37,6 +41,10 @@ export function useFullCoursePreview({
   const [selectedClass, setSelectedClass] = useState(0);
   const [currentVideoSrc, setCurrentVideoSrc] = useState(masterPlaylistSrc);
 
+  const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleSelection>(
+    () => loadCC(course.id)
+  );
+
   const sections = useMemo(() => course.content ?? [], [course.content]);
   const currentSection = sections[selectedSection];
   const currentClass = currentSection?.classes?.[selectedClass];
@@ -55,7 +63,6 @@ export function useFullCoursePreview({
       const section = sections[sectionIndex];
       const cls = section?.classes?.[classIndex];
       if (!section || !cls) return masterPlaylistSrc;
-
       const sectionSlug = slugFromTitle(section.sectionTitle);
       const classSlug = slugFromTitle(cls.title);
       return `${apiBaseUrl}/courses/${course.id}/full/${sectionSlug}/${classSlug}/playlist`;
@@ -63,91 +70,158 @@ export function useFullCoursePreview({
     [apiBaseUrl, course.id, masterPlaylistSrc, sections]
   );
 
-  // 🔑 Clave de reanudación por curso/section/class
   const progressKey = useMemo(
     () => timeKey(course.id, currentSectionSlug, currentClassSlug),
     [course.id, currentSectionSlug, currentClassSlug]
   );
 
-  // Inicialización de selección + URL
+  // Inicializa selección + URL
   useEffect(() => {
     if (!active) return;
-    const initialUrl = sections.length ? buildPlaylistUrl(0, 0) : masterPlaylistSrc;
+    const initialUrl = sections.length
+      ? buildPlaylistUrl(0, 0)
+      : masterPlaylistSrc;
     setSelectedSection(0);
     setSelectedClass(0);
     setCurrentVideoSrc(initialUrl);
   }, [active, buildPlaylistUrl, masterPlaylistSrc, sections.length]);
 
-  // Montaje HLS estable (primer render + cambios de src + cambios de layout)
+  // Montaje HLS + subtítulos
+  // useFullCoursePreview.ts — solo muestro el bloque relevante de "montaje HLS"
   useEffect(() => {
     if (!active) return;
 
     const videoEl = videoRef.current;
     if (!videoEl || !currentVideoSrc) return;
 
-    // Limpieza previa
     if (hlsRef.current) {
-      try { hlsRef.current.stopLoad(); } catch {}
-      try { hlsRef.current.destroy(); } catch {}
+      try {
+        hlsRef.current.stopLoad();
+      } catch {}
+      try {
+        hlsRef.current.destroy();
+      } catch {}
       hlsRef.current = null;
     }
 
-    // Autoplay friendly
     videoEl.muted = true;
     (videoEl as any).playsInline = true;
 
-    // Función común para restaurar tiempo y reproducir
-    const restoreAndPlay = () => {
-      const t = loadTime(progressKey);
-      if (Number.isFinite(t) && t > 0) {
-        try { videoEl.currentTime = Math.max(0, t - 1); } catch {}
-      }
-      videoEl.play().catch(() => { /* autoplay bloqueado */ });
+    const applyCCSafely = () => {
+      applyTextTrackSelection(videoEl, selectedSubtitle);
+      // reintentos muy cortos
+      queueMicrotask(() => applyTextTrackSelection(videoEl, selectedSubtitle));
+      setTimeout(() => applyTextTrackSelection(videoEl, selectedSubtitle), 120);
     };
 
-    // Safari (HLS nativo)
+    // Re-aplica cuando cada <track> termina de cargar
+    const trackEls = Array.from(
+      videoEl.querySelectorAll("track[kind='subtitles']")
+    ) as HTMLTrackElement[];
+    const onTrackLoad = () => applyCCSafely();
+    trackEls.forEach((t) => t.addEventListener("load", onTrackLoad));
+
+    const restoreTimeAndCC = () => {
+      const t = loadTime(progressKey);
+      if (Number.isFinite(t) && t > 0) {
+        try {
+          videoEl.currentTime = Math.max(0, t - 1);
+        } catch {}
+      }
+      applyCCSafely();
+    };
+
+    const logTracks = () => {
+      setTimeout(() => {
+        const v = videoRef.current;
+        if (!v) return;
+        const tts = Array.from(v.textTracks).map((t, i) => ({
+          i,
+          kind: t.kind,
+          lang: t.language,
+          label: t.label,
+          mode: t.mode,
+          cues: t.cues?.length ?? 0,
+        }));
+        const els = Array.from(
+          v.querySelectorAll('track[kind="subtitles"]')
+        ).map((el: any, i) => ({
+          i,
+          src: el.src,
+          srclang: el.srclang,
+          label: el.label,
+          readyState: el.readyState, // 0 NONE, 1 LOADING, 2 LOADED, 3 ERROR
+        }));
+        console.log("TT:", tts);
+        console.log("TRACK ELs:", els);
+      }, 800);
+    };
+
     if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
       videoEl.crossOrigin = "use-credentials";
       videoEl.src = currentVideoSrc;
       videoEl.load();
 
-      const onLoaded = () => restoreAndPlay();
+      const onLoaded = () => {
+        restoreTimeAndCC();
+        videoEl.play().catch(() => {});
+      };
+      const onAddTrack = () => applyCCSafely();
+      const onCanPlay = () => applyCCSafely();
+
+      videoEl.textTracks?.addEventListener?.("addtrack", onAddTrack as any);
       videoEl.addEventListener("loadedmetadata", onLoaded, { once: true });
+      videoEl.addEventListener("canplay", onCanPlay);
 
       return () => {
-        videoEl.removeEventListener("loadedmetadata", onLoaded);
+        trackEls.forEach((t) => t.removeEventListener("load", onTrackLoad));
+        videoEl.textTracks?.removeEventListener?.(
+          "addtrack",
+          onAddTrack as any
+        );
+        videoEl.removeEventListener("canplay", onCanPlay);
         videoEl.removeAttribute("src");
         videoEl.load();
       };
     }
 
-    // Hls.js
     const hls = new Hls({
       enableWorker: true,
       lowLatencyMode: true,
       backBufferLength: 90,
-      xhrSetup: (xhr) => { xhr.withCredentials = true; },
+      xhrSetup: (xhr) => {
+        xhr.withCredentials = true;
+      },
     });
 
-    // attach → loadSource
+    const onAddTrack = () => applyCCSafely();
+    videoEl.textTracks?.addEventListener?.("addtrack", onAddTrack as any);
+
     hls.attachMedia(videoEl);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.startLoad(0);
       hls.loadSource(currentVideoSrc);
     });
 
-    hls.on(Hls.Events.MANIFEST_PARSED, restoreAndPlay);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      restoreTimeAndCC();
+      videoEl.play().catch(() => {});
+      logTracks();
+    });
 
     hls.on(Hls.Events.LEVEL_LOADED, () => {
-      // si ya hay datos, intenta reproducir
+      applyCCSafely();
       if (videoEl.readyState >= 2 && videoEl.paused) {
         videoEl.play().catch(() => {});
       }
     });
 
     hls.on(Hls.Events.ERROR, (_e, data) => {
-      logHls({ level: data.fatal ? "error" : "warn", detail: data.details, data });
-
+      logHls({
+        level: data.fatal ? "error" : "warn",
+        detail: data.details,
+        data,
+      });
       if (data.fatal) {
         switch (data.type) {
           case Hls.ErrorTypes.NETWORK_ERROR:
@@ -157,8 +231,9 @@ export function useFullCoursePreview({
             hls.recoverMediaError();
             break;
           default:
-            try { hls.destroy(); } catch {}
-            break;
+            try {
+              hls.destroy();
+            } catch {}
         }
       }
     });
@@ -166,19 +241,24 @@ export function useFullCoursePreview({
     hlsRef.current = hls;
 
     return () => {
-      try { hls.stopLoad(); } catch {}
-      try { hls.destroy(); } catch {}
+      try {
+        hls.stopLoad();
+      } catch {}
+      try {
+        hls.destroy();
+      } catch {}
       hlsRef.current = null;
+      trackEls.forEach((t) => t.removeEventListener("load", onTrackLoad));
+      videoEl.textTracks?.removeEventListener?.("addtrack", onAddTrack as any);
       videoEl.removeAttribute("src");
       videoEl.load();
     };
-  }, [active, currentVideoSrc, progressKey]);
+  }, [active, currentVideoSrc, progressKey, selectedSubtitle]);
 
-  // Guardado periódico del progreso (cada ~1s)
+  // Guardado periódico del progreso
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-
     let last = 0;
     const onTime = () => {
       const now = performance.now();
@@ -187,10 +267,17 @@ export function useFullCoursePreview({
         last = now;
       }
     };
-
     el.addEventListener("timeupdate", onTime);
     return () => el.removeEventListener("timeupdate", onTime);
   }, [progressKey]);
+
+  // Persistir y aplicar selección de CC cuando el usuario cambia
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    saveCC(course.id, selectedSubtitle);
+    applyTextTrackSelection(el, selectedSubtitle);
+  }, [course.id, selectedSubtitle]);
 
   // Corrección de índices si cambia el contenido
   useEffect(() => {
@@ -199,20 +286,24 @@ export function useFullCoursePreview({
     if (selectedSection > maxSection) {
       setSelectedSection(maxSection);
       setSelectedClass(0);
-    } else if (selectedClass >= (sections[selectedSection]?.classes.length ?? 0)) {
+    } else if (
+      selectedClass >= (sections[selectedSection]?.classes.length ?? 0)
+    ) {
       setSelectedClass(0);
     }
   }, [sections, selectedSection, selectedClass]);
 
   // Cambio manual de clase/sección
-  const handleSelect = useCallback((sectionIndex: number, classIndex: number) => {
-    const el = videoRef.current;
-    if (el) saveTime(progressKey, el.currentTime); // guarda antes de saltar
-
-    setSelectedSection(sectionIndex);
-    setSelectedClass(classIndex);
-    setCurrentVideoSrc(buildPlaylistUrl(sectionIndex, classIndex));
-  }, [buildPlaylistUrl, progressKey]);
+  const handleSelect = useCallback(
+    (sectionIndex: number, classIndex: number) => {
+      const el = videoRef.current;
+      if (el) saveTime(progressKey, el.currentTime);
+      setSelectedSection(sectionIndex);
+      setSelectedClass(classIndex);
+      setCurrentVideoSrc(buildPlaylistUrl(sectionIndex, classIndex));
+    },
+    [buildPlaylistUrl, progressKey]
+  );
 
   const currentSubtitles = currentClass?.subtitles ?? [];
 
@@ -226,7 +317,9 @@ export function useFullCoursePreview({
     currentClassSlug,
     currentSubtitles,
     videoRef,
-    currentVideoSrc,   // para usar como `key` si quieres
+    currentVideoSrc,
+    selectedSubtitle,
+    setSelectedSubtitle,
     handleSelect,
   };
 }

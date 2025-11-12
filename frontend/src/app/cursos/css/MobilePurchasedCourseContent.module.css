@@ -920,3 +920,6 @@ video::cue-region {
     height: calc(100svh - 85px);
   }
 }
+
+.visible { opacity: 1; pointer-events: auto; transition: opacity 150ms ease; }
+.hidden  { opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
