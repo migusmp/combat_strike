@@ -7,7 +7,7 @@ import {
 } from "@/app/interfaces/courses";
 
 type ControllerArgs = {
-  videoRef: RefObject<HTMLVideoElement>;
+  videoRef: RefObject<HTMLVideoElement | null>;
   sections: ContentSection[];
   selectedSection: number;
   selectedClass: number;

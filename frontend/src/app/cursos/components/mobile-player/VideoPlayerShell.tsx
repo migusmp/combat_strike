@@ -4,9 +4,7 @@ import VideoHitbox from "../VideoHtiBox";
 import TopButtons from "./TopButtons";
 import { RefObject } from "react";
 import { SubtitleTrack } from "@/app/interfaces/courses";
-import OverlayControls, {
-  OverlayControlsProps,
-} from "./OverlayControlls/OverlayControlls";
+import OverlayControls, { OverlayControlsProps } from "./OverlayControlls/OverlayControlls";
 
 type Props = {
   overlayActive: boolean;
@@ -15,8 +13,11 @@ type Props = {
   baseUrl: string;
   courseId: string | number;
 
-  // refs
-  videoRef: RefObject<HTMLVideoElement>;
+  /** 👇 NUEVO: clave para forzar remount del <video> */
+  srcKey: string;
+
+  // refs (tipos sin | null)
+  videoRef: RefObject<HTMLVideoElement | null>;
   shellRef: RefObject<HTMLDivElement | null>;
 
   // handlers
@@ -29,7 +30,9 @@ type Props = {
     sectionSlug?: string;
     classSlug?: string;
   };
-  seekHint?: { side: "left" | "right"; id: number } | null; // <-- NUEVO
+
+  // hint doble tap
+  seekHint?: { side: "left" | "right"; id: number } | null;
 };
 
 export default function VideoPlayerShell({
@@ -38,6 +41,7 @@ export default function VideoPlayerShell({
   currentSubtitles,
   baseUrl,
   courseId,
+  srcKey,
   videoRef,
   shellRef,
   onTap,
@@ -52,11 +56,21 @@ export default function VideoPlayerShell({
         ref={videoRef}
         className={styles.mobilePlayerVideo}
         playsInline
+        preload="auto"
         controls={false}
         crossOrigin="use-credentials"
         onPointerDown={onTap}
         onClick={onTap}
         onTouchStart={onTap}
+        /** Un par de reintentos “suaves” por si el autoplay se bloquea */
+        onLoadedMetadata={(e) => {
+          const v = e.currentTarget as HTMLVideoElement;
+          v.play().catch(() => {/* esperar interacción */});
+        }}
+        onCanPlay={(e) => {
+          const v = e.currentTarget as HTMLVideoElement;
+          if (v.paused) v.play().catch(() => {/* esperar interacción */});
+        }}
       >
         {overlayProps.sectionSlug &&
           overlayProps.classSlug &&
@@ -67,7 +81,8 @@ export default function VideoPlayerShell({
               src={`${baseUrl}/courses/${courseId}/full/${overlayProps.sectionSlug}/${overlayProps.classSlug}/subtitles/${t.file}`}
               srcLang={t.lang}
               label={t.label}
-              default={false}
+              /** activa el que tengas seleccionado si quieres: */
+              default={selectedSubtitle !== "off" && selectedSubtitle === t.lang}
             />
           ))}
       </video>
@@ -79,14 +94,11 @@ export default function VideoPlayerShell({
         onQuickToggleCC={onQuickToggleCC}
         onOpenSettings={onToggleSettings}
       />
+
       {/* HINT de doble tap (+5s/-5s) */}
       <div
         className={`${styles.seekHint} ${
-          seekHint
-            ? seekHint.side === "left"
-              ? styles.seekLeft
-              : styles.seekRight
-            : ""
+          seekHint ? (seekHint.side === "left" ? styles.seekLeft : styles.seekRight) : ""
         } ${seekHint ? styles.seekHintVisible : ""}`}
         key={seekHint?.id ?? 0}
         aria-hidden

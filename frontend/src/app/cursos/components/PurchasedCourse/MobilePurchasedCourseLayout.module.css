@@ -1,0 +1,9 @@
+.mobileWrapper {
+  position: relative;
+  width: 100%;
+  min-height: calc(100dvh - 85px);
+  background: #050b17;
+}
+@supports (height: 100svh) {
+  .mobileWrapper { min-height: calc(100svh - 85px); }
+}

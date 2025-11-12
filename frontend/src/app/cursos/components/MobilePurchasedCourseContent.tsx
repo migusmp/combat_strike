@@ -4,27 +4,30 @@ import SettingsModal from "./mobile-player/SettingsModal";
 import SectionList from "./mobile-player/SectionList";
 import MorePanel from "./mobile-player/MorePanel";
 import styles from "../css/MobilePurchasedCourseContent.module.css";
-import { RefObject, useState } from "react";
-import { Course, SubtitleTrack, ContentSection } from "@/app/interfaces/courses";
+import { RefObject, useMemo, useState } from "react";
+import { Course, SubtitleTrack, ContentSection, Classes } from "@/app/interfaces/courses";
 import { useVideoController } from "./mobile-player/useVideController";
 
-type Props = {
+interface Props {
   course: Course;
   sections: ContentSection[];
   selectedSection: number;
   selectedClass: number;
-  videoRef: RefObject<HTMLVideoElement>;
-  currentSectionSlug?: string;
-  currentClassSlug?: string;
+  currentSection: ContentSection | null;
+  currentClass: Classes | null;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
+  currentSectionSlug: string | undefined;
+  currentClassSlug: string | undefined;
   currentSubtitles: SubtitleTrack[];
   baseUrl: string;
-  onSelect: (s: number, c: number) => void;
+  onSelect: (sectionIdx: number, classIdx: number) => void;
   progress: number;
   totalSections: number;
   totalClasses: number;
   durationHours: number;
   durationMinutes: number;
-};
+}
+
 
 const formatDuration = (hours: number, minutes: number) =>
   hours > 0 ? `${hours} h ${minutes.toString().padStart(2,"0")} min` : `${minutes.toString().padStart(2,"0")} min`;
@@ -47,10 +50,17 @@ export default function MobilePurchasedCourseContent({
   const [tab, setTab] = useState<"clases" | "mas">("clases");
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const srcKey = useMemo(() => {
+  return currentSectionSlug && currentClassSlug
+    ? `${course.id}/${currentSectionSlug}/${currentClassSlug}`
+    : `master:${course.id}`;
+}, [course.id, currentSectionSlug, currentClassSlug]);
+
   return (
     <section className={styles.mobileCourseLayout}>
       <header className={styles.mobileStickyHeader}>
         <VideoPlayerShell
+          srcKey={srcKey}
           videoRef={videoRef}
           shellRef={vc.shellRef}
           overlayActive={vc.overlayActive}
