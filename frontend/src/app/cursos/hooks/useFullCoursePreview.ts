@@ -74,6 +74,65 @@ export function useFullCoursePreview({
     () => timeKey(course.id, currentSectionSlug, currentClassSlug),
     [course.id, currentSectionSlug, currentClassSlug]
   );
+  /** 🔎 Helpers para navegar entre clases */
+  const hasNext = useMemo(() => {
+    const sec = sections[selectedSection];
+    if (!sec?.classes?.length) return false;
+    // ¿queda otra clase en la sección?
+    if (selectedClass + 1 < (sec.classes?.length ?? 0)) return true;
+    // ¿hay una sección posterior con al menos una clase?
+    for (let s = selectedSection + 1; s < sections.length; s++) {
+      if ((sections[s]?.classes?.length ?? 0) > 0) return true;
+    }
+    return false;
+  }, [sections, selectedSection, selectedClass]);
+
+  const getNextIndex = useCallback((): {
+    section: number;
+    cls: number;
+  } | null => {
+    const sec = sections[selectedSection];
+    if (!sec?.classes?.length) return null;
+
+    // siguiente clase en la misma sección
+    if (selectedClass + 1 < (sec.classes?.length ?? 0)) {
+      return { section: selectedSection, cls: selectedClass + 1 };
+    }
+    // busca la primera clase de la siguiente sección que tenga contenido
+    for (let s = selectedSection + 1; s < sections.length; s++) {
+      const hasClasses = (sections[s]?.classes?.length ?? 0) > 0;
+      if (hasClasses) return { section: s, cls: 0 };
+    }
+    return null;
+  }, [sections, selectedSection, selectedClass]);
+
+  const goNext = useCallback(() => {
+    const next = getNextIndex();
+    if (!next) return;
+    // guarda progreso del actual antes de cambiar
+    const el = videoRef.current;
+    if (el) saveTime(progressKey, el.currentTime);
+    setSelectedSection(next.section);
+    setSelectedClass(next.cls);
+    setCurrentVideoSrc(buildPlaylistUrl(next.section, next.cls));
+  }, [getNextIndex, buildPlaylistUrl, progressKey]);
+
+  useEffect(() => {
+    if (!active) return;
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    const onEnded = () => {
+      if (hasNext) {
+        goNext();
+      }
+    };
+    videoEl.addEventListener("ended", onEnded);
+
+    return () => {
+      videoEl.removeEventListener("ended", onEnded);
+    };
+  }, [active, hasNext, goNext]);
 
   // Inicializa selección + URL
   useEffect(() => {
@@ -206,7 +265,7 @@ export function useFullCoursePreview({
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       restoreTimeAndCC();
       videoEl.play().catch(() => {});
-      logTracks();
+      // logTracks();
     });
 
     hls.on(Hls.Events.LEVEL_LOADED, () => {
