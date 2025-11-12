@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Footer from "@/app/components/Home/Footer";
-import styles from "../css/PurchasedCourseLayout.module.css";
+import styles from "../../css/PurchasedCourseLayout.module.css";
 import { Course } from "@/app/interfaces/courses";
 import { PurchasedCourse } from "@/app/interfaces/purchases";
 import { buildPreviewClips } from "../../utils/previewClips";

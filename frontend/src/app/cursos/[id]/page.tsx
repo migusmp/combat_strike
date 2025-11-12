@@ -6,7 +6,7 @@ import LoadingSpinner from "@/app/components/LoadingSpinner";
 import styles from "@/app/css/Cursos.module.css";
 import ResponsiveCourseLayout from "../components/ResponsiveCourseLayout";
 import { useAuthContext } from "@/app/context/AuthContext";
-import PurchasedCourseLayout from "../components/PurchasedCourseLayout";
+import PurchasedCourseLayout from "../components/PurchasedCourse";
 
 export default function CoursePage() {
     const { id } = useParams<{ id: string }>();
