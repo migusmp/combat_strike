@@ -41,6 +41,9 @@ export function useVideoController({
 
   const [controlsVisible, setControlsVisible] = useState(false);
   const [hideWhilePaused, setHideWhilePaused] = useState(false);
+  const [progressOnly, setProgressOnly] = useState(false);
+  const progressOnlyRef = useRef(false);
+  useEffect(() => { progressOnlyRef.current = progressOnly; }, [progressOnly]);
   const overlayActive = controlsVisible || (!isPlaying && !hideWhilePaused);
 
   // --- Refs que no disparan renders ---
@@ -155,18 +158,34 @@ export function useVideoController({
     });
   }, [currentSubtitles]);
 
-  // Aplicar subtítulos al <video>
+  // Aplicar subtítulos al <video> y reintentar cuando se agregan pistas
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    const tracks = video.textTracks;
-    for (let i = 0; i < tracks.length; i += 1) {
-      const htmlTrack = tracks[i];
-      const meta = currentSubtitles?.[i];
-      const lang = meta?.lang ?? htmlTrack.language;
-      if (selectedSubtitle === "off") htmlTrack.mode = "disabled";
-      else htmlTrack.mode = lang === selectedSubtitle ? "showing" : "disabled";
-    }
+    const apply = () => {
+      const tracks = video.textTracks;
+      for (let i = 0; i < tracks.length; i += 1) {
+        const htmlTrack = tracks[i];
+        const meta = currentSubtitles?.[i];
+        const lang = (meta?.lang || htmlTrack.language || "").toLowerCase();
+        if (selectedSubtitle === "off") {
+          htmlTrack.mode = "disabled" as TextTrackMode;
+        } else {
+          const want = selectedSubtitle.toLowerCase();
+          const match = lang === want || lang.startsWith(want);
+          htmlTrack.mode = match ? ("showing" as TextTrackMode) : ("disabled" as TextTrackMode);
+        }
+      }
+    };
+    apply();
+
+    const onAdd = () => apply();
+    try {
+      video.textTracks?.addEventListener?.("addtrack", onAdd as any);
+    } catch {}
+    return () => {
+      try { video.textTracks?.removeEventListener?.("addtrack", onAdd as any); } catch {}
+    };
   }, [selectedSubtitle, currentSubtitles, videoRef]);
 
   // Mantener overlay ref actualizado
@@ -187,10 +206,10 @@ export function useVideoController({
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
-    hideTimerRef.current = setTimeout(
-      () => setControlsVisible(false),
-      HIDE_DELAY_MS
-    );
+    hideTimerRef.current = setTimeout(() => {
+      setControlsVisible(false);
+      setProgressOnly(false);
+    }, HIDE_DELAY_MS);
     return () => {
       if (hideTimerRef.current) {
         clearTimeout(hideTimerRef.current);
@@ -249,6 +268,7 @@ export function useVideoController({
     const wasPlaying = !video.paused;
 
     setControlsVisible(true);
+    setProgressOnly(false);
     if (hideTimerRef.current) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
@@ -258,10 +278,10 @@ export function useVideoController({
       video.pause();
     } else {
       void video.play();
-      hideTimerRef.current = setTimeout(
-        () => setControlsVisible(false),
-        HIDE_DELAY_MS
-      );
+      hideTimerRef.current = setTimeout(() => {
+        setControlsVisible(false);
+        setProgressOnly(false);
+      }, HIDE_DELAY_MS);
     }
   };
 
@@ -281,6 +301,21 @@ export function useVideoController({
       pendingNavRef.current = null;
     }, SINGLE_TAP_DELAY_MS);
     pendingNavRef.current = { side, timer };
+  };
+
+  const revealProgressBriefly = () => {
+    setHideWhilePaused(false);
+    setProgressOnly(true);
+    setControlsVisible(true);
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    hideTimerRef.current = setTimeout(() => {
+      const isPaused = videoRef.current?.paused;
+      if (!isPaused) setControlsVisible(false);
+      setProgressOnly(false);
+    }, HIDE_DELAY_MS);
   };
 
   // reemplaza tu seekBy por esta versión
@@ -342,10 +377,10 @@ export function useVideoController({
       void video.play();
     }
     if (video && !video.paused) {
-      hideTimerRef.current = setTimeout(
-        () => setControlsVisible(false),
-        HIDE_DELAY_MS
-      );
+      hideTimerRef.current = setTimeout(() => {
+        setControlsVisible(false);
+        setProgressOnly(false);
+      }, HIDE_DELAY_MS);
     }
     window.removeEventListener("pointermove", handleGlobalPointerMove);
     window.removeEventListener("pointerup", handleGlobalPointerUp);
@@ -354,6 +389,7 @@ export function useVideoController({
 
   const onProgressPointerDown = (e: React.PointerEvent) => {
     setControlsVisible(true);
+    setProgressOnly(false);
     if (hideTimerRef.current) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
@@ -390,7 +426,7 @@ export function useVideoController({
     const isNearPrev =
       !!prev && Math.hypot(prev.x - x, prev.y - y) <= MAX_TAP_DIST;
 
-    // Doble tap => ±5s pero NO cambia visibilidad
+    // Doble tap => ±5s y mostramos la barra brevemente
     if (isNearPrev && now - lastTapTsRef.current < DBL_TAP_MS) {
       e.preventDefault?.();
       e.stopPropagation?.();
@@ -405,10 +441,7 @@ export function useVideoController({
       const forward = ratio >= 0.5;
       seekBy(forward ? 5 : -5, forward ? "right" : "left", now);
 
-      if (!wasVisibleBeforeTapRef.current) {
-        setControlsVisible(false);
-        setHideWhilePaused((p) => p);
-      }
+      revealProgressBriefly();
       lastTapTsRef.current = 0;
       lastTapPosRef.current = null;
       if (pendingNavRef.current) {
@@ -425,18 +458,35 @@ export function useVideoController({
     singleTapTimerRef.current = setTimeout(() => {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
 
-      const currentlyVisible = overlayActiveRef.current;
-      if (currentlyVisible) {
-        setControlsVisible(false);
-        if (!isPlaying) setHideWhilePaused(true);
-      } else {
+      // Si estamos en modo solo-progreso, promover a controles completos
+      if (progressOnlyRef.current) {
+        setProgressOnly(false);
         setHideWhilePaused(false);
         setControlsVisible(true);
         if (isPlaying) {
-          hideTimerRef.current = setTimeout(
-            () => setControlsVisible(false),
-            HIDE_DELAY_MS
-          );
+          hideTimerRef.current = setTimeout(() => {
+            setControlsVisible(false);
+            setProgressOnly(false);
+          }, HIDE_DELAY_MS);
+        }
+        singleTapTimerRef.current = null;
+        return;
+      }
+
+      const currentlyVisible = overlayActiveRef.current;
+      if (currentlyVisible) {
+        setControlsVisible(false);
+        setProgressOnly(false);
+        if (!isPlaying) setHideWhilePaused(true);
+      } else {
+        setProgressOnly(false);
+        setHideWhilePaused(false);
+        setControlsVisible(true);
+        if (isPlaying) {
+          hideTimerRef.current = setTimeout(() => {
+            setControlsVisible(false);
+            setProgressOnly(false);
+          }, HIDE_DELAY_MS);
         }
       }
       singleTapTimerRef.current = null;
@@ -501,5 +551,6 @@ export function useVideoController({
     toggleFullscreen,
     setSelectedSubtitle,
     seekHint,
+    progressOnly,
   };
 }

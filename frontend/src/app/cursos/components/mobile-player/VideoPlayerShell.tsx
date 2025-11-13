@@ -8,6 +8,7 @@ import OverlayControls, { OverlayControlsProps } from "./OverlayControlls/Overla
 
 type Props = {
   overlayActive: boolean;
+  progressOnly: boolean;
   selectedSubtitle: "off" | string;
   currentSubtitles: SubtitleTrack[];
   baseUrl: string;
@@ -37,6 +38,7 @@ type Props = {
 
 export default function VideoPlayerShell({
   overlayActive,
+  progressOnly,
   selectedSubtitle,
   currentSubtitles,
   baseUrl,
@@ -93,7 +95,7 @@ export default function VideoPlayerShell({
         ccActive={selectedSubtitle !== "off"}
         onQuickToggleCC={onQuickToggleCC}
         onOpenSettings={onToggleSettings}
-        hidden={!overlayActive}
+        hidden={!overlayActive || progressOnly}
       />
 
       {/* HINT de doble tap (+5s/-5s) */}

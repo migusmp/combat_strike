@@ -64,6 +64,7 @@ export default function MobilePurchasedCourseContent({
           videoRef={videoRef}
           shellRef={vc.shellRef}
           overlayActive={vc.overlayActive}
+          progressOnly={vc.progressOnly}
           selectedSubtitle={vc.selectedSubtitle}
           currentSubtitles={currentSubtitles}
           baseUrl={baseUrl}
@@ -90,6 +91,7 @@ export default function MobilePurchasedCourseContent({
             formatTimeLabel: vc.formatTimeLabel,
             sectionSlug: currentSectionSlug,
             classSlug: currentClassSlug,
+            progressOnly: vc.progressOnly,
           }}
           seekHint={vc.seekHint}
         />
