@@ -4,7 +4,7 @@ import SettingsModal from "./mobile-player/SettingsModal";
 import SectionList from "./mobile-player/SectionList";
 import MorePanel from "./mobile-player/MorePanel";
 import styles from "../css/MobilePurchasedCourseContent.module.css";
-import { RefObject, useMemo, useState } from "react";
+import { RefObject, useEffect, useMemo, useState } from "react";
 import { Course, SubtitleTrack, ContentSection, Classes } from "@/app/interfaces/courses";
 import { useVideoController } from "./mobile-player/useVideController";
 
@@ -19,6 +19,8 @@ interface Props {
   currentSectionSlug: string | undefined;
   currentClassSlug: string | undefined;
   currentSubtitles: SubtitleTrack[];
+  selectedSubtitle: "off" | string;
+  setSelectedSubtitle: (lang: "off" | string) => void;
   baseUrl: string;
   onSelect: (sectionIdx: number, classIdx: number) => void;
   progress: number;
@@ -35,7 +37,7 @@ const formatDuration = (hours: number, minutes: number) =>
 export default function MobilePurchasedCourseContent({
   course, sections, selectedSection, selectedClass,
   videoRef, currentSectionSlug, currentClassSlug,
-  currentSubtitles, baseUrl, onSelect,
+  currentSubtitles, selectedSubtitle, setSelectedSubtitle, baseUrl, onSelect,
   progress, totalSections, totalClasses, durationHours, durationMinutes,
 }: Props) {
   const vc = useVideoController({
@@ -49,6 +51,11 @@ export default function MobilePurchasedCourseContent({
 
   const [tab, setTab] = useState<"clases" | "mas">("clases");
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Mantén el controller sincronizado con la preferencia global del hook
+  useEffect(() => {
+    vc.setSelectedSubtitle(selectedSubtitle);
+  }, [selectedSubtitle]);
 
   const srcKey = useMemo(() => {
   return currentSectionSlug && currentClassSlug
@@ -65,13 +72,20 @@ export default function MobilePurchasedCourseContent({
           shellRef={vc.shellRef}
           overlayActive={vc.overlayActive}
           progressOnly={vc.progressOnly}
-          selectedSubtitle={vc.selectedSubtitle}
+          selectedSubtitle={selectedSubtitle}
           currentSubtitles={currentSubtitles}
           baseUrl={baseUrl}
           courseId={course.id}
           onTap={vc.onVideoPointerDown}
           onToggleSettings={() => setSettingsOpen(true)}
-          onQuickToggleCC={() => vc.setSelectedSubtitle(prev => prev === "off" ? (currentSubtitles[0]?.lang ?? "off") : "off")}
+          onQuickToggleCC={() => {
+            const next = selectedSubtitle === "off" ? (currentSubtitles[0]?.lang ?? "off") : "off";
+            vc.setSelectedSubtitle(next);
+            setSelectedSubtitle(next);
+          }}
+          endCard={vc.endCard}
+          onCancelAutoNext={vc.cancelAutoNext}
+          onPlayNextNow={vc.playNextNow}
           overlayProps={{
             overlayActive: vc.overlayActive,
             isPlaying: vc.isPlaying,
@@ -87,11 +101,12 @@ export default function MobilePurchasedCourseContent({
             goPrev: vc.goPrev,
             goNext: vc.goNext,
             isFullscreen: vc.isFullscreen,
+            isEnded: vc.isEnded,
             toggleFullscreen: vc.toggleFullscreen,
             formatTimeLabel: vc.formatTimeLabel,
             sectionSlug: currentSectionSlug,
             classSlug: currentClassSlug,
-            progressOnly: vc.progressOnly,
+            progressOnly: vc.progressOnly || !!vc.endCard?.active,
           }}
           seekHint={vc.seekHint}
         />
@@ -132,9 +147,9 @@ export default function MobilePurchasedCourseContent({
 
       {settingsOpen && (
         <SettingsModal
-          selected={vc.selectedSubtitle}
+          selected={selectedSubtitle}
           tracks={currentSubtitles}
-          onSelect={(lang) => { vc.setSelectedSubtitle(lang); setSettingsOpen(false); }}
+          onSelect={(lang) => { vc.setSelectedSubtitle(lang); setSelectedSubtitle(lang); setSettingsOpen(false); }}
           onClose={() => setSettingsOpen(false)}
         />
       )}

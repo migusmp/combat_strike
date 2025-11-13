@@ -51,15 +51,35 @@ function parseVTT(vtt: string): Array<{ start: number; end: number; text: string
   return cues;
 }
 
-/** Fallback: descarga el VTT y lo inyecta como TextTrack manual */
-async function fetchAndInjectTrack(video: HTMLVideoElement, trackEl: HTMLTrackElement, label: string, lang: string) {
+function getManualMap(video: HTMLVideoElement): Map<string, TextTrack> {
+  const v = video as any;
+  if (!v.__csManualTracks) v.__csManualTracks = new Map<string, TextTrack>();
+  return v.__csManualTracks as Map<string, TextTrack>;
+}
+
+/** Fallback: descarga el VTT y lo inyecta como TextTrack manual (idempotente por idioma) */
+async function fetchAndInjectTrack(
+  video: HTMLVideoElement,
+  trackEl: HTMLTrackElement,
+  label: string,
+  lang: string
+) {
+  const key = (lang || "").toLowerCase();
+  const manualMap = getManualMap(video);
+  const existing = manualMap.get(key);
+  if (existing) {
+    // Ya existe manual para este idioma → úsalo
+    existing.mode = "showing" as TextTrackMode;
+    return existing;
+  }
   const url = trackEl.src;
   const res = await fetch(url, { credentials: "include" });
   if (!res.ok) throw new Error(`VTT fetch ${res.status}`);
   const vttText = await res.text();
   const cues = parseVTT(vttText);
 
-  const manual = video.addTextTrack("subtitles", label || lang.toUpperCase(), lang || "");
+  const manual = video.addTextTrack("subtitles", label || (lang ? lang.toUpperCase() : ""), lang || "");
+  (manual as any)._csManual = true;
   manual.mode = "showing";
   for (const c of cues) {
     try {
@@ -72,6 +92,8 @@ async function fetchAndInjectTrack(video: HTMLVideoElement, trackEl: HTMLTrackEl
       manual.addCue(cue);
     }
   }
+  manualMap.set(key, manual);
+  return manual;
 }
 
 /** Selecciona/activa subtítulos y, si fallan, usa el fallback */
@@ -81,7 +103,7 @@ export async function applyTextTrackSelection(video: HTMLVideoElement, selection
   const textTracks = Array.from(video.textTracks ?? []);
   const trackEls = Array.from(video.querySelectorAll('track[kind="subtitles"]')) as HTMLTrackElement[];
 
-  // desactiva todo
+  // desactiva todo (nativos y manuales) y evita activar por default
   textTracks.forEach(t => (t.mode = "disabled"));
   trackEls.forEach(el => (el.default = false));
 
@@ -93,41 +115,62 @@ export async function applyTextTrackSelection(video: HTMLVideoElement, selection
     const label = (el.label || "").toLowerCase();
     return lang.startsWith(norm) || label.includes(norm);
   });
-  if (pickIndex < 0) return;
+  // Si ya existe manual para este idioma, úsalo aunque no veamos el <track> aún
+  const manualMap = getManualMap(video);
+  const manual = manualMap.get(norm);
+  if (manual) {
+    textTracks.forEach(t => (t.mode = t === manual ? ("showing" as TextTrackMode) : ("disabled" as TextTrackMode)));
+    return;
+  }
+  if (pickIndex < 0) {
+    // Reintenta una vez tras un pequeño delay por si los <track> aún no están listos
+    await new Promise(r => setTimeout(r, 120));
+    const retryEls = Array.from(video.querySelectorAll('track[kind="subtitles"]')) as HTMLTrackElement[];
+    const retryIdx = retryEls.findIndex((el) => {
+      const lang = (el.srclang || el.getAttribute("srcLang") || "").toLowerCase();
+      const label = (el.label || "").toLowerCase();
+      return lang.startsWith(norm) || label.includes(norm);
+    });
+    if (retryIdx < 0) return;
+    // actualiza referencias y pickIndex
+    trackEls.splice(0, trackEls.length, ...retryEls);
+    (pickIndex as any) = retryIdx;
+  }
 
   const pickedEl = trackEls[pickIndex];
   const pickedText = textTracks[pickIndex];
-  if (!pickedText) return;
-
-  pickedEl.default = true;
-
   const tryNative = () => {
+    if (!pickedText) return false;
     pickedText.mode = "hidden";
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     pickedText.cues && pickedText.cues.length;
     pickedText.mode = "showing";
+    return true;
   };
 
   const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 
   // Intentos nativos rápidos
-  tryNative();
+  let nativeShown = tryNative();
   await wait(80);
-  tryNative();
+  if (!nativeShown) nativeShown = tryNative();
 
   // Si ya hay cues visibles, terminamos
-  if ((pickedEl as any).readyState === 2 && (pickedText.cues?.length ?? 0) > 0) return;
+  if (pickedText && (pickedEl as any).readyState === 2 && (pickedText.cues?.length ?? 0) > 0) return;
 
   // Espera a que cargue/añada tracks
   await wait(200);
-  tryNative();
-  if ((pickedEl as any).readyState === 2 && (pickedText.cues?.length ?? 0) > 0) return;
+  nativeShown = tryNative();
+  if (pickedText && (pickedEl as any).readyState === 2 && (pickedText.cues?.length ?? 0) > 0) return;
 
   // Si el readyState indica ERROR (3) o no hay cues tras varios intentos → fallback manual
   const rs = (pickedEl as any).readyState;
-  if (rs === 3 || (pickedText.cues?.length ?? 0) === 0) {
+  if (rs === 3 || !pickedText || (pickedText.cues?.length ?? 0) === 0) {
     try {
-      await fetchAndInjectTrack(video, pickedEl, pickedEl.label, pickedEl.srclang || "");
+      // Inyecta manual e impide que la pista nativa se muestre después
+      const manual = await fetchAndInjectTrack(video, pickedEl, pickedEl.label, pickedEl.srclang || "");
+      // Asegura que la nativa quede desactivada para evitar duplicados cuando cargue
+      textTracks.forEach(t => (t.mode = t === manual ? ("showing" as TextTrackMode) : ("disabled" as TextTrackMode)));
       return;
     } catch (e) {
       console.warn("Fallback VTT injection failed:", e);

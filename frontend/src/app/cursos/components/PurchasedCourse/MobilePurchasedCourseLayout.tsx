@@ -32,6 +32,8 @@ export default function MobilePurchasedCourseLayout({ course, purchase }: Props)
     currentClassSlug,
     currentSubtitles,
     videoRef,
+    selectedSubtitle,
+    setSelectedSubtitle,
     handleSelect,
   } = useFullCoursePreview({
     course,
@@ -62,6 +64,8 @@ export default function MobilePurchasedCourseLayout({ course, purchase }: Props)
         currentSectionSlug={currentSectionSlug}
         currentClassSlug={currentClassSlug}
         currentSubtitles={currentSubtitles}
+        selectedSubtitle={selectedSubtitle as any}
+        setSelectedSubtitle={setSelectedSubtitle as any}
         baseUrl={baseUrl}
         onSelect={handleSelect}
         progress={progress}

@@ -15,6 +15,15 @@ type ControllerArgs = {
   currentSubtitles: SubtitleTrack[];
 };
 
+type EndCard = {
+  active: boolean;
+  deadline: number;
+  secondsLeft: number;
+  progress: number; // 0..1
+  nextTitle?: string;
+  nextDuration?: string;
+};
+
 export function useVideoController({
   videoRef,
   sections,
@@ -38,6 +47,7 @@ export function useVideoController({
     "off"
   );
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isEnded, setIsEnded] = useState(false);
 
   const [controlsVisible, setControlsVisible] = useState(false);
   const [hideWhilePaused, setHideWhilePaused] = useState(false);
@@ -69,6 +79,17 @@ export function useVideoController({
     side: "prev" | "next";
     timer: ReturnType<typeof setTimeout>;
   } | null>(null);
+
+  // --- End screen (auto-next) ---
+  const [endCard, setEndCard] = useState<EndCard | null>(null);
+  const endTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const endRafRef = useRef<number | null>(null);
+  const endStartRef = useRef<number | null>(null);
+  const totalEndMs = 10000; // 10s countdown
+  const goNextRef = useRef<() => void>(() => {});
+  useEffect(() => { goNextRef.current = goNext; });
+  const endCardRef = useRef<EndCard | null>(null);
+  useEffect(() => { endCardRef.current = endCard; }, [endCard]);
 
   // --- Preview de scrubbing (solo para UI) ---
   const [preview, setPreview] = useState<{
@@ -115,7 +136,15 @@ export function useVideoController({
     const onPause = () => {
       setIsPlaying(false); /* mantener hideWhilePaused como esté */
     };
-    const onTime = () => setCurrentTime(video.currentTime || 0);
+    const onTime = () => {
+      const t = video.currentTime || 0;
+      setCurrentTime(t);
+      const dur = Number.isFinite(video.duration) ? video.duration : 0;
+      if (endCardRef.current?.active && dur > 0 && t < dur - 0.25) {
+        if (endTimerRef.current) { clearInterval(endTimerRef.current); endTimerRef.current = null; }
+        setEndCard(null);
+      }
+    };
     const onMeta = () =>
       setDuration(Number.isFinite(video.duration) ? video.duration : 0);
     const onVol = () => {
@@ -128,6 +157,47 @@ export function useVideoController({
     video.addEventListener("loadedmetadata", onMeta);
     video.addEventListener("durationchange", onMeta);
     video.addEventListener("volumechange", onVol);
+    const onEnded = () => {
+      if (hasNext) {
+        const start = performance.now();
+        endStartRef.current = start;
+        if (endTimerRef.current) { clearInterval(endTimerRef.current); endTimerRef.current = null; }
+        if (endRafRef.current) { cancelAnimationFrame(endRafRef.current); endRafRef.current = null; }
+        setIsEnded(true);
+        // Datos de la siguiente clase
+        let nextTitle: string | undefined;
+        let nextDuration: string | undefined;
+        if (nextTarget) {
+          const sec = sections[nextTarget.s];
+          const cls = sec?.classes?.[nextTarget.c];
+          if (cls) {
+            nextTitle = cls.title;
+            const h = cls.duration?.hours ?? 0;
+            const m = cls.duration?.minutes ?? 0;
+            nextDuration = h > 0 ? `${h} h ${String(m).padStart(2, "0")} min` : `${m} min`;
+          }
+        }
+        setEndCard({ active: true, deadline: Date.now() + totalEndMs, secondsLeft: 10, progress: 0, nextTitle, nextDuration });
+        setHideWhilePaused(false);
+        setControlsVisible(true);
+        const tick = (now: number) => {
+          if (endStartRef.current == null) return;
+          const elapsed = now - endStartRef.current;
+          const progress = Math.min(1, Math.max(0, elapsed / totalEndMs));
+          const left = Math.max(0, Math.ceil((totalEndMs - elapsed) / 1000));
+          setEndCard((prev) => (prev ? { ...prev, secondsLeft: left, progress } : prev));
+          if (progress >= 1) {
+            if (endRafRef.current) { cancelAnimationFrame(endRafRef.current); endRafRef.current = null; }
+            setEndCard(null);
+            (goNextRef as any).current();
+            return;
+          }
+          endRafRef.current = requestAnimationFrame(tick);
+        };
+        endRafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    video.addEventListener("ended", onEnded);
 
     // init
     onMeta();
@@ -141,52 +211,26 @@ export function useVideoController({
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("durationchange", onMeta);
       video.removeEventListener("volumechange", onVol);
+      video.removeEventListener("ended", onEnded);
+      if (endRafRef.current) { cancelAnimationFrame(endRafRef.current); endRafRef.current = null; }
     };
   }, [videoRef]);
 
-  // Subtítulos por defecto
+  // Subtítulos por defecto (respeta "off")
   useEffect(() => {
     if (!currentSubtitles?.length) {
       setSelectedSubtitle("off");
       return;
     }
     setSelectedSubtitle((prev) => {
-      if (prev !== "off" && currentSubtitles.some((t) => t.lang === prev))
-        return prev;
+      if (prev === "off") return "off";
+      if (prev && currentSubtitles.some((t) => t.lang === prev)) return prev;
       const es = currentSubtitles.find((t) => t.lang === "es");
       return (es?.lang ?? currentSubtitles[0].lang) as string;
     });
   }, [currentSubtitles]);
 
-  // Aplicar subtítulos al <video> y reintentar cuando se agregan pistas
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const apply = () => {
-      const tracks = video.textTracks;
-      for (let i = 0; i < tracks.length; i += 1) {
-        const htmlTrack = tracks[i];
-        const meta = currentSubtitles?.[i];
-        const lang = (meta?.lang || htmlTrack.language || "").toLowerCase();
-        if (selectedSubtitle === "off") {
-          htmlTrack.mode = "disabled" as TextTrackMode;
-        } else {
-          const want = selectedSubtitle.toLowerCase();
-          const match = lang === want || lang.startsWith(want);
-          htmlTrack.mode = match ? ("showing" as TextTrackMode) : ("disabled" as TextTrackMode);
-        }
-      }
-    };
-    apply();
-
-    const onAdd = () => apply();
-    try {
-      video.textTracks?.addEventListener?.("addtrack", onAdd as any);
-    } catch {}
-    return () => {
-      try { video.textTracks?.removeEventListener?.("addtrack", onAdd as any); } catch {}
-    };
-  }, [selectedSubtitle, currentSubtitles, videoRef]);
+  // La selección de subtítulos la gestiona el hook con applyTextTrackSelection
 
   // Mantener overlay ref actualizado
   useEffect(() => {
@@ -277,6 +321,11 @@ export function useVideoController({
     if (wasPlaying) {
       video.pause();
     } else {
+      // Si el video estaba finalizado, reinicia desde el principio
+      if (isEnded) {
+        try { video.currentTime = 0; } catch {}
+        setIsEnded(false);
+      }
       void video.play();
       hideTimerRef.current = setTimeout(() => {
         setControlsVisible(false);
@@ -301,6 +350,18 @@ export function useVideoController({
       pendingNavRef.current = null;
     }, SINGLE_TAP_DELAY_MS);
     pendingNavRef.current = { side, timer };
+  };
+
+  const cancelAutoNext = () => {
+    if (endTimerRef.current) { clearInterval(endTimerRef.current); endTimerRef.current = null; }
+    if (endRafRef.current) { cancelAnimationFrame(endRafRef.current); endRafRef.current = null; }
+    setEndCard(null);
+  };
+
+  const playNextNow = () => {
+    if (!hasNext) return;
+    cancelAutoNext();
+    goNext();
   };
 
   const revealProgressBriefly = () => {
@@ -338,6 +399,7 @@ export function useVideoController({
     }
     video.currentTime = next;
     setCurrentTime(next);
+    if (dur > 0 && next < dur - 0.25) setIsEnded(false);
 
     // hint
     if (seekHintTimerRef.current) clearTimeout(seekHintTimerRef.current);
@@ -354,6 +416,7 @@ export function useVideoController({
     if (!video || !res) return;
     video.currentTime = res.time;
     setCurrentTime(res.time);
+    if (duration > 0 && res.time < duration - 0.25) setIsEnded(false);
   };
 
   const handleGlobalPointerMove = (e: PointerEvent) => {
@@ -365,6 +428,7 @@ export function useVideoController({
     if (video) video.currentTime = res.time;
     setCurrentTime(res.time);
     setPreview(res);
+    if (duration > 0 && res.time < duration - 0.25) setIsEnded(false);
   };
 
   const handleGlobalPointerUp = () => {
@@ -526,6 +590,7 @@ export function useVideoController({
     currentTime,
     duration,
     isFullscreen,
+    isEnded,
     selectedSubtitle,
     preview,
 
@@ -552,5 +617,8 @@ export function useVideoController({
     setSelectedSubtitle,
     seekHint,
     progressOnly,
+    endCard,
+    cancelAutoNext,
+    playNextNow,
   };
 }

@@ -36,6 +36,9 @@ export function useFullCoursePreview({
 }: UseFullCoursePreviewOptions) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
+  // Autoplay solo al inicio; respeta pausa del usuario
+  const shouldAutoplayRef = useRef(true);
+  const hasPlayedOnceRef = useRef(false);
 
   const [selectedSection, setSelectedSection] = useState(0);
   const [selectedClass, setSelectedClass] = useState(0);
@@ -123,16 +126,20 @@ export function useFullCoursePreview({
     if (!videoEl) return;
 
     const onEnded = () => {
-      if (hasNext) {
-        goNext();
-      }
+      // El controlador de UI maneja el auto-siguiente y la pantalla de fin
     };
+    const onPlay = () => { hasPlayedOnceRef.current = true; };
+    const onPause = () => { if (hasPlayedOnceRef.current) shouldAutoplayRef.current = false; };
     videoEl.addEventListener("ended", onEnded);
+    videoEl.addEventListener("play", onPlay);
+    videoEl.addEventListener("pause", onPause);
 
     return () => {
       videoEl.removeEventListener("ended", onEnded);
+      videoEl.removeEventListener("play", onPlay);
+      videoEl.removeEventListener("pause", onPause);
     };
-  }, [active, hasNext, goNext]);
+  }, [active]);
 
   // Inicializa selección + URL
   useEffect(() => {
@@ -216,6 +223,32 @@ export function useFullCoursePreview({
       }, 800);
     };
 
+    // Nudge helper to recover from small stalls/gaps near segment boundaries
+    const nudgePlayback = () => {
+      try {
+        const v = videoEl;
+        if (!v) return;
+        const ct = v.currentTime || 0;
+        const br = v.buffered;
+        if (br && br.length) {
+          // If currentTime is before the first buffered range, jump slightly into it
+          for (let i = 0; i < br.length; i += 1) {
+            const start = br.start(i);
+            const end = br.end(i);
+            if (ct >= start && ct < end) break; // already in range
+            if (ct < start) { v.currentTime = Math.max(0, start + 0.05); break; }
+          }
+        }
+        void v.play().catch(() => {});
+      } catch {}
+    };
+
+    // Recover on HTMLMediaElement 'waiting'/'stalled'
+    const onWaiting = () => nudgePlayback();
+    const onStalled = () => nudgePlayback();
+    videoEl.addEventListener("waiting", onWaiting);
+    videoEl.addEventListener("stalled", onStalled);
+
     if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
       videoEl.crossOrigin = "use-credentials";
       videoEl.src = currentVideoSrc;
@@ -223,7 +256,7 @@ export function useFullCoursePreview({
 
       const onLoaded = () => {
         restoreTimeAndCC();
-        videoEl.play().catch(() => {});
+        if (shouldAutoplayRef.current) videoEl.play().catch(() => {});
       };
       const onAddTrack = () => applyCCSafely();
       const onCanPlay = () => applyCCSafely();
@@ -264,13 +297,14 @@ export function useFullCoursePreview({
 
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       restoreTimeAndCC();
-      videoEl.play().catch(() => {});
+      if (shouldAutoplayRef.current) videoEl.play().catch(() => {});
       // logTracks();
     });
 
     hls.on(Hls.Events.LEVEL_LOADED, () => {
       applyCCSafely();
-      if (videoEl.readyState >= 2 && videoEl.paused) {
+      // Solo intenta autoplay si aún está permitido
+      if (videoEl.readyState >= 2 && videoEl.paused && shouldAutoplayRef.current) {
         videoEl.play().catch(() => {});
       }
     });
@@ -281,6 +315,12 @@ export function useFullCoursePreview({
         detail: data.details,
         data,
       });
+      // Non-fatal stalls: try a gentle recovery
+      if (!data.fatal && (data.details === "bufferStalledError" || data.details === "bufferSeekOverHole")) {
+        try { hls.startLoad(); } catch {}
+        nudgePlayback();
+        return;
+      }
       if (data.fatal) {
         switch (data.type) {
           case Hls.ErrorTypes.NETWORK_ERROR:
@@ -309,6 +349,8 @@ export function useFullCoursePreview({
       hlsRef.current = null;
       trackEls.forEach((t) => t.removeEventListener("load", onTrackLoad));
       videoEl.textTracks?.removeEventListener?.("addtrack", onAddTrack as any);
+      videoEl.removeEventListener("waiting", onWaiting);
+      videoEl.removeEventListener("stalled", onStalled);
       videoEl.removeAttribute("src");
       videoEl.load();
     };
@@ -357,6 +399,8 @@ export function useFullCoursePreview({
     (sectionIndex: number, classIndex: number) => {
       const el = videoRef.current;
       if (el) saveTime(progressKey, el.currentTime);
+      // permitir autoplay al cambiar de clase de forma programada
+      shouldAutoplayRef.current = true;
       setSelectedSection(sectionIndex);
       setSelectedClass(classIndex);
       setCurrentVideoSrc(buildPlaylistUrl(sectionIndex, classIndex));
