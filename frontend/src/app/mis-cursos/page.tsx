@@ -72,8 +72,31 @@ export default function MyCoursesPage() {
             });
     }, [purchasedCourses]);
 
-    const inProgress = enrichedCourses.filter((course) => course.progress < 100);
-    const completed = enrichedCourses.filter((course) => course.progress >= 100);
+    const inProgress = useMemo(
+        () =>
+            enrichedCourses
+                .filter((course) => course.progress < 100)
+                .sort((a, b) => {
+                    // primero por mayor progreso, si empatan por fecha de compra más reciente
+                    if (b.progress !== a.progress) return b.progress - a.progress;
+                    const aDate = a.purchaseDate ? new Date(a.purchaseDate).getTime() : 0;
+                    const bDate = b.purchaseDate ? new Date(b.purchaseDate).getTime() : 0;
+                    return bDate - aDate;
+                }),
+        [enrichedCourses],
+    );
+
+    const completed = useMemo(
+        () =>
+            enrichedCourses
+                .filter((course) => course.progress >= 100)
+                .sort((a, b) => {
+                    const aDate = a.purchaseDate ? new Date(a.purchaseDate).getTime() : 0;
+                    const bDate = b.purchaseDate ? new Date(b.purchaseDate).getTime() : 0;
+                    return bDate - aDate;
+                }),
+        [enrichedCourses],
+    );
 
     const summary = {
         active: inProgress.length,
@@ -154,8 +177,8 @@ export default function MyCoursesPage() {
                                         </div>
                                         <h3>{course.title}</h3>
                                         <div className={styles.metaRow}>
-                                            <span>{course.category}</span>
-                                            <span>{course.progress}%</span>
+                                            <span className={styles.categoryLabel}>{course.category}</span>
+                                            <span className={styles.statusBadgeActive}>En progreso</span>
                                         </div>
                                         <div className={styles.progressBar}>
                                             <div className={styles.progressFill} style={{ width: `${course.progress}%` }} />
@@ -193,8 +216,8 @@ export default function MyCoursesPage() {
                                         </div>
                                         <h3>{course.title}</h3>
                                         <div className={styles.metaRow}>
-                                            <span>{course.category}</span>
-                                            <span>100%</span>
+                                            <span className={styles.categoryLabel}>{course.category}</span>
+                                            <span className={styles.statusBadgeCompleted}>Completado</span>
                                         </div>
                                         <div className={styles.progressBar}>
                                             <div className={styles.progressFill} style={{ width: "100%" }} />

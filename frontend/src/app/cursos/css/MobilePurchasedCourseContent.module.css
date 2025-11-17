@@ -1140,12 +1140,28 @@ video::cue-region {
     height: 100svh;
   }
 }
+.landscape {
+  background-color: #000;
+}
 
 .landscape .mobileStickyHeader {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+
+.landscape .bottomControls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  /* Sin padding lateral ni inferior para ocupar todo el ancho */
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
 }
 
 .landscape .mobilePlayerShell {

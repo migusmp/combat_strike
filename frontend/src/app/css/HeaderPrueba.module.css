@@ -522,8 +522,8 @@
   gap: 1.4rem;
   background: linear-gradient(
     180deg,
-    rgba(3, 10, 28, 0.96) 0%,
-    rgba(1, 4, 18, 0.92) 100%
+    rgba(3, 10, 28, 1) 0%,
+    rgba(1, 4, 18, 1) 100%
   );
   color: #f5f9ff;
   border-right: 1px solid rgba(124, 242, 255, 0.18);
@@ -752,5 +752,17 @@
   .logoGlow {
     width: 42px;
     height: 42px;
+  }
+
+  /* Adaptar dropdown de notificaciones en móvil para que no sobresalga */
+  .notificationDropdown {
+    position: fixed;
+    top: 85px; /* altura del header */
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-height: calc(100vh - 85px - 16px);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
