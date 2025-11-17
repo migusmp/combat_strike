@@ -1143,7 +1143,6 @@ video::cue-region {
 
 .landscape .mobileStickyHeader {
   height: 100%;
-  padding-bottom: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
