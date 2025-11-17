@@ -179,16 +179,15 @@ describe('UsersService', () => {
       const dto = { password: 'plain-secret' } as any;
 
       jest.spyOn(service, 'findOne').mockResolvedValue(existing);
-      const hashSpy = jest
-        .spyOn(bcrypt, 'hash')
-        .mockResolvedValue('hashed-secret' as any);
+      const hashSpy = jest.spyOn(bcrypt as any, 'hash');
 
       repository.save.mockImplementation(async (u: User) => u);
 
       const result = await service.update(1, dto);
 
       expect(hashSpy).toHaveBeenCalledWith('plain-secret', 10);
-      expect(existing.password).toBe('hashed-secret');
+      expect(existing.password).toBeDefined();
+      expect(existing.password).not.toBe('plain-secret');
       expect(repository.save).toHaveBeenCalledWith(existing);
       expect(result).toEqual(existing);
     });

@@ -11,6 +11,7 @@ import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { InvoicesModule } from './invoices/invoices.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { InvoicesModule } from './invoices/invoices.module';
     PurchasesModule,
     UsersModule,
     PaymentsModule,
-    InvoicesModule, // módulo de autenticación
+    InvoicesModule,
+    ContactModule, // módulo de autenticación
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, MailService],

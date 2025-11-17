@@ -101,4 +101,34 @@ export class MailService {
       ],
     });
   }
+  /**
+   * 🔹 Envía el correo del usuario al correo de la empresa
+   */
+  async sendContactEmail(name: string, email: string, subject: string, message: string) {
+    const to = process.env.CONTACT_EMAIL || process.env.EMAIL_USER;
+    if (!to) {
+      throw new Error('CONTACT_EMAIL/EMAIL_USER no configurado en variables de entorno');
+    }
+
+    await this.transporter.sendMail({
+      from: `"DL Combat Strike - Contacto" <${to}>`,
+      to,
+      replyTo: email,
+      subject: subject || 'Nuevo mensaje de contacto',
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
+          <h1 style="margin: 0 0 12px; color: #055293;">Nuevo mensaje desde el formulario de contacto</h1>
+          <p style="margin: 0 0 4px;"><strong>Nombre:</strong> ${name || '—'}</p>
+          <p style="margin: 0 0 12px;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 0 0 8px;"><strong>Asunto:</strong> ${subject || 'Sin asunto'}</p>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
+          <p style="white-space: pre-wrap; margin: 0;">${message}</p>
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
+          <p style="font-size: 0.85rem; color: #6b7280;">
+            Responde directamente a este correo para contestar al usuario.
+          </p>
+        </div>
+      `,
+    });
+  }
 }
