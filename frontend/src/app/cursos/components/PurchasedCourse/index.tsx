@@ -24,7 +24,16 @@ function debounce<T extends (...args: any[]) => void>(fn: T, wait = 150) {
 
 /** Hook: isMobile con debounce en resize */
 function useDebouncedIsMobile(breakpoint = 768, wait = 150) {
-  const get = () => (typeof window !== "undefined" ? window.innerWidth <= breakpoint : false);
+  const get = () => {
+    if (typeof window === "undefined") return false;
+
+    const canMatch = typeof window.matchMedia === "function";
+    const isCoarse = canMatch ? window.matchMedia("(pointer: coarse)").matches : false;
+    const noHover = canMatch ? window.matchMedia("(hover: none)").matches : false;
+    const isTouchDevice = isCoarse && noHover;
+
+    return isTouchDevice || window.innerWidth <= breakpoint;
+  };
   const [isMobile, setIsMobile] = useState<boolean>(get);
 
   useEffect(() => {

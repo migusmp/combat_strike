@@ -7,6 +7,7 @@
   top: 85px;                    /* debajo de tu header global */
   height: calc(100dvh - 85px);  /* compensa el offset del header */
   /* Si prefieres, equivalente: inset: 85px 0 0 0; y sin height */
+  z-index: 800;                /* por encima del header principal */
 
   /* layout */
   width: 100%;
@@ -47,6 +48,23 @@
   /* box-shadow: 0 35px 65px rgba(0, 0, 0, 0.75); */
   position: relative;
   touch-action: manipulation; /* evita doble-tap zoom y gestos no deseados */
+}
+
+/* 📱 Cuando el contenedor entra en fullscreen,
+   hacemos que rellene completamente la pantalla */
+.mobilePlayerShell:fullscreen,
+.mobilePlayerShell:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.mobilePlayerShell:fullscreen .mobilePlayerVideo,
+.mobilePlayerShell:-webkit-full-screen .mobilePlayerVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ocupa todo el alto y ancho en fullscreen */
 }
 
 .cinema {
@@ -1099,3 +1117,51 @@ video::cue-region {
 
 .visible { opacity: 1; pointer-events: auto; transition: opacity 150ms ease; }
 .hidden  { opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
+
+/* =========================================================
+   📱 Modo apaisado (horizontal) para móviles
+   - Player a la izquierda ocupando alto completo
+   - Lista de clases / panel "Más" a la derecha
+   ========================================================= */
+.landscape {
+  top: 0;                       /* ocupa toda la pantalla, tapa header */
+  height: 100dvh;
+  display: grid;
+  /* En horizontal queremos que el header (player)
+     ocupe el 100% del ancho, sin segunda columna */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: 0;
+  z-index: 1500;
+}
+
+@supports (height: 100svh) {
+  .landscape {
+    height: 100svh;
+  }
+}
+
+.landscape .mobileStickyHeader {
+  height: 100%;
+  padding-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.landscape .mobilePlayerShell {
+  flex: 1 1 auto;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.landscape .mobileCourseInfo {
+  margin-top: 0.75rem;
+}
+
+.landscape .mobileScrollableContent {
+  max-height: 100%;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom, 12px));
+}

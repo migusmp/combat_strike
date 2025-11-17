@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./MobilePurchasedCourseLayout.module.css";
 import { Course } from "@/app/interfaces/courses";
 import { PurchasedCourse } from "@/app/interfaces/purchases";
@@ -13,6 +13,26 @@ interface Props {
 }
 
 export default function MobilePurchasedCourseLayout({ course, purchase }: Props) {
+  const [isLandscape, setIsLandscape] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const updateOrientation = () => {
+      const { innerWidth, innerHeight } = window;
+      setIsLandscape(innerWidth > innerHeight);
+    };
+
+    updateOrientation();
+    window.addEventListener("resize", updateOrientation);
+    window.addEventListener("orientationchange", updateOrientation);
+
+    return () => {
+      window.removeEventListener("resize", updateOrientation);
+      window.removeEventListener("orientationchange", updateOrientation);
+    };
+  }, []);
+
   const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
   const fullCourseSrc = `${baseUrl}/courses/${course.id}/full/playlist`;
 
@@ -54,6 +74,7 @@ export default function MobilePurchasedCourseLayout({ course, purchase }: Props)
   return (
     <div className={styles.mobileWrapper}>
       <MobilePurchasedCourseContent
+        isLandscape={isLandscape}
         course={course}
         sections={sections}
         selectedSection={selectedSection}
