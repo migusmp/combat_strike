@@ -5,11 +5,12 @@ import { UsersService } from './users.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let usersService: { findOne: jest.Mock };
+  let usersService: { findOne: jest.Mock; update: jest.Mock };
 
   beforeEach(async () => {
     usersService = {
       findOne: jest.fn(),
+       update: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -62,6 +63,31 @@ describe('UsersController', () => {
       await expect(
         controller.getProfile(mockRequest({ id: 1 })),
       ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('updateMe', () => {
+    const mockRequest = (user?: { id: number }) => ({ user }) as any;
+
+    it('should update the authenticated user', async () => {
+      const dto = { name: 'Nuevo nombre' } as any;
+      const updatedUser = { id: 1, name: 'Nuevo nombre' };
+      usersService.update.mockResolvedValue(updatedUser);
+
+      const result = await controller.updateMe(mockRequest({ id: 1 }), dto);
+
+      expect(usersService.update).toHaveBeenCalledWith(1, dto);
+      expect(result).toEqual(updatedUser);
+    });
+
+    it('should throw ForbiddenException when request has no user', async () => {
+      const dto = { name: 'Nuevo nombre' } as any;
+
+      await expect(
+        controller.updateMe(mockRequest(undefined), dto),
+      ).rejects.toThrow(ForbiddenException);
+
+      expect(usersService.update).not.toHaveBeenCalled();
     });
   });
 });

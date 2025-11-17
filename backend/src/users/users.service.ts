@@ -67,9 +67,10 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    // Comprueba si el usuario existe
     const user = await this.findOne(id);
     if (!user) throw new NotFoundException('Usuario no encontrado');
-
+    
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }

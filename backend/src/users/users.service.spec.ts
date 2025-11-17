@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Purchase } from 'src/purchases/entities/purchases.entity';
+import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -133,6 +134,74 @@ describe('UsersService', () => {
           course: { id: 11, title: 'Course 2' },
         },
       ]);
+    });
+  });
+
+  describe('update', () => {
+    it('should update user fields without hashing when no password is provided', async () => {
+      const existing = {
+        id: 1,
+        email: 'test@example.com',
+        name: 'Old',
+        second_name: 'User',
+        isVerified: true,
+        role: 'user',
+      } as User;
+
+      const dto = { name: 'New name' } as any;
+
+      const findSpy = jest
+        .spyOn(service, 'findOne')
+        .mockResolvedValue(existing);
+
+      repository.save.mockImplementation(async (u: User) => u);
+
+      const result = await service.update(1, dto);
+
+      expect(findSpy).toHaveBeenCalledWith(1);
+      expect(repository.save).toHaveBeenCalledWith(existing);
+      expect(result).toEqual({
+        ...existing,
+        name: 'New name',
+      });
+    });
+
+    it('should hash password when provided before saving', async () => {
+      const existing = {
+        id: 1,
+        email: 'test@example.com',
+        name: 'Old',
+        second_name: 'User',
+        isVerified: true,
+        role: 'user',
+      } as User;
+
+      const dto = { password: 'plain-secret' } as any;
+
+      jest.spyOn(service, 'findOne').mockResolvedValue(existing);
+      const hashSpy = jest
+        .spyOn(bcrypt, 'hash')
+        .mockResolvedValue('hashed-secret' as any);
+
+      repository.save.mockImplementation(async (u: User) => u);
+
+      const result = await service.update(1, dto);
+
+      expect(hashSpy).toHaveBeenCalledWith('plain-secret', 10);
+      expect(existing.password).toBe('hashed-secret');
+      expect(repository.save).toHaveBeenCalledWith(existing);
+      expect(result).toEqual(existing);
+    });
+
+    it('should propagate NotFoundException from findOne', async () => {
+      jest
+        .spyOn(service, 'findOne')
+        .mockRejectedValue(new NotFoundException('Usuario no encontrado'));
+
+      await expect(service.update(999, {} as any)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(repository.save).not.toHaveBeenCalled();
     });
   });
 });

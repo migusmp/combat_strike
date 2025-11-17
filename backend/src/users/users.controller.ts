@@ -93,9 +93,10 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @Patch('me')
+  @Patch('update/me')
   async updateMe(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     const loggedUser = req.user as RequestUser;
+    console.log("Usuario que quiere actualizar informacion:",loggedUser);
 
     if (!loggedUser) {
       throw new ForbiddenException('No autorizado');

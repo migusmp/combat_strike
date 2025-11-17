@@ -24,7 +24,7 @@ export class UsersModule {
           path: 'users/me/courses',
           method: RequestMethod.GET,
         }, // 🔐 proteger cursos comprados
-        { path: 'users/me', method: RequestMethod.PATCH }, // 🔐 proteger PATCH /users/:id
+        { path: 'users/update/me', method: RequestMethod.PATCH }, // 🔐 proteger PATCH /users/:id
         { path: 'users/:id', method: RequestMethod.DELETE }, // 🔐 proteger DELETE /users/:id
       );
   }
