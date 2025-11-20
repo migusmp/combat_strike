@@ -192,7 +192,14 @@ export function useFullCoursePreview({
       const t = loadTime(progressKey);
       if (Number.isFinite(t) && t > 0) {
         try {
-          videoEl.currentTime = Math.max(0, t - 1);
+          const hasDuration = Number.isFinite(videoEl.duration);
+          const maxSafe =
+            hasDuration && videoEl.duration > 0
+              ? Math.max(0, videoEl.duration - 0.2)
+              : undefined;
+          const target =
+            maxSafe != null ? Math.min(Math.max(0, t), maxSafe) : Math.max(0, t);
+          videoEl.currentTime = target;
         } catch {}
       }
       applyCCSafely();
