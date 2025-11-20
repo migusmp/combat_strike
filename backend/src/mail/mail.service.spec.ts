@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MailService } from './mail.service';
 
 const sendMailMock = jest.fn();
+const originalEnv = { ...process.env };
 
 jest.mock('nodemailer', () => {
   return {
@@ -13,6 +14,18 @@ jest.mock('nodemailer', () => {
 
 describe('MailService', () => {
   let service: MailService;
+
+  beforeAll(() => {
+    process.env.EMAIL_USER = 'test@example.com';
+    process.env.EMAIL_PASS = 'app-password';
+    process.env.FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost';
+  });
+
+  afterAll(() => {
+    process.env.EMAIL_USER = originalEnv.EMAIL_USER;
+    process.env.EMAIL_PASS = originalEnv.EMAIL_PASS;
+    process.env.FRONTEND_URL = originalEnv.FRONTEND_URL;
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

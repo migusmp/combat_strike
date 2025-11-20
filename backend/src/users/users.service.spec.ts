@@ -7,6 +7,11 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
+jest.mock('bcrypt', () => ({
+  hash: jest.fn(),
+  compare: jest.fn(),
+}));
+
 describe('UsersService', () => {
   let service: UsersService;
   let repository: jest.Mocked<Repository<User>>;
@@ -179,7 +184,8 @@ describe('UsersService', () => {
       const dto = { password: 'plain-secret' } as any;
 
       jest.spyOn(service, 'findOne').mockResolvedValue(existing);
-      const hashSpy = jest.spyOn(bcrypt as any, 'hash');
+      const hashSpy = bcrypt.hash as jest.Mock;
+      hashSpy.mockResolvedValue('hashed-secret');
 
       repository.save.mockImplementation(async (u: User) => u);
 

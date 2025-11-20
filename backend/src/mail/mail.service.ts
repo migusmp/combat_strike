@@ -7,11 +7,21 @@ export class MailService {
   private transporter;
 
   constructor() {
+    const user = process.env.EMAIL_USER;
+    const rawPass = process.env.EMAIL_PASS;
+
+    if (!user || !rawPass) {
+      throw new Error('EMAIL_USER o EMAIL_PASS no están configurados en las variables de entorno');
+    }
+
+    // Permite pegar contraseñas de app de Gmail con espacios (REDACTED_EMAIL_APP_PASSWORD)
+    const pass = rawPass.replace(/\s/g, '');
+
     this.transporter = nodemailer.createTransport({
       service: 'gmail', // o usa SMTP de tu proveedor
       auth: {
-        user: process.env.EMAIL_USER, // config en .env
-        pass: process.env.EMAIL_PASS,
+        user, // config en .env
+        pass,
       },
     });
   }
@@ -110,12 +120,13 @@ export class MailService {
       throw new Error('CONTACT_EMAIL/EMAIL_USER no configurado en variables de entorno');
     }
 
-    await this.transporter.sendMail({
-      from: `"DL Combat Strike - Contacto" <${to}>`,
-      to,
-      replyTo: email,
-      subject: subject || 'Nuevo mensaje de contacto',
-      html: `
+    try {
+      await this.transporter.sendMail({
+        from: `"DL Combat Strike - Contacto" <${to}>`,
+        to,
+        replyTo: email,
+        subject: subject || 'Nuevo mensaje de contacto',
+        html: `
         <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.5;">
           <h1 style="margin: 0 0 12px; color: #055293;">Nuevo mensaje desde el formulario de contacto</h1>
           <p style="margin: 0 0 4px;"><strong>Nombre:</strong> ${name || '—'}</p>
@@ -129,6 +140,11 @@ export class MailService {
           </p>
         </div>
       `,
-    });
+      });
+    } catch (error) {
+      // Log sencillo para depurar problemas de envío
+      console.error('Error enviando correo de contacto:', error);
+      throw error;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import type { ContactEmailDTO } from './interfaces/email.interfaces';
 
@@ -6,11 +6,12 @@ import type { ContactEmailDTO } from './interfaces/email.interfaces';
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
-  private contact(@Body() body: ContactEmailDTO) {
+  @Post('send')
+  async contact(@Body() body: ContactEmailDTO) {
     if (!body.name || !body.email || !body.subject || !body.message) {
       throw new BadRequestException('Faltan campos obligatorios');
     }
     
-    return this.contactService.sendContactEmail(body);
+    return await this.contactService.sendContactEmail(body);
   }
 }
