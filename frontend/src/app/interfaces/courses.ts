@@ -103,6 +103,9 @@ export interface Course {
   /** Lista de elementos incluidos con la compra del curso */
   includes: string[];
 
+  /** Archivos o recursos descargables (PDFs, plantillas, guías, etc.) */
+  downloadables?: string[];
+
   /** Requisitos previos recomendados para realizar el curso */
   requirements: string[];
 

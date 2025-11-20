@@ -39,6 +39,7 @@ export interface Course {
   image: string;
   price: string;
   includes: string[];
+  downloadables?: string[];
   whatYouWillLearn: string[];
   requirements: string[];
 

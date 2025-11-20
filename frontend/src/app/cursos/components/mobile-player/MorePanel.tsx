@@ -12,34 +12,66 @@ type Props = {
 };
 
 export default function MorePanel({
-  progress, totalSections, totalClasses, durationHours, durationMinutes, requirements, includes,
+  progress,
+  totalSections,
+  totalClasses,
+  durationHours,
+  durationMinutes,
+  requirements,
+  includes,
 }: Props) {
   return (
     <div className={styles.mobileMoreContent}>
-      <article className={styles.mobileMoreCard}>
+      <article className={`${styles.mobileMoreCard} ${styles.mobileMoreHighlight}`}>
         <header>
-          <span>Progreso actual</span>
-          <strong>{progress}%</strong>
+          <div>
+            <p className={styles.mobileTag}>Tu avance</p>
+            <h3 className={styles.mobileHeadingAccent}>Progreso actual</h3>
+          </div>
+          <span className={styles.mobileStat}>{progress}%</span>
         </header>
         <div className={styles.mobileMoreProgress}>
-          <span style={{ width: `${progress}%` }} />
+          <span style={{ width: `${Math.min(progress, 100)}%` }} />
         </div>
-        <p>
-          {totalSections} secciones · {totalClasses} clases · {durationHours} h {durationMinutes} min
+        <p className={styles.mobileMetaLine}>
+          {totalSections} secciones · {totalClasses} clases · {durationHours} h{" "}
+          {durationMinutes} min
         </p>
       </article>
 
       {!!requirements?.length && (
         <article className={styles.mobileMoreCard}>
-          <header><span>Requisitos</span></header>
-          <ul>{requirements.map((r) => <li key={r}>{r}</li>)}</ul>
+          <header>
+            <div>
+              <p className={styles.mobileTag}>Prepárate</p>
+              <h3 className={styles.mobileHeadingAccent}>Requisitos</h3>
+            </div>
+          </header>
+          <div className={styles.mobilePillList}>
+            {requirements.map((r) => (
+              <span key={r} className={styles.mobilePill}>
+                {r}
+              </span>
+            ))}
+          </div>
         </article>
       )}
 
       {!!includes?.length && (
         <article className={styles.mobileMoreCard}>
-          <header><span>Incluye</span></header>
-          <ul>{includes.map((i) => <li key={i}>{i}</li>)}</ul>
+          <header>
+            <div>
+              <p className={styles.mobileTag}>Tu compra</p>
+              <h3>Incluye</h3>
+            </div>
+          </header>
+          <div className={styles.mobilePillList}>
+            {includes.map((i) => (
+              <span key={i} className={styles.mobilePill}>
+                {i}
+              </span>
+            ))}
+          </div>
         </article>
       )}
     </div>

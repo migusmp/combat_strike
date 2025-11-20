@@ -13,6 +13,24 @@ type Props = {
 export default function SectionList({
   sections, selectedSection, selectedClass, onSelect, formatDuration,
 }: Props) {
+  if (!sections?.length) {
+    return (
+      <div className={styles.mobileSectionList}>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className={`${styles.mobileSectionCard} ${styles.mobileSkeletonCard}`}>
+            <div className={styles.mobileSkeletonLineWide} />
+            <div className={styles.mobileSkeletonLine} />
+            <div className={styles.mobileSkeletonPills}>
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className={styles.mobileSectionList}>
       {sections.map((section, sectionIdx) => (

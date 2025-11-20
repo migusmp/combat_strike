@@ -3,6 +3,7 @@ import VideoPlayerShell from "./mobile-player/VideoPlayerShell";
 import SettingsModal from "./mobile-player/SettingsModal";
 import SectionList from "./mobile-player/SectionList";
 import MorePanel from "./mobile-player/MorePanel";
+import DownloadablesPanel from "./mobile-player/DownloadablesPanel";
 import styles from "../css/MobilePurchasedCourseContent.module.css";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Course, SubtitleTrack, ContentSection, Classes } from "@/app/interfaces/courses";
@@ -31,7 +32,6 @@ interface Props {
   durationMinutes: number;
 }
 
-
 const formatDuration = (hours: number, minutes: number) =>
   hours > 0 ? `${hours} h ${minutes.toString().padStart(2,"0")} min` : `${minutes.toString().padStart(2,"0")} min`;
 
@@ -51,8 +51,15 @@ export default function MobilePurchasedCourseContent({
     currentSubtitles,
   });
 
-  const [tab, setTab] = useState<"clases" | "mas">("clases");
+  const [tab, setTab] = useState<"clases" | "mas" | "descargables">("clases");
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const downloadables =
+    (course.downloadables?.length ? course.downloadables : undefined) ??
+    course.includes?.filter((item) =>
+      /(pdf|descargable|gu[ií]a|plantilla|kit|material)/i.test(item),
+    ) ??
+    [];
 
   const hasAutoFullScreenRef = useRef(false);
   const wasLandscapeRef = useRef(isLandscape ?? false);
@@ -175,6 +182,13 @@ export default function MobilePurchasedCourseContent({
               >
                 Más
               </button>
+              <button
+                type="button"
+                className={tab === "descargables" ? styles.mobileTabActive : ""}
+                onClick={() => setTab("descargables")}
+              >
+                Descargables
+              </button>
             </div>
           </div>
         )}
@@ -190,7 +204,7 @@ export default function MobilePurchasedCourseContent({
               onSelect={onSelect}
               formatDuration={formatDuration}
             />
-          ) : (
+          ) : tab === "mas" ? (
             <MorePanel
               progress={progress}
               totalSections={totalSections}
@@ -199,6 +213,12 @@ export default function MobilePurchasedCourseContent({
               durationMinutes={durationMinutes}
               requirements={course.requirements}
               includes={course.includes}
+            />
+          ) : (
+            <DownloadablesPanel
+              items={downloadables}
+              fallbackIncludes={course.includes}
+              sections={sections}
             />
           )}
         </div>

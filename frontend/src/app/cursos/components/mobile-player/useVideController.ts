@@ -490,7 +490,7 @@ export function useVideoController({
     const isNearPrev =
       !!prev && Math.hypot(prev.x - x, prev.y - y) <= MAX_TAP_DIST;
 
-    // Doble tap => ±5s y mostramos la barra brevemente
+    // Doble tap => ±10s y mostramos la barra brevemente
     if (isNearPrev && now - lastTapTsRef.current < DBL_TAP_MS) {
       e.preventDefault?.();
       e.stopPropagation?.();
@@ -503,7 +503,7 @@ export function useVideoController({
       const rect = area.getBoundingClientRect();
       const ratio = rect.width ? (x - rect.left) / rect.width : 0.5;
       const forward = ratio >= 0.5;
-      seekBy(forward ? 5 : -5, forward ? "right" : "left", now);
+      seekBy(forward ? 10 : -10, forward ? "right" : "left", now);
 
       revealProgressBriefly();
       lastTapTsRef.current = 0;

@@ -693,19 +693,22 @@
 
 .mobileTabs {
   display: flex;
-  gap: 1.5rem;
+  gap: 0;
   margin-top: 0.4rem;
-  padding-left: 0.5rem;
+  padding: 0 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .mobileTabs button {
+  flex: 1;
   background: none;
   border: none;
   color: rgba(248, 251, 255, 0.6);
   padding: 0.6rem 0;
   font-weight: 600;
   font-size: 0.95rem;
+  text-align: center;
+  position: relative;
 }
 
 .mobileTabActive {
@@ -852,61 +855,140 @@
 }
 
 .mobileMoreContent {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 1rem;
+  padding: 0 0 1.4rem;
 }
 
 .mobileMoreCard {
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(7, 13, 35, 0.8);
-  padding: 1rem;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.45);
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  padding: 0.95rem 0 1.05rem;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobileMoreHighlight {
+  background: transparent;
+}
+
+.mobileMoreDownloads {
+  background: transparent;
 }
 
 .mobileMoreCard header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.85rem;
-  text-transform: uppercase;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  color: rgba(248, 251, 255, 0.6);
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.7rem;
 }
 
-.mobileMoreCard header strong {
-  font-size: 1.1rem;
-  letter-spacing: normal;
-  color: #f8fbff;
+.mobileMoreCard h3 {
+  margin: 0.05rem 0 0.1rem;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #e9f4ff;
+  letter-spacing: 0.01em;
+}
+
+.mobileTag {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: rgba(106, 255, 208, 0.76);
+  font-weight: 700;
+}
+
+.mobileHeadingAccent {
+  color: #e9f4ff;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 24px rgba(106, 255, 208, 0.24);
+}
+
+.mobileStat {
+  padding: 0.25rem 0.65rem;
+  background: rgba(106, 255, 208, 0.14);
+  border: 1px solid rgba(106, 255, 208, 0.35);
+  border-radius: 999px;
+  font-weight: 700;
+  color: #d9fff3;
+}
+
+.mobileBadge {
+  padding: 0.2rem 0.55rem;
+  background: rgba(100, 197, 255, 0.2);
+  border: 1px solid rgba(100, 197, 255, 0.45);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #d9eaff;
+}
+
+.mobileHint {
+  margin: 0.05rem 0 0.75rem;
+  color: rgba(248, 251, 255, 0.78);
+  font-size: 0.92rem;
 }
 
 .mobileMoreProgress {
   width: 100%;
-  height: 10px;
+  height: 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.16);
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .mobileMoreProgress span {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(135deg, #64c5ff, #6affd0);
+  background: linear-gradient(120deg, #64c5ff, #6affd0);
+  box-shadow: 0 0 18px rgba(106, 255, 208, 0.35);
 }
 
-.mobileMoreCard ul {
-  list-style: none;
+.mobileMetaLine {
   margin: 0;
-  padding: 0;
+  color: rgba(233, 244, 255, 0.86);
+  font-size: 0.96rem;
+  letter-spacing: 0.01em;
+}
+
+.mobilePillList {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.mobilePill {
+  display: inline-flex;
+  align-items: center;
   gap: 0.35rem;
-  color: rgba(248, 251, 255, 0.75);
-  font-size: 0.92rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e9f4ff;
+  font-size: 0.91rem;
+  line-height: 1.2;
+  box-shadow: none;
+  letter-spacing: 0.01em;
+  backdrop-filter: saturate(110%);
+}
+
+.mobileMoreDownloads .mobilePill {
+  background: rgba(106, 255, 208, 0.14);
+}
+
+.mobileDownloadsSurface {
+  background: transparent;
+  border-radius: 0;
+  padding: 0.95rem 0 1.05rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* 🔹 Fondo semitransparente difuminado */
@@ -1179,4 +1261,76 @@ video::cue-region {
   max-height: 100%;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom, 12px));
+}
+
+/* Skeletons y descargas */
+.mobileDownloadSections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0.35rem 0 0.2rem;
+}
+
+.mobileDownloadSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.mobileDownloadSectionTitle {
+  margin: 0;
+  color: #e9f4ff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.mobileDownloadExtras {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.mobileSkeletonCard {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 0;
+}
+
+.mobileSkeletonLine,
+.mobileSkeletonLineWide {
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  margin-bottom: 0.65rem;
+}
+
+.mobileSkeletonLineWide { width: 75%; }
+.mobileSkeletonLine { width: 55%; }
+
+.mobileSkeletonPills {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mobileSkeletonPills span {
+  flex: 1;
+  height: 32px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.mobileSkeletonBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

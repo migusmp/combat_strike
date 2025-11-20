@@ -133,7 +133,7 @@ export default function VideoPlayerShell({
         aria-hidden
       >
         <div className={styles.seekBubble}>
-          {seekHint?.side === "right" ? "⏩ +5s" : "⏪ -5s"}
+          {seekHint?.side === "right" ? "⏩ +10s" : "⏪ -10s"}
         </div>
       </div>
 
