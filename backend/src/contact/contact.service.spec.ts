@@ -4,9 +4,9 @@ import { MailService } from '../mail/mail.service';
 
 describe('ContactService', () => {
   let service: ContactService;
-  const mailServiceMock = {
+  const mailServiceMock: jest.Mocked<Pick<MailService, 'sendContactEmail'>> = {
     sendContactEmail: jest.fn(),
-  } as jest.Mocked<MailService>;
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
