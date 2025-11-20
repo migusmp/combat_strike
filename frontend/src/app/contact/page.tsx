@@ -5,6 +5,7 @@ import Footer from "../components/Home/Footer";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "../css/Contact.module.css";
+import { API_URL } from "../utils/api_url";
 
 export default function ContactPage() {
     const [form, setForm] = useState({
@@ -13,20 +14,77 @@ export default function ContactPage() {
         topic: "",
         message: "",
     });
+    const [messageSentSuccessfully, setMessageSentSuccessfully] = useState(false);
 
+    // Guardar los cambios de los datos del formulario
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const messageSent = messageSentSuccessfully ? "¡Mensaje enviado con éxito! Te contactaremos pronto." : "";
+
+    const handleCloseModal = () => {
+        setMessageSentSuccessfully(false);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Formulario enviado:", form);
-        alert("Formulario enviado correctamente!");
+        const res = await fetch(`${API_URL}/contact/send`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: form.name,
+                email: form.email,
+                subject: form.topic,
+                message: form.message,
+            }),
+        });
+        if (!res.ok) {
+            console.error("Error al enviar el formulario de contacto:", res.statusText);
+            return;
+        }
+
+        setMessageSentSuccessfully(true)
+
         setForm({ name: "", email: "", topic: "", message: "" });
     };
 
     return (
         <>
+            {messageSentSuccessfully && (
+                <div
+                    className={styles.modalOverlay}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="contact-success-title"
+                    onClick={handleCloseModal}
+                >
+                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                        <button
+                            type="button"
+                            className={styles.modalClose}
+                            onClick={handleCloseModal}
+                            aria-label="Cerrar mensaje de confirmación"
+                        >
+                            ×
+                        </button>
+                        <div className={styles.modalIcon}>
+                            <span>✓</span>
+                        </div>
+                        <h2 id="contact-success-title" className={styles.modalTitle}>
+                            ¡Mensaje enviado!
+                        </h2>
+                        <p className={styles.modalText}>{messageSent}</p>
+                        <div className={styles.modalActions}>
+                            <button type="button" onClick={handleCloseModal}>
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className={styles.contactWrapper}>
                 <section className={styles.hero}>
                     <div className={styles.heroContent}>

@@ -1,6 +1,13 @@
 // utils/subtitles.ts
 export type SubtitleSelection = "off" | string;
 
+type ManualEntry = {
+  key: string;
+  lang: string;
+  src: string;
+  track: TextTrack;
+};
+
 export const ccKey = (courseId: number | string) => `cs:cc:${courseId}`;
 
 export function saveCC(courseId: number | string, value: SubtitleSelection) {
@@ -51,10 +58,23 @@ function parseVTT(vtt: string): Array<{ start: number; end: number; text: string
   return cues;
 }
 
-function getManualMap(video: HTMLVideoElement): Map<string, TextTrack> {
+function getManualMap(video: HTMLVideoElement): Map<string, ManualEntry> {
   const v = video as any;
-  if (!v.__csManualTracks) v.__csManualTracks = new Map<string, TextTrack>();
-  return v.__csManualTracks as Map<string, TextTrack>;
+  if (!v.__csManualTracks) v.__csManualTracks = new Map<string, ManualEntry>();
+  return v.__csManualTracks as Map<string, ManualEntry>;
+}
+
+const manualKey = (lang: string, src: string) => `${lang.toLowerCase()}::${src}`;
+
+export function clearManualTracks(video: HTMLVideoElement) {
+  const v = video as any;
+  const map = v.__csManualTracks as Map<string, ManualEntry> | undefined;
+  if (!map) return;
+  map.forEach((entry) => {
+    try { entry.track.mode = "disabled"; } catch {}
+  });
+  map.clear();
+  delete v.__csManualTracks;
 }
 
 /** Fallback: descarga el VTT y lo inyecta como TextTrack manual (idempotente por idioma) */
@@ -64,14 +84,23 @@ async function fetchAndInjectTrack(
   label: string,
   lang: string
 ) {
-  const key = (lang || "").toLowerCase();
+  const key = manualKey(lang, trackEl.src);
   const manualMap = getManualMap(video);
   const existing = manualMap.get(key);
   if (existing) {
-    // Ya existe manual para este idioma → úsalo
-    existing.mode = "showing" as TextTrackMode;
-    return existing;
+    // Ya existe manual para este idioma y src → úsalo
+    existing.track.mode = "showing" as TextTrackMode;
+    return existing.track;
   }
+
+  // Si hay manuales previos del mismo idioma pero otro src, los damos de baja
+  manualMap.forEach((entry, mapKey) => {
+    if (entry.lang === (lang || "").toLowerCase() && mapKey !== key) {
+      try { entry.track.mode = "disabled"; } catch {}
+      manualMap.delete(mapKey);
+    }
+  });
+
   const url = trackEl.src;
   const res = await fetch(url, { credentials: "include" });
   if (!res.ok) throw new Error(`VTT fetch ${res.status}`);
@@ -92,7 +121,7 @@ async function fetchAndInjectTrack(
       manual.addCue(cue);
     }
   }
-  manualMap.set(key, manual);
+  manualMap.set(key, { key, lang: (lang || "").toLowerCase(), src: trackEl.src, track: manual });
   return manual;
 }
 
@@ -110,16 +139,20 @@ export async function applyTextTrackSelection(video: HTMLVideoElement, selection
   if (selection === "off") return;
 
   const norm = selection.toLowerCase();
-  const pickIndex = trackEls.findIndex((el) => {
+  let pickIndex = trackEls.findIndex((el) => {
     const lang = (el.srclang || el.getAttribute("srcLang") || "").toLowerCase();
     const label = (el.label || "").toLowerCase();
     return lang.startsWith(norm) || label.includes(norm);
   });
   // Si ya existe manual para este idioma, úsalo aunque no veamos el <track> aún
   const manualMap = getManualMap(video);
-  const manual = manualMap.get(norm);
-  if (manual) {
-    textTracks.forEach(t => (t.mode = t === manual ? ("showing" as TextTrackMode) : ("disabled" as TextTrackMode)));
+  const manualForSelection = Array.from(manualMap.values()).find(
+    (entry) =>
+      entry.lang === norm &&
+      trackEls.some((el) => (el.srclang || el.getAttribute("srcLang") || "").toLowerCase() === norm && el.src === entry.src)
+  );
+  if (manualForSelection) {
+    textTracks.forEach(t => (t.mode = t === manualForSelection.track ? ("showing" as TextTrackMode) : ("disabled" as TextTrackMode)));
     return;
   }
   if (pickIndex < 0) {
@@ -134,7 +167,7 @@ export async function applyTextTrackSelection(video: HTMLVideoElement, selection
     if (retryIdx < 0) return;
     // actualiza referencias y pickIndex
     trackEls.splice(0, trackEls.length, ...retryEls);
-    (pickIndex as any) = retryIdx;
+    pickIndex = retryIdx;
   }
 
   const pickedEl = trackEls[pickIndex];

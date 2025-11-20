@@ -5,6 +5,7 @@ import Hls from "hls.js";
 import { Course } from "@/app/interfaces/courses";
 import {
   applyTextTrackSelection,
+  clearManualTracks,
   loadCC,
   saveCC,
   SubtitleSelection,
@@ -272,6 +273,7 @@ export function useFullCoursePreview({
           onAddTrack as any
         );
         videoEl.removeEventListener("canplay", onCanPlay);
+        clearManualTracks(videoEl);
         videoEl.removeAttribute("src");
         videoEl.load();
       };
@@ -351,6 +353,7 @@ export function useFullCoursePreview({
       videoEl.textTracks?.removeEventListener?.("addtrack", onAddTrack as any);
       videoEl.removeEventListener("waiting", onWaiting);
       videoEl.removeEventListener("stalled", onStalled);
+      clearManualTracks(videoEl);
       videoEl.removeAttribute("src");
       videoEl.load();
     };
