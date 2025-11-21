@@ -55,11 +55,41 @@ export class CourseProgressService {
     return this.progressRepo.save(existing ? { ...existing, ...payload } : this.progressRepo.create(payload));
   }
 
-  async getProgress(userId: number, courseId: number) {
-    await this.ensureOwnership(userId, courseId);
+  private async findUserCourseProgress(userId: number, courseId: number) {
     return this.progressRepo.find({
       where: { user: { id: userId }, course: { id: courseId } },
       order: { updatedAt: 'DESC' },
     });
+  }
+
+  async getProgress(userId: number, courseId: number) {
+    await this.ensureOwnership(userId, courseId);
+    return this.findUserCourseProgress(userId, courseId);
+  }
+
+  async getProgressSummary(userId: number, courseId: number) {
+    await this.ensureOwnership(userId, courseId);
+    const rows = await this.findUserCourseProgress(userId, courseId);
+
+    let seenSeconds = 0;
+    let totalDurationSeconds = 0;
+
+    rows.forEach((row) => {
+      const duration = Math.max(0, row.durationSeconds || 0);
+      const position = Math.max(0, row.positionSeconds || 0);
+      const seen = row.completedAt ? duration : Math.min(position, duration);
+      totalDurationSeconds += duration;
+      seenSeconds += seen;
+    });
+
+    const progress = totalDurationSeconds
+      ? Math.min(100, Math.max(0, Math.round((seenSeconds / totalDurationSeconds) * 100)))
+      : 0;
+
+    return {
+      progress,
+      seenSeconds,
+      totalDurationSeconds,
+    };
   }
 }

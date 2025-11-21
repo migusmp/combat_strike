@@ -22,6 +22,7 @@ export class CourseProgressModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(AuthCookieMiddleware).forRoutes(
       { path: 'courses/:courseId/progress', method: RequestMethod.ALL },
+      { path: 'courses/:courseId/progress/summary', method: RequestMethod.ALL },
     );
   }
 }

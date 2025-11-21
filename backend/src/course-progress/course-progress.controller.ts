@@ -42,4 +42,13 @@ export class CourseProgressController {
     }
     return this.service.getProgress(user.id, courseId);
   }
+
+  @Get('summary')
+  summary(@Param('courseId', ParseIntPipe) courseId: number, @Req() req: Request) {
+    const user = req.user as RequestUser | undefined;
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return this.service.getProgressSummary(user.id, courseId);
+  }
 }

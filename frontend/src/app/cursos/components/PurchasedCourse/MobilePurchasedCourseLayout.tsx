@@ -14,6 +14,7 @@ interface Props {
 
 export default function MobilePurchasedCourseLayout({ course, purchase }: Props) {
   const [isLandscape, setIsLandscape] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -36,11 +37,37 @@ export default function MobilePurchasedCourseLayout({ course, purchase }: Props)
   const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
   const fullCourseSrc = `${baseUrl}/courses/${course.id}/full/playlist`;
 
-  const progress = useMemo(() => {
+  const initialProgress = useMemo(() => {
     const raw = (purchase?.course as unknown as { progress?: number } | undefined)?.progress;
     if (typeof raw !== "number") return 0;
     return Math.min(100, Math.max(0, Math.round(raw)));
   }, [purchase?.course]);
+
+  useEffect(() => {
+    setProgress(initialProgress);
+  }, [initialProgress]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchSummary = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/courses/${course.id}/progress/summary`, {
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        const serverProgress = typeof data?.progress === "number" ? data.progress : 0;
+        setProgress(Math.min(100, Math.max(0, Math.round(serverProgress))));
+      } catch {
+        /* noop */
+      }
+    };
+    fetchSummary();
+    return () => {
+      cancelled = true;
+    };
+  }, [baseUrl, course.id]);
 
   const {
     sections,

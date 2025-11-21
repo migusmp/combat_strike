@@ -31,6 +31,13 @@ type SluggedSection = {
   classes: Array<Classes & { slug: string; durationSeconds: number }>;
 };
 
+type CachedProgress = {
+  map: number[][];
+  signature: string;
+};
+
+const serverProgressCache = new Map<number, CachedProgress>();
+
 const clampProgress = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
 const durationInSeconds = (cls: Classes) =>
   Math.max(0, (cls.duration?.hours ?? 0) * 3600 + (cls.duration?.minutes ?? 0) * 60);
@@ -60,6 +67,19 @@ export default function SectionList({
     [sections]
   );
 
+  const slugSignature = useMemo(
+    () =>
+      sluggedSections
+        .map(
+          (section) =>
+            `${section.slug}:${section.classes
+              .map((cls) => cls.slug)
+              .join(",")}`
+        )
+        .join("|"),
+    [sluggedSections],
+  );
+
   const emptyMap = useCallback(
     () => sluggedSections.map((section) => section.classes.map(() => 0)),
     [sluggedSections],
@@ -81,15 +101,33 @@ export default function SectionList({
   const [serverProgressMap, setServerProgressMap] = useState<number[][]>(() => emptyMap());
   const [resetting, setResetting] = useState<Record<string, boolean>>({});
 
+  const persistProgressToCache = useCallback(
+    (map: number[][]) => {
+      serverProgressCache.set(courseId, { map, signature: slugSignature });
+    },
+    [courseId, slugSignature],
+  );
+
   // Reset mapas cuando cambian secciones
   useEffect(() => {
+    const cached = serverProgressCache.get(courseId);
+    if (cached && cached.signature !== slugSignature) {
+      serverProgressCache.delete(courseId);
+    }
     setProgressMap(buildStoredProgress());
     setServerProgressMap(emptyMap());
-  }, [buildStoredProgress, emptyMap]);
+  }, [buildStoredProgress, emptyMap, courseId, slugSignature]);
 
   // Trae progreso desde el servidor
   useEffect(() => {
     let cancelled = false;
+    const cached = serverProgressCache.get(courseId);
+    if (cached && cached.signature === slugSignature) {
+      setServerProgressMap(cached.map);
+      setProgressMap(cached.map);
+      return;
+    }
+
     const fetchProgress = async () => {
       try {
         const res = await fetch(`${baseUrl}/courses/${courseId}/progress`, {
@@ -123,6 +161,7 @@ export default function SectionList({
         });
         setServerProgressMap(incoming);
         setProgressMap(incoming);
+        persistProgressToCache(incoming);
       } catch {
         /* noop */
       }
@@ -131,7 +170,7 @@ export default function SectionList({
     return () => {
       cancelled = true;
     };
-  }, [baseUrl, courseId, emptyMap, sluggedSections]);
+  }, [baseUrl, courseId, emptyMap, sluggedSections, slugSignature, persistProgressToCache]);
 
   useEffect(() => {
     const section = sluggedSections[selectedSection];
@@ -158,9 +197,18 @@ export default function SectionList({
         });
       });
 
+      persistProgressToCache(next);
       return next;
     });
-  }, [currentDuration, currentTime, selectedClass, selectedSection, sluggedSections, serverProgressMap]);
+  }, [
+    currentDuration,
+    currentTime,
+    selectedClass,
+    selectedSection,
+    sluggedSections,
+    serverProgressMap,
+    persistProgressToCache,
+  ]);
 
   const handleReset = async (sectionIdx: number, classIdx: number) => {
     const section = sluggedSections[sectionIdx];
@@ -186,11 +234,13 @@ export default function SectionList({
           sec.map((pct, cIdx) => (sIdx === sectionIdx && cIdx === classIdx ? 0 : pct)),
         ),
       );
-      setProgressMap((prev) =>
-        prev.map((sec, sIdx) =>
+      setProgressMap((prev) => {
+        const next = prev.map((sec, sIdx) =>
           sec.map((pct, cIdx) => (sIdx === sectionIdx && cIdx === classIdx ? 0 : pct)),
-        ),
-      );
+        );
+        persistProgressToCache(next);
+        return next;
+      });
       saveTime(timeKey(courseId, section.slug, cls.slug), 0);
     } catch {
       /* ignore errors */
