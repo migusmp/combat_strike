@@ -894,6 +894,45 @@
   white-space: nowrap;
 }
 
+.mobileClassCompleteRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.mobileClassCompleteTag {
+  background: rgba(106, 255, 208, 0.15);
+  color: #6affd0;
+  border: 1px solid rgba(106, 255, 208, 0.5);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.mobileClassReset {
+  background: none;
+  border: 1px solid rgba(248, 251, 255, 0.25);
+  color: #f8fbff;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.mobileClassReset:hover:not(:disabled) {
+  border-color: rgba(106, 255, 208, 0.8);
+  color: #6affd0;
+}
+
+.mobileClassReset:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .mobileClassButtonActive {
   background: rgba(106, 255, 208, 0.09);
   border-radius: 14px;

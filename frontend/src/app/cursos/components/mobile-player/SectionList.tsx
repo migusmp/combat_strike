@@ -79,6 +79,7 @@ export default function SectionList({
 
   const [progressMap, setProgressMap] = useState<number[][]>(() => buildStoredProgress());
   const [serverProgressMap, setServerProgressMap] = useState<number[][]>(() => emptyMap());
+  const [resetting, setResetting] = useState<Record<string, boolean>>({});
 
   // Reset mapas cuando cambian secciones
   useEffect(() => {
@@ -161,6 +162,43 @@ export default function SectionList({
     });
   }, [currentDuration, currentTime, selectedClass, selectedSection, sluggedSections, serverProgressMap]);
 
+  const handleReset = async (sectionIdx: number, classIdx: number) => {
+    const section = sluggedSections[sectionIdx];
+    const cls = section?.classes?.[classIdx];
+    if (!section || !cls) return;
+    const key = `${sectionIdx}-${classIdx}`;
+    setResetting((prev) => ({ ...prev, [key]: true }));
+    const durationSeconds = Math.max(1, cls.durationSeconds || 1);
+    try {
+      await fetch(`${baseUrl}/courses/${courseId}/progress`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sectionSlug: section.slug,
+          classSlug: cls.slug,
+          positionSeconds: 0,
+          durationSeconds,
+        }),
+      });
+      setServerProgressMap((prev) =>
+        prev.map((sec, sIdx) =>
+          sec.map((pct, cIdx) => (sIdx === sectionIdx && cIdx === classIdx ? 0 : pct)),
+        ),
+      );
+      setProgressMap((prev) =>
+        prev.map((sec, sIdx) =>
+          sec.map((pct, cIdx) => (sIdx === sectionIdx && cIdx === classIdx ? 0 : pct)),
+        ),
+      );
+      saveTime(timeKey(courseId, section.slug, cls.slug), 0);
+    } catch {
+      /* ignore errors */
+    } finally {
+      setResetting((prev) => ({ ...prev, [key]: false }));
+    }
+  };
+
   if (!sections?.length) {
     return (
       <div className={styles.mobileSectionList}>
@@ -198,9 +236,11 @@ export default function SectionList({
               const isComplete = progressPct >= 98;
               return (
                 <li key={`${section.sectionTitle}-${classIdx}`}>
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => onSelect(sectionIdx, classIdx)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(sectionIdx, classIdx); } }}
                     className={`${styles.mobileClassButton} ${isActive ? styles.mobileClassButtonActive : ""}`}
                   >
                     <span
@@ -219,9 +259,27 @@ export default function SectionList({
                           {isComplete ? "Completado" : `${progressPct}%`}
                         </span>
                       </div>
+                      {isComplete && (
+                        <div className={styles.mobileClassCompleteRow}>
+                          <span className={styles.mobileClassCompleteTag}>Completado</span>
+                          <button
+                            type="button"
+                            className={styles.mobileClassReset}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleReset(sectionIdx, classIdx);
+                              onSelect(sectionIdx, classIdx);
+                            }}
+                            disabled={!!resetting[`${sectionIdx}-${classIdx}`]}
+                          >
+                            {resetting[`${sectionIdx}-${classIdx}`] ? "Reiniciando..." : "Volver a ver"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <span className={styles.mobileClassIcon} aria-hidden="true">↓</span>
-                  </button>
+                  </div>
                 </li>
               );
             })}
