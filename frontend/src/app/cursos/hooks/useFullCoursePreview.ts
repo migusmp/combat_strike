@@ -72,6 +72,30 @@ export function useFullCoursePreview({
     () => timeKey(course.id, currentSectionSlug, currentClassSlug),
     [course.id, currentSectionSlug, currentClassSlug]
   );
+
+  const syncSelectionToServer = useCallback((sectionIndex: number, classIndex: number) => {
+    const section = sections[sectionIndex];
+    const cls = section?.classes?.[classIndex];
+    if (!section || !cls) return;
+    const sectionSlug = slugFromTitle(section.sectionTitle);
+    const classSlug = slugFromTitle(cls.title);
+    const durationSeconds = Math.max(
+      1,
+      (cls.duration?.hours ?? 0) * 3600 + (cls.duration?.minutes ?? 0) * 60
+    );
+    const storedSeconds = loadTime(timeKey(course.id, sectionSlug, classSlug));
+    void fetch(`${apiBaseUrl}/courses/${course.id}/progress`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sectionSlug,
+        classSlug,
+        positionSeconds: Math.max(0, Math.floor(storedSeconds)),
+        durationSeconds,
+      }),
+    }).catch(() => { /* noop */ });
+  }, [apiBaseUrl, course.id, sections]);
   /** 🔎 Helpers para navegar entre clases */
   const hasNext = useMemo(() => {
     const sec = sections[selectedSection];
@@ -113,7 +137,8 @@ export function useFullCoursePreview({
     setSelectedSection(next.section);
     setSelectedClass(next.cls);
     setCurrentVideoSrc(buildPlaylistUrl(next.section, next.cls));
-  }, [getNextIndex, buildPlaylistUrl, progressKey]);
+    syncSelectionToServer(next.section, next.cls);
+  }, [getNextIndex, buildPlaylistUrl, progressKey, syncSelectionToServer]);
 
   useEffect(() => {
     if (!active) return;
@@ -186,46 +211,41 @@ export function useFullCoursePreview({
           saveTime(timeKey(course.id, row.sectionSlug, row.classSlug), pos);
         });
 
-        // Busca la primera clase con pct < 98 en el orden del curso
-        let target: { sectionIdx: number; classIdx: number } | null = null;
-        for (let s = 0; s < sections.length && !target; s++) {
-          const sec = sections[s];
-          const secSlug = slugFromTitle(sec.sectionTitle);
-          for (let c = 0; c < sec.classes.length; c++) {
-            const clsSlug = slugFromTitle(sec.classes[c].title);
-            const pct = progressBySlug.get(`${secSlug}:${clsSlug}`)?.pct ?? 0;
-            if (pct < 98) {
-              target = { sectionIdx: s, classIdx: c };
-              break;
-            }
-          }
-        }
+        // Elige la clase incompleta más reciente; si todas están completas, la última actualizada
+        const latestIncomplete = progressList
+          .map((row) => ({
+            row,
+            ts: row?.updatedAt ? new Date(row.updatedAt).getTime() : -1,
+            pct: progressBySlug.get(`${row.sectionSlug}:${row.classSlug}`)?.pct ?? 0,
+          }))
+          .filter((item) => item.pct < 98)
+          .sort((a, b) => b.ts - a.ts)[0];
 
-        // Si todo está completo, recurre al último actualizado
-        if (!target) {
-          const latest = progressList.reduce(
-            (best, row) => {
-              const ts = row?.updatedAt ? new Date(row.updatedAt).getTime() : -1;
-              if (ts > best.ts) return { ts, row };
-              return best;
-            },
-            { ts: -1, row: null as Row | null },
-          ).row;
-          if (latest) {
-            const secIdx = sections.findIndex((s) => slugFromTitle(s.sectionTitle) === latest.sectionSlug);
-            const clsIdx = secIdx >= 0
-              ? sections[secIdx].classes.findIndex((c) => slugFromTitle(c.title) === latest.classSlug)
-              : -1;
-            if (secIdx >= 0 && clsIdx >= 0) target = { sectionIdx: secIdx, classIdx: clsIdx };
-          }
-        }
+        const latestAny = progressList
+          .map((row) => ({
+            row,
+            ts: row?.updatedAt ? new Date(row.updatedAt).getTime() : -1,
+          }))
+          .sort((a, b) => b.ts - a.ts)[0];
 
-        if (!target) return;
+        const choose = latestIncomplete ?? latestAny;
+        if (!choose) return;
+
+        const targetSectionIdx = sections.findIndex(
+          (s) => slugFromTitle(s.sectionTitle) === choose.row.sectionSlug
+        );
+        const targetClassIdx =
+          targetSectionIdx >= 0
+            ? sections[targetSectionIdx].classes.findIndex(
+              (c) => slugFromTitle(c.title) === choose.row.classSlug
+            )
+            : -1;
+        if (targetSectionIdx < 0 || targetClassIdx < 0) return;
 
         hasRestoredProgressRef.current = true;
-        setSelectedSection(target.sectionIdx);
-        setSelectedClass(target.classIdx);
-        setCurrentVideoSrc(buildPlaylistUrl(target.sectionIdx, target.classIdx));
+        setSelectedSection(targetSectionIdx);
+        setSelectedClass(targetClassIdx);
+        setCurrentVideoSrc(buildPlaylistUrl(targetSectionIdx, targetClassIdx));
       } catch {
         /* ignore restore errors */
       }
@@ -532,8 +552,9 @@ export function useFullCoursePreview({
       setSelectedSection(sectionIndex);
       setSelectedClass(classIndex);
       setCurrentVideoSrc(buildPlaylistUrl(sectionIndex, classIndex));
+      syncSelectionToServer(sectionIndex, classIndex);
     },
-    [buildPlaylistUrl, progressKey]
+    [buildPlaylistUrl, progressKey, syncSelectionToServer]
   );
 
   const currentSubtitles = currentClass?.subtitles ?? [];
