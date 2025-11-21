@@ -506,16 +506,28 @@ export function useFullCoursePreview({
       const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
       syncProgress(dur || el.currentTime || 0, dur || el.currentTime || 1);
     };
+    const onPauseSync = () => {
+      const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
+      if (dur > 0) syncProgress(el.currentTime || 0, dur || 1, true);
+    };
+    const onSeeking = () => {
+      const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
+      if (dur > 0) syncProgress(el.currentTime || 0, dur || 1, true);
+    };
     const onSeeked = () => {
       const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
       if (dur > 0) syncProgress(el.currentTime, dur, true);
     };
     el.addEventListener("timeupdate", onTime);
     el.addEventListener("ended", onEnded);
+    el.addEventListener("pause", onPauseSync);
+    el.addEventListener("seeking", onSeeking);
     el.addEventListener("seeked", onSeeked);
     return () => {
       el.removeEventListener("timeupdate", onTime);
       el.removeEventListener("ended", onEnded);
+      el.removeEventListener("pause", onPauseSync);
+      el.removeEventListener("seeking", onSeeking);
       el.removeEventListener("seeked", onSeeked);
     };
   }, [active, apiBaseUrl, course.id, currentClassSlug, currentSectionSlug, progressKey]);
