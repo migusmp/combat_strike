@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { ContactModule } from './contact/contact.module';
+import { CourseProgressModule } from './course-progress/course-progress.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ContactModule } from './contact/contact.module';
     PaymentsModule,
     InvoicesModule,
     ContactModule, // módulo de autenticación
+    CourseProgressModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, MailService],

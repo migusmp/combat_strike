@@ -811,7 +811,7 @@
   color: #f8fbff;
   padding: 0.85rem 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.8rem;
   cursor: pointer;
   text-align: left;
@@ -828,6 +828,14 @@
   font-size: 0.82rem;
 }
 
+.mobileClassCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
 .mobileClassIndex {
   width: 34px;
   height: 34px;
@@ -841,10 +849,49 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.mobileClassIndexDone {
+  background: rgba(106, 255, 208, 0.16);
+  border-color: rgba(106, 255, 208, 0.85);
+  color: #6affd0;
+  box-shadow: 0 0 0 1px rgba(106, 255, 208, 0.35);
+}
+
 .mobileClassIcon {
   margin-left: auto;
   color: rgba(248, 251, 255, 0.5);
   font-size: 1rem;
+  margin-top: 0.2rem;
+}
+
+.mobileClassProgressRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+}
+
+.mobileClassProgressTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(248, 251, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mobileClassProgressTrack span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #6affd0 0%, #52b6ff 100%);
+  border-radius: 999px;
+  width: 0;
+  transition: width 160ms ease;
+}
+
+.mobileClassProgressLabel {
+  color: rgba(248, 251, 255, 0.78);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .mobileClassButtonActive {

@@ -198,11 +198,15 @@ export default function MobilePurchasedCourseContent({
         <div className={styles.mobileScrollableContent}>
           {tab === "clases" ? (
             <SectionList
+              courseId={course.id}
+              baseUrl={baseUrl}
               sections={sections}
               selectedSection={selectedSection}
               selectedClass={selectedClass}
               onSelect={onSelect}
               formatDuration={formatDuration}
+              currentTime={vc.currentTime}
+              currentDuration={vc.duration}
             />
           ) : tab === "mas" ? (
             <MorePanel

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Hls from "hls.js";
 import styles from "../css/FullCoursePreviewModal.module.css";
 import { Course } from "@/app/interfaces/courses";
+import { slugFromTitle } from "../utils/slugFromTitle";
 
 interface FullCoursePreviewModalProps {
     show: boolean;
@@ -12,15 +13,6 @@ interface FullCoursePreviewModalProps {
     masterPlaylistSrc: string;
     apiBaseUrl: string;
 }
-
-const slugFromTitle = (value?: string) =>
-    (value ?? "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "-");
 
 export default function FullCoursePreviewModal({
     show,

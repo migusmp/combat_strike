@@ -364,6 +364,18 @@ export function useVideoController({
     goNext();
   };
 
+  // Al cambiar de clase/sección, resetea estados de fin/overlay para no mostrar "replay" de la anterior
+  useEffect(() => {
+    cancelAutoNext();
+    setIsEnded(false);
+    setEndCard(null);
+    setProgressOnly(false);
+    setHideWhilePaused(false);
+    setControlsVisible(false);
+    setCurrentTime(0);
+    setDuration(0);
+  }, [selectedSection, selectedClass]);
+
   const revealProgressBriefly = () => {
     setHideWhilePaused(false);
     setProgressOnly(true);

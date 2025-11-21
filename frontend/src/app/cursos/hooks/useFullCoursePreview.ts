@@ -12,6 +12,7 @@ import {
 } from "../utils/subtitles";
 import { loadTime, saveTime, timeKey } from "../utils/videoProgress";
 import { logHls } from "../utils/telemetry";
+import { slugFromTitle } from "../utils/slugFromTitle";
 
 interface UseFullCoursePreviewOptions {
   course: Course;
@@ -19,15 +20,6 @@ interface UseFullCoursePreviewOptions {
   apiBaseUrl: string;
   active: boolean;
 }
-
-const slugFromTitle = (value?: string) =>
-  (value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
 
 export function useFullCoursePreview({
   course,
@@ -44,6 +36,7 @@ export function useFullCoursePreview({
   const [selectedSection, setSelectedSection] = useState(0);
   const [selectedClass, setSelectedClass] = useState(0);
   const [currentVideoSrc, setCurrentVideoSrc] = useState(masterPlaylistSrc);
+  const lastSyncedProgressRef = useRef(0);
 
   const [selectedSubtitle, setSelectedSubtitle] = useState<SubtitleSelection>(
     () => loadCC(course.id)
@@ -368,19 +361,50 @@ export function useFullCoursePreview({
 
   // Guardado periódico del progreso
   useEffect(() => {
+    if (!active) return;
     const el = videoRef.current;
     if (!el) return;
     let last = 0;
+    lastSyncedProgressRef.current = 0;
+    const syncProgress = (positionSeconds: number, durationSeconds: number) => {
+      if (!currentSectionSlug || !currentClassSlug) return;
+      const now = Date.now();
+      const isComplete = durationSeconds > 0 && positionSeconds / durationSeconds >= 0.98;
+      // Envía cada 10s o al completar
+      if (!isComplete && now - lastSyncedProgressRef.current < 10000) return;
+      lastSyncedProgressRef.current = now;
+      void fetch(`${apiBaseUrl}/courses/${course.id}/progress`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sectionSlug: currentSectionSlug,
+          classSlug: currentClassSlug,
+          positionSeconds: Math.floor(positionSeconds),
+          durationSeconds: Math.max(1, Math.floor(durationSeconds)),
+        }),
+      }).catch(() => { /* silencio: no bloquea reproducción */ });
+    };
     const onTime = () => {
       const now = performance.now();
       if (now - last > 1000) {
         saveTime(progressKey, el.currentTime);
         last = now;
+        const dur = Number.isFinite(el.duration) ? el.duration : 0;
+        if (dur > 0) syncProgress(el.currentTime, dur);
       }
     };
+    const onEnded = () => {
+      const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
+      syncProgress(dur || el.currentTime || 0, dur || el.currentTime || 1);
+    };
     el.addEventListener("timeupdate", onTime);
-    return () => el.removeEventListener("timeupdate", onTime);
-  }, [progressKey]);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("timeupdate", onTime);
+      el.removeEventListener("ended", onEnded);
+    };
+  }, [active, apiBaseUrl, course.id, currentClassSlug, currentSectionSlug, progressKey]);
 
   // Persistir y aplicar selección de CC cuando el usuario cambia
   useEffect(() => {
