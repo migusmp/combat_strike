@@ -32,6 +32,7 @@ export function useFullCoursePreview({
   // Autoplay solo al inicio; respeta pausa del usuario
   const shouldAutoplayRef = useRef(true);
   const hasPlayedOnceRef = useRef(false);
+  const hasRestoredProgressRef = useRef(false);
 
   const [selectedSection, setSelectedSection] = useState(0);
   const [selectedClass, setSelectedClass] = useState(0);
@@ -135,9 +136,9 @@ export function useFullCoursePreview({
     };
   }, [active]);
 
-  // Inicializa selección + URL
+  // Inicializa selección + URL si no hay restauración de progreso
   useEffect(() => {
-    if (!active) return;
+    if (!active || hasRestoredProgressRef.current) return;
     const initialUrl = sections.length
       ? buildPlaylistUrl(0, 0)
       : masterPlaylistSrc;
@@ -145,6 +146,93 @@ export function useFullCoursePreview({
     setSelectedClass(0);
     setCurrentVideoSrc(initialUrl);
   }, [active, buildPlaylistUrl, masterPlaylistSrc, sections.length]);
+
+  // Restaura la última clase no completada (o la más reciente) desde el backend
+  useEffect(() => {
+    if (!active || !sections.length || hasRestoredProgressRef.current) return;
+    const controller = new AbortController();
+    const restore = async () => {
+      try {
+        const res = await fetch(`${apiBaseUrl}/courses/${course.id}/progress`, {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!Array.isArray(data) || !data.length) return;
+
+        type Row = {
+          sectionSlug: string;
+          classSlug: string;
+          positionSeconds?: number;
+          durationSeconds?: number;
+          completedAt?: string | null;
+          updatedAt?: string;
+        };
+        const progressList: Row[] = data;
+        const progressBySlug = new Map<string, { pct: number; pos: number }>();
+
+        const pctOf = (row: Row) => {
+          if (row.completedAt) return 100;
+          const pos = Math.max(0, Math.floor(row.positionSeconds ?? 0));
+          const dur = Math.max(1, Math.floor(row.durationSeconds ?? row.positionSeconds ?? 1));
+          return Math.min(100, Math.max(0, Math.round((pos / dur) * 100)));
+        };
+
+        progressList.forEach((row) => {
+          const pct = pctOf(row);
+          const pos = Math.max(0, Math.floor(row.positionSeconds ?? 0));
+          progressBySlug.set(`${row.sectionSlug}:${row.classSlug}`, { pct, pos });
+          saveTime(timeKey(course.id, row.sectionSlug, row.classSlug), pos);
+        });
+
+        // Busca la primera clase con pct < 98 en el orden del curso
+        let target: { sectionIdx: number; classIdx: number } | null = null;
+        for (let s = 0; s < sections.length && !target; s++) {
+          const sec = sections[s];
+          const secSlug = slugFromTitle(sec.sectionTitle);
+          for (let c = 0; c < sec.classes.length; c++) {
+            const clsSlug = slugFromTitle(sec.classes[c].title);
+            const pct = progressBySlug.get(`${secSlug}:${clsSlug}`)?.pct ?? 0;
+            if (pct < 98) {
+              target = { sectionIdx: s, classIdx: c };
+              break;
+            }
+          }
+        }
+
+        // Si todo está completo, recurre al último actualizado
+        if (!target) {
+          const latest = progressList.reduce(
+            (best, row) => {
+              const ts = row?.updatedAt ? new Date(row.updatedAt).getTime() : -1;
+              if (ts > best.ts) return { ts, row };
+              return best;
+            },
+            { ts: -1, row: null as Row | null },
+          ).row;
+          if (latest) {
+            const secIdx = sections.findIndex((s) => slugFromTitle(s.sectionTitle) === latest.sectionSlug);
+            const clsIdx = secIdx >= 0
+              ? sections[secIdx].classes.findIndex((c) => slugFromTitle(c.title) === latest.classSlug)
+              : -1;
+            if (secIdx >= 0 && clsIdx >= 0) target = { sectionIdx: secIdx, classIdx: clsIdx };
+          }
+        }
+
+        if (!target) return;
+
+        hasRestoredProgressRef.current = true;
+        setSelectedSection(target.sectionIdx);
+        setSelectedClass(target.classIdx);
+        setCurrentVideoSrc(buildPlaylistUrl(target.sectionIdx, target.classIdx));
+      } catch {
+        /* ignore restore errors */
+      }
+    };
+    restore();
+    return () => controller.abort();
+  }, [active, apiBaseUrl, buildPlaylistUrl, course.id, sections]);
 
   // Montaje HLS + subtítulos
   // useFullCoursePreview.ts — solo muestro el bloque relevante de "montaje HLS"
@@ -366,12 +454,12 @@ export function useFullCoursePreview({
     if (!el) return;
     let last = 0;
     lastSyncedProgressRef.current = 0;
-    const syncProgress = (positionSeconds: number, durationSeconds: number) => {
+    const syncProgress = (positionSeconds: number, durationSeconds: number, force = false) => {
       if (!currentSectionSlug || !currentClassSlug) return;
       const now = Date.now();
       const isComplete = durationSeconds > 0 && positionSeconds / durationSeconds >= 0.98;
       // Envía cada 10s o al completar
-      if (!isComplete && now - lastSyncedProgressRef.current < 10000) return;
+      if (!force && !isComplete && now - lastSyncedProgressRef.current < 10000) return;
       lastSyncedProgressRef.current = now;
       void fetch(`${apiBaseUrl}/courses/${course.id}/progress`, {
         method: "PUT",
@@ -398,11 +486,17 @@ export function useFullCoursePreview({
       const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
       syncProgress(dur || el.currentTime || 0, dur || el.currentTime || 1);
     };
+    const onSeeked = () => {
+      const dur = Number.isFinite(el.duration) ? el.duration : el.currentTime || 0;
+      if (dur > 0) syncProgress(el.currentTime, dur, true);
+    };
     el.addEventListener("timeupdate", onTime);
     el.addEventListener("ended", onEnded);
+    el.addEventListener("seeked", onSeeked);
     return () => {
       el.removeEventListener("timeupdate", onTime);
       el.removeEventListener("ended", onEnded);
+      el.removeEventListener("seeked", onSeeked);
     };
   }, [active, apiBaseUrl, course.id, currentClassSlug, currentSectionSlug, progressKey]);
 
