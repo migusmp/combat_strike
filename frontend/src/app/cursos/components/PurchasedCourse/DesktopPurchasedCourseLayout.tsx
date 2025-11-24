@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./DesktopPurchasedCourseLayout.module.css";
 import { useFullCoursePreview } from "../../hooks/useFullCoursePreview";
@@ -15,6 +16,7 @@ const HIDE_HEADER_CLASS = "cs-hide-global-header";
 
 export default function DesktopPurchasedCourseLayout({ course }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [panelTab, setPanelTab] = useState<"content" | "downloads">("content");
 
   const baseUrl = useMemo(
     () => (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, ""),
@@ -90,7 +92,6 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
 
   const onSelectClass = (sectionIdx: number, classIdx: number) => {
     handleSelect(sectionIdx, classIdx);
-    setSidebarOpen(false);
   };
 
   const classNumber = flatIndex ? `${flatIndex}.` : "";
@@ -113,9 +114,16 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
         <div className={styles.topChrome}>
           <div className={styles.leftCluster}>
             <div className={styles.brandMark} aria-label="Combat Strike">
-              <span className={styles.brandLetter}>U</span>
+              <Image
+                src="/assets/logo-blanco-sin-texto-small.webp"
+                alt="Combat Strike"
+                width={38}
+                height={38}
+                className={styles.brandLogo}
+                priority
+              />
             </div>
-            <span className={styles.betaPill}>Beta</span>
+            {/* <span className={styles.betaPill}>Beta</span> */}
             <div className={styles.playingMeta}>
               <span className={styles.lessonTitle}>
                 {classNumber} {playingTitle}
@@ -261,84 +269,202 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
           }`}
           aria-label="Contenido del curso"
         >
-          <div className={styles.sidebarHeader}>
-            <div>
-              <p className={styles.sidebarEyebrow}>Contenido del curso</p>
-              <h3 className={styles.sidebarTitle}>{course.title}</h3>
-              {currentSection && (
-                <p className={styles.sidebarNowPlaying}>
-                  Reproduciendo: {currentSection.sectionTitle}
-                </p>
-              )}
+          <div className={styles.sidebarTopActions}>
+            <div className={styles.topPill}>
+              <button
+                type="button"
+                className={`${styles.pillButton} ${panelTab === "downloads" ? styles.pillButtonActive : ""}`}
+                aria-label="Descargas"
+                aria-pressed={panelTab === "downloads"}
+                onClick={() => setPanelTab("downloads")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 3v12" />
+                  <path d="m8 11 4 4 4-4" />
+                  <path d="M5 21h14" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={`${styles.pillButton} ${panelTab === "content" ? styles.pillButtonActive : ""}`}
+                aria-label="Contenido del curso"
+                aria-pressed={panelTab === "content"}
+                onClick={() => setPanelTab("content")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 6l1.5 3 3 .5-2.2 2.3.5 3.2L12 13.8 9.2 15l.5-3.2L7.5 9.5l3-.5L12 6Z" />
+                </svg>
+              </button>
             </div>
             <button
               type="button"
-              className={styles.closeButton}
-              onClick={() => setSidebarOpen(false)}
+              className={styles.closeActionButton}
               aria-label="Cerrar panel"
+              onClick={() => setSidebarOpen(false)}
             >
-              ×
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
           </div>
 
-          <div className={styles.sidebarList}>
-            {sections.map((section, sectionIdx) => (
-              <div key={section.sectionTitle} className={styles.sectionBlock}>
-                <div className={styles.sectionHeader}>
-                  <span className={styles.sectionNumber}>
-                    Sección {sectionIdx + 1}
-                  </span>
-                  <strong className={styles.sectionName}>
-                    {section.sectionTitle}
-                  </strong>
+          {panelTab === "content" ? (
+            <>
+              <div className={styles.sidebarHeader}>
+                <div>
+                  <p className={styles.sidebarEyebrow}>Contenido del curso</p>
+                  <h3 className={styles.sidebarTitle}>{course.title}</h3>
+                  {currentSection && (
+                    <p className={styles.sidebarNowPlaying}>
+                      Reproduciendo: {currentSection.sectionTitle}
+                    </p>
+                  )}
                 </div>
-                <ul className={styles.classList}>
-                  {section.classes.map((cls, classIdx) => {
-                    const isActive =
-                      sectionIdx === selectedSection &&
-                      classIdx === selectedClass;
-                    const priorClasses = sections
-                      .slice(0, sectionIdx)
-                      .reduce(
-                        (sum, s) => sum + (s.classes?.length ?? 0),
-                        0
-                      );
-                    const itemNumber = priorClasses + classIdx + 1;
-                    const durationLabel =
-                      cls.duration.hours > 0
-                        ? `${cls.duration.hours}h ${cls.duration.minutes
-                            .toString()
-                            .padStart(2, "0")}m`
-                        : `${cls.duration.minutes.toString().padStart(2, "0")}m`;
-
-                    return (
-                      <li key={`${cls.title}-${classIdx}`}>
-                        <button
-                          type="button"
-                          className={`${styles.classButton} ${
-                            isActive ? styles.classButtonActive : ""
-                          }`}
-                          onClick={() => onSelectClass(sectionIdx, classIdx)}
-                        >
-                          <span className={styles.classIndex}>
-                            {itemNumber.toString().padStart(2, "0")}
-                          </span>
-                          <div className={styles.classInfo}>
-                            <span className={styles.classTitle}>
-                              {cls.title}
-                            </span>
-                            <span className={styles.classMeta}>
-                              {durationLabel}
-                            </span>
-                          </div>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
               </div>
-            ))}
-          </div>
+
+              <div className={styles.sidebarList}>
+                {sections.map((section, sectionIdx) => (
+                  <div key={section.sectionTitle} className={styles.sectionBlock}>
+                    <div className={styles.sectionHeader}>
+                      <span className={styles.sectionNumber}>
+                        Sección {sectionIdx + 1}
+                      </span>
+                      <strong className={styles.sectionName}>
+                        {section.sectionTitle}
+                      </strong>
+                    </div>
+                    <ul className={styles.classList}>
+                      {section.classes.map((cls, classIdx) => {
+                        const isActive =
+                          sectionIdx === selectedSection &&
+                          classIdx === selectedClass;
+                        const priorClasses = sections
+                          .slice(0, sectionIdx)
+                          .reduce(
+                            (sum, s) => sum + (s.classes?.length ?? 0),
+                            0
+                          );
+                        const itemNumber = priorClasses + classIdx + 1;
+                        const durationLabel =
+                          cls.duration.hours > 0
+                            ? `${cls.duration.hours}h ${cls.duration.minutes
+                                .toString()
+                                .padStart(2, "0")}m`
+                            : `${cls.duration.minutes.toString().padStart(2, "0")}m`;
+
+                        return (
+                          <li key={`${cls.title}-${classIdx}`}>
+                            <button
+                              type="button"
+                              className={`${styles.classButton} ${
+                                isActive ? styles.classButtonActive : ""
+                              }`}
+                              onClick={() => onSelectClass(sectionIdx, classIdx)}
+                            >
+                              <span className={styles.classIndex}>
+                                {itemNumber.toString().padStart(2, "0")}
+                              </span>
+                              <div className={styles.classInfo}>
+                                <span className={styles.classTitle}>
+                                  {cls.title}
+                                </span>
+                                <span className={styles.classMeta}>
+                                  {durationLabel}
+                                </span>
+                              </div>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.descriptionBar}>
+                <button type="button" className={styles.descriptionToggle}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                  Ver descripción general del curso
+                </button>
+                <div className={styles.descriptionCard}>
+                  <div className={styles.descriptionThumb}>
+                    <Image
+                      src={course.image}
+                      alt={course.title}
+                      width={48}
+                      height={48}
+                      className={styles.descriptionImage}
+                    />
+                  </div>
+                  <div className={styles.descriptionBody}>
+                    <p className={styles.descriptionTitle}>{course.title}</p>
+                    <p className={styles.descriptionText}>
+                      {course.description || "Descripción general del curso"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className={styles.sidebarDownloads}>
+              <h4 className={styles.downloadsTitle}>Descargas</h4>
+              {course.downloadables?.length ? (
+                <ul className={styles.downloadList}>
+                  {course.downloadables.map((item, idx) => (
+                    <li key={`${item}-${idx}`} className={styles.downloadItem}>
+                      <span className={styles.downloadIndex}>{idx + 1}</span>
+                      <span className={styles.downloadName}>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.downloadEmpty}>No hay descargas disponibles.</p>
+              )}
+            </div>
+          )}
         </aside>
 
       </div>
