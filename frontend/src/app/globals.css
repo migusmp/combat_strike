@@ -26,3 +26,16 @@ body {
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Oculta el header global en vistas de curso comprado */
+html.cs-hide-global-header,
+body.cs-hide-global-header {
+    overflow: hidden;
+    background: #0d0e15;
+}
+body.cs-hide-global-header header {
+    display: none !important;
+}
+body.cs-hide-global-header main {
+    margin-top: 0 !important;
+}

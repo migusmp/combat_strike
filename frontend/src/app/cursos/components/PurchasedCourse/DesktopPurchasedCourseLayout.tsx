@@ -1,73 +1,44 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import Footer from "@/app/components/Home/Footer";
-import styles from "../../css/PurchasedCourseLayout.module.css";
+import { useEffect, useMemo, useState } from "react";
+import styles from "./DesktopPurchasedCourseLayout.module.css";
+import { useFullCoursePreview } from "../../hooks/useFullCoursePreview";
 import { Course } from "@/app/interfaces/courses";
 import { PurchasedCourse } from "@/app/interfaces/purchases";
-import { buildPreviewClips } from "../../utils/previewClips";
-import { useFullCoursePreview } from "../../hooks/useFullCoursePreview";
-import CoursePreviewModal from "../CoursePreviewModal";
-import FullCoursePreviewModal from "../FullCoursePreviewModal";
 
 interface Props {
   course: Course;
   purchase?: PurchasedCourse;
 }
 
-const formatDate = (value?: string) => {
-  if (!value) return "—";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "—";
-  return parsed.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
+const HIDE_HEADER_CLASS = "cs-hide-global-header";
 
-export default function DesktopPurchasedCourseLayout({ course, purchase }: Props) {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [showFullCourseModal, setShowFullCourseModal] = useState(false);
+export default function DesktopPurchasedCourseLayout({ course }: Props) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const purchaseDate = formatDate(purchase?.purchasedAt);
-  const statusLabel = purchase?.status ?? "Pago completado";
-  const providerLabel = purchase?.provider ?? "—";
-  const orderId = purchase?.externalOrderId ?? "—";
-  const amountLabel =
-    typeof purchase?.amount === "number"
-      ? `${purchase.amount.toFixed(2)} €`
-      : `${course.price} €`;
-
-  const progress = useMemo(() => {
-    const raw = (purchase?.course as unknown as { progress?: number } | undefined)?.progress;
-    if (typeof raw !== "number") {
-      return statusLabel === "COMPLETED" ? 100 : 0;
-    }
-    return Math.min(100, Math.max(0, Math.round(raw)));
-  }, [purchase?.course, statusLabel]);
-
-  const totalSections = course.content.length;
-  const totalClasses = course.content.reduce((sum, section) => sum + section.classes.length, 0);
-  const totalMinutes = course.content.reduce((minutes, section) => {
-    section.classes.forEach((cls) => {
-      minutes += cls.duration.hours * 60 + cls.duration.minutes;
-    });
-    return minutes;
-  }, 0);
-  const durationHours = Math.floor(totalMinutes / 60);
-  const durationMinutes = totalMinutes % 60;
-
-  const scrollToContent = () => {
-    contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const previewClips = useMemo(() => buildPreviewClips(course), [course]);
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
-  const previewSrc = `${baseUrl}/courses/${course.id}/preview/playlist`;
+  const baseUrl = useMemo(
+    () => (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, ""),
+    []
+  );
   const fullCourseSrc = `${baseUrl}/courses/${course.id}/full/playlist`;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const body = document.body;
+    const html = document.documentElement;
+    const prevBodyOverflow = body.style.overflow;
+    const prevHtmlOverflow = html.style.overflow;
+    body.classList.add(HIDE_HEADER_CLASS);
+    html.classList.add(HIDE_HEADER_CLASS);
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    return () => {
+      body.classList.remove(HIDE_HEADER_CLASS);
+      html.classList.remove(HIDE_HEADER_CLASS);
+      body.style.overflow = prevBodyOverflow;
+      html.style.overflow = prevHtmlOverflow;
+    };
+  }, []);
 
   const {
     sections,
@@ -79,6 +50,8 @@ export default function DesktopPurchasedCourseLayout({ course, purchase }: Props
     currentClassSlug,
     currentSubtitles,
     videoRef,
+    selectedSubtitle,
+    setSelectedSubtitle,
     handleSelect,
   } = useFullCoursePreview({
     course,
@@ -87,235 +60,288 @@ export default function DesktopPurchasedCourseLayout({ course, purchase }: Props
     active: true,
   });
 
+  const flatIndex = useMemo(() => {
+    if (!sections.length) return null;
+    let acc = 0;
+    for (let s = 0; s < sections.length; s += 1) {
+      const len = sections[s]?.classes?.length ?? 0;
+      if (s < selectedSection) {
+        acc += len;
+        continue;
+      }
+      acc += Math.min(len, selectedClass + 1);
+      break;
+    }
+    return acc > 0 ? acc : 1;
+  }, [sections, selectedSection, selectedClass]);
+
+  const canToggleCC = currentSubtitles.length > 0;
+  const subtitleToggleLabel =
+    selectedSubtitle === "off" ? "Mostrar subtítulos" : "Ocultar subtítulos";
+
+  const handleSubtitleToggle = () => {
+    if (!canToggleCC) return;
+    const next =
+      selectedSubtitle === "off"
+        ? currentSubtitles[0]?.lang ?? "off"
+        : "off";
+    setSelectedSubtitle(next);
+  };
+
+  const onSelectClass = (sectionIdx: number, classIdx: number) => {
+    handleSelect(sectionIdx, classIdx);
+    setSidebarOpen(false);
+  };
+
+  const classNumber = flatIndex ? `${flatIndex}.` : "";
+  const playingTitle = currentClass?.title ?? course.title;
+
+  const videoFrameClass = `${styles.videoFrame} ${
+    sidebarOpen ? styles.videoFrameSidebar : styles.videoFrameFull
+  }`;
+  const videoViewportClass = `${styles.videoViewport} ${
+    sidebarOpen ? styles.videoViewportSidebar : styles.videoViewportFull
+  }`;
+
+  const stageClass = `${styles.videoStage} ${
+    sidebarOpen ? styles.videoStageSidebar : ""
+  }`;
+
   return (
-    <div className={styles.wrapper}>
-      <div ref={contentRef} className={styles.viewerBlock}>
-        <section className={styles.fullCourseLayout}>
-          {/* Player principal */}
-          <div className={styles.playerColumn}>
-            <div className={styles.playerShell}>
-              <video
-                ref={videoRef}
-                controls
-                crossOrigin="use-credentials"
-                className={styles.playerVideo}
+    <section className={styles.screen}>
+      <div className={stageClass}>
+        <div className={styles.topChrome}>
+          <div className={styles.leftCluster}>
+            <div className={styles.brandMark} aria-label="Combat Strike">
+              <span className={styles.brandLetter}>U</span>
+            </div>
+            <span className={styles.betaPill}>Beta</span>
+            <div className={styles.playingMeta}>
+              <span className={styles.lessonTitle}>
+                {classNumber} {playingTitle}
+              </span>
+              <span className={styles.playBadge} aria-hidden="true">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="11"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    opacity="0.4"
+                  />
+                  <path
+                    d="M10 8.5L16 12L10 15.5V8.5Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.rightCluster}>
+            <button
+              type="button"
+              className={styles.iconButton}
+              aria-pressed={sidebarOpen}
+              aria-label="Abrir índice del curso"
+              onClick={() => setSidebarOpen((open) => !open)}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                {currentSectionSlug &&
-                  currentClassSlug &&
-                  currentSubtitles.map((subtitle, idx) => (
-                    <track
-                      key={`${subtitle.file}-${idx}`}
-                      kind="subtitles"
-                      src={`${baseUrl}/courses/${course.id}/full/${currentSectionSlug}/${currentClassSlug}/subtitles/${subtitle.file}`}
-                      srcLang={subtitle.lang}
-                      label={subtitle.label}
-                      default={subtitle.lang === "es"}
-                    />
-                  ))}
-              </video>
-            </div>
-            <div className={styles.playerMeta}>
-              <p className={styles.playerEyebrow}>Reproduciendo</p>
-              <h3>
-                {currentSection ? currentSection.sectionTitle : "Sin secciones"}{" "}
-                {currentClass ? `· ${currentClass.title}` : ""}
-              </h3>
-              {currentClass && (
-                <span>
-                  {currentClass.duration.hours > 0 ? `${currentClass.duration.hours} h ` : ""}
-                  {currentClass.duration.minutes} min
-                </span>
-              )}
-            </div>
-            <div className={styles.playerActions}>
-              <button type="button" className={styles.secondaryGhost} onClick={() => setShowPreviewModal(true)}>
-                Ver vista rápida
-              </button>
-              <button type="button" className={styles.softButton} onClick={() => setShowFullCourseModal(true)}>
-                Abrir en ventana
-              </button>
-            </div>
-          </div>
-
-          {/* Sidebar de secciones */}
-          <aside className={styles.sectionSidebar}>
-            <header>
-              <span className={styles.panelTag}>Plan de entrenamiento</span>
-              <h2>Contenido del curso</h2>
-              <p>
-                {totalSections} secciones · {totalClasses} clases · {durationHours} h {durationMinutes} min
-              </p>
-            </header>
-            <div className={styles.sectionModuleList}>
-              {sections.map((section, sectionIdx) => (
-                <div key={section.sectionTitle} className={styles.sectionModule}>
-                  <button
-                    type="button"
-                    className={`${styles.sectionModuleHeader} ${
-                      selectedSection === sectionIdx ? styles.sectionModuleHeaderActive : ""
-                    }`}
-                    onClick={() => handleSelect(sectionIdx, 0)}
-                  >
-                    <div>
-                      <strong>{section.sectionTitle}</strong>
-                      <span>{section.classes.length} clases</span>
-                    </div>
-                    <span className={styles.sectionModuleIcon}>▶</span>
-                  </button>
-                  <ul className={styles.sectionClassList}>
-                    {section.classes.map((cls, classIdx) => {
-                      const isActive = selectedSection === sectionIdx && selectedClass === classIdx;
-                      return (
-                        <li key={`${section.sectionTitle}-${classIdx}`}>
-                          <button
-                            type="button"
-                            className={`${styles.sectionClassButton} ${
-                              isActive ? styles.sectionClassButtonActive : ""
-                            }`}
-                            onClick={() => handleSelect(sectionIdx, classIdx)}
-                          >
-                            <span>{classIdx + 1}.</span>
-                            <div>
-                              <p>{cls.title}</p>
-                              <small>
-                                {cls.duration.hours > 0 ? `${cls.duration.hours} h ` : ""}
-                                {cls.duration.minutes} min
-                              </small>
-                            </div>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </section>
-      </div>
-
-      {/* Información general */}
-      <section className={styles.infoGrid}>
-        <article className={styles.infoCardWide}>
-          <header>
-            <span>Progreso actual</span>
-            <strong>{progress}%</strong>
-          </header>
-          <div className={styles.progressTrack}>
-            <span style={{ width: `${progress}%` }} />
-          </div>
-          <footer>
-            {totalSections} secciones · {totalClasses} clases
-          </footer>
-        </article>
-
-        <article className={styles.infoCardCompact}>
-          <span>Resumen de compra</span>
-          <dl>
-            <div><dt>Fecha</dt><dd>{purchaseDate}</dd></div>
-            <div><dt>Pago</dt><dd>{statusLabel}</dd></div>
-            <div><dt>Proveedor</dt><dd>{providerLabel}</dd></div>
-            <div><dt>Importe</dt><dd>{amountLabel}</dd></div>
-          </dl>
-        </article>
-
-        <article className={styles.infoCardCompact}>
-          <span>Acciones rápidas</span>
-          <div className={styles.quickActions}>
-            <Link href="/mis-cursos">Volver a mis cursos</Link>
-            <button type="button" onClick={scrollToContent}>
-              Ver temario
+                <rect
+                  x="4"
+                  y="6"
+                  width="16"
+                  height="2.2"
+                  rx="1.1"
+                  fill="currentColor"
+                  opacity="0.9"
+                />
+                <rect
+                  x="4"
+                  y="11"
+                  width="16"
+                  height="2.2"
+                  rx="1.1"
+                  fill="currentColor"
+                  opacity="0.75"
+                />
+                <rect
+                  x="4"
+                  y="16"
+                  width="10"
+                  height="2.2"
+                  rx="1.1"
+                  fill="currentColor"
+                  opacity="0.55"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={styles.iconButton}
+              aria-label={subtitleToggleLabel}
+              onClick={handleSubtitleToggle}
+              disabled={!canToggleCC}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 12C4 8.686 6.686 6 10 6H14C17.314 6 20 8.686 20 12C20 15.314 17.314 18 14 18H10C6.686 18 4 15.314 4 12Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  opacity="0.9"
+                />
+                <path
+                  d="M10 9.75C9.17 9.75 8.5 10.42 8.5 11.25V12.75C8.5 13.58 9.17 14.25 10 14.25H11"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M14 9.75C13.17 9.75 12.5 10.42 12.5 11.25V12.75C12.5 13.58 13.17 14.25 14 14.25H15.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
-        </article>
-      </section>
-
-      {/* Paneles adicionales */}
-      <section className={styles.trainingPanels}>
-        <div className={styles.panelStack}>
-          <article className={styles.panelCard}>
-            <header>
-              <span className={styles.panelTag}>Resultados</span>
-              <h2>Lo que aprenderás</h2>
-            </header>
-            <ul className={styles.learnList}>
-              {course.whatYouWillLearn?.map((item, i) => (
-                <li key={i}><span />{item}</li>
-              ))}
-            </ul>
-          </article>
-
-          <article className={styles.panelCard}>
-            <header>
-              <span className={styles.panelTag}>Antes de comenzar</span>
-              <h2>Requisitos recomendados</h2>
-            </header>
-            <ul className={styles.requireList}>
-              {course.requirements?.map((req, i) => (
-                <li key={i}>{req}</li>
-              ))}
-            </ul>
-          </article>
-
-          <article className={styles.panelCard}>
-            <header>
-              <span className={styles.panelTag}>Descripción</span>
-              <h2>Profundiza en el programa</h2>
-            </header>
-            <p className={styles.descriptionCopy}>{course.longDescription}</p>
-          </article>
         </div>
 
-        <aside className={styles.sidebarStack}>
-          <div className={styles.infoCard}>
-            <h3>Detalles de compra</h3>
-            <dl>
-              <div><dt>Código de pedido</dt><dd>{orderId}</dd></div>
-              <div><dt>Proveedor</dt><dd>{providerLabel}</dd></div>
-              <div><dt>Pago</dt><dd>{statusLabel}</dd></div>
-              <div><dt>Importe</dt><dd>{amountLabel}</dd></div>
-            </dl>
+        <div className={videoFrameClass}>
+          <div className={styles.noise} aria-hidden="true" />
+          <div className={videoViewportClass}>
+            <video
+              ref={videoRef}
+              className={styles.videoElement}
+              controls
+              playsInline
+              crossOrigin="use-credentials"
+              poster={course.image}
+            >
+              {currentSectionSlug &&
+                currentClassSlug &&
+                currentSubtitles.map((subtitle, idx) => (
+                  <track
+                    key={`${subtitle.file}-${idx}`}
+                    kind="subtitles"
+                    src={`${baseUrl}/courses/${course.id}/full/${currentSectionSlug}/${currentClassSlug}/subtitles/${subtitle.file}`}
+                    srcLang={subtitle.lang}
+                    label={subtitle.label}
+                    default={subtitle.lang === "es"}
+                  />
+                ))}
+            </video>
+          </div>
+        </div>
+
+        <aside
+          className={`${styles.sidebar} ${
+            sidebarOpen ? styles.sidebarOpen : ""
+          }`}
+          aria-label="Contenido del curso"
+        >
+          <div className={styles.sidebarHeader}>
+            <div>
+              <p className={styles.sidebarEyebrow}>Contenido del curso</p>
+              <h3 className={styles.sidebarTitle}>{course.title}</h3>
+              {currentSection && (
+                <p className={styles.sidebarNowPlaying}>
+                  Reproduciendo: {currentSection.sectionTitle}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Cerrar panel"
+            >
+              ×
+            </button>
           </div>
 
-          <div className={styles.infoCard}>
-            <h3>Incluye</h3>
-            <ul className={styles.includesList}>
-              {course.includes.map((item, i) => (
-                <li key={i}><span>✔</span>{item}</li>
-              ))}
-            </ul>
-          </div>
+          <div className={styles.sidebarList}>
+            {sections.map((section, sectionIdx) => (
+              <div key={section.sectionTitle} className={styles.sectionBlock}>
+                <div className={styles.sectionHeader}>
+                  <span className={styles.sectionNumber}>
+                    Sección {sectionIdx + 1}
+                  </span>
+                  <strong className={styles.sectionName}>
+                    {section.sectionTitle}
+                  </strong>
+                </div>
+                <ul className={styles.classList}>
+                  {section.classes.map((cls, classIdx) => {
+                    const isActive =
+                      sectionIdx === selectedSection &&
+                      classIdx === selectedClass;
+                    const priorClasses = sections
+                      .slice(0, sectionIdx)
+                      .reduce(
+                        (sum, s) => sum + (s.classes?.length ?? 0),
+                        0
+                      );
+                    const itemNumber = priorClasses + classIdx + 1;
+                    const durationLabel =
+                      cls.duration.hours > 0
+                        ? `${cls.duration.hours}h ${cls.duration.minutes
+                            .toString()
+                            .padStart(2, "0")}m`
+                        : `${cls.duration.minutes.toString().padStart(2, "0")}m`;
 
-          <div className={styles.infoCard}>
-            <h3>Soporte</h3>
-            <p>¿Dudas sobre tu curso o el acceso? Escríbenos y te ayudaremos.</p>
-            <a href="mailto:soporte@combatstrike.com" className={styles.supportLink}>
-              Contactar soporte
-            </a>
+                    return (
+                      <li key={`${cls.title}-${classIdx}`}>
+                        <button
+                          type="button"
+                          className={`${styles.classButton} ${
+                            isActive ? styles.classButtonActive : ""
+                          }`}
+                          onClick={() => onSelectClass(sectionIdx, classIdx)}
+                        >
+                          <span className={styles.classIndex}>
+                            {itemNumber.toString().padStart(2, "0")}
+                          </span>
+                          <div className={styles.classInfo}>
+                            <span className={styles.classTitle}>
+                              {cls.title}
+                            </span>
+                            <span className={styles.classMeta}>
+                              {durationLabel}
+                            </span>
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
           </div>
         </aside>
-      </section>
 
-      {showPreviewModal && (
-        <CoursePreviewModal
-          show={showPreviewModal}
-          onClose={() => setShowPreviewModal(false)}
-          courseTitle={course.title}
-          videoSrc={previewSrc}
-          videos={previewClips}
-          course={course}
-        />
-      )}
-      {showFullCourseModal && (
-        <FullCoursePreviewModal
-          show={showFullCourseModal}
-          onClose={() => setShowFullCourseModal(false)}
-          course={course}
-          masterPlaylistSrc={fullCourseSrc}
-          apiBaseUrl={baseUrl}
-        />
-      )}
-      <Footer />
-    </div>
+      </div>
+    </section>
   );
 }

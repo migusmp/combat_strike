@@ -12,9 +12,29 @@ interface Props {
   purchase?: PurchasedCourse;
 }
 
+const HIDE_HEADER_CLASS = "cs-hide-global-header";
+
 export default function MobilePurchasedCourseLayout({ course, purchase }: Props) {
   const [isLandscape, setIsLandscape] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const body = document.body;
+    const html = document.documentElement;
+    const prevBodyOverflow = body.style.overflow;
+    const prevHtmlOverflow = html.style.overflow;
+    body.classList.add(HIDE_HEADER_CLASS);
+    html.classList.add(HIDE_HEADER_CLASS);
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    return () => {
+      body.classList.remove(HIDE_HEADER_CLASS);
+      html.classList.remove(HIDE_HEADER_CLASS);
+      body.style.overflow = prevBodyOverflow;
+      html.style.overflow = prevHtmlOverflow;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
