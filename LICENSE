@@ -1,0 +1,59 @@
+CombatStrike Source-Available License (Non-Commercial / No Re-Hosting)
+Version 1.0 — 2026-01-28
+
+Copyright (c) 2026 Miguel
+All rights reserved.
+
+This software is source-available for viewing, cloning, and evaluation.
+It is NOT open source.
+
+1) Definitions
+- “Software” means all source code, configuration, documentation, and other files
+  in this repository, including updates.
+- “You” means any person or entity obtaining a copy of the Software.
+- “Commercial Use” means using the Software (or any derivative) to generate
+  revenue, deliver services, support a paid product, provide paid training,
+  consulting, SaaS/hosting, or any business activity beyond internal evaluation.
+
+2) Permission Grant (Allowed)
+Subject to compliance with this license, You are granted a limited, non-exclusive,
+non-transferable, revocable license to:
+- view and CLONE the Software from the official repository;
+- run the Software locally or in a private environment for learning, testing,
+  and internal evaluation;
+- modify the Software for your own internal evaluation.
+
+3) Restrictions (Not Allowed) — No Commercial Use
+Without prior written permission from the copyright holder, You may NOT:
+- use the Software (or any derivative) for Commercial Use;
+- sell, license, rent, or otherwise monetize the Software;
+- offer the Software as a hosted service (SaaS), API, or any online service;
+- use the Software in production or to support a commercial product/service;
+- provide paid training or paid content that includes the Software as a deliverable.
+
+4) Restrictions (Not Allowed) — No Redistribution / Re-Hosting
+Without prior written permission, You may NOT:
+- redistribute the Software or derivatives in any form;
+- re-host, mirror, or upload the Software to another repository or website;
+- publish forks publicly (including public forks on any platform);
+- share packaged versions, Docker images, releases, or archives containing the Software.
+
+5) Contributions
+If You submit contributions (pull requests, patches, suggestions), You agree the
+copyright holder may use them in the Software without obligation.
+
+6) Ownership
+The Software is licensed, not sold. All rights remain with the copyright holder.
+
+7) Termination
+Any breach terminates this license immediately. Upon termination, You must delete
+all copies of the Software in your possession or control.
+
+8) Disclaimer
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM OR DAMAGES.
+
+9) Commercial Licensing / Permissions
+To request permission for commercial use or redistribution, contact:
+Miguel — <add your email/contact here>
