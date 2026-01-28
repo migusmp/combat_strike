@@ -84,9 +84,7 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
   const handleSubtitleToggle = () => {
     if (!canToggleCC) return;
     const next =
-      selectedSubtitle === "off"
-        ? currentSubtitles[0]?.lang ?? "off"
-        : "off";
+      selectedSubtitle === "off" ? currentSubtitles[0]?.lang ?? "off" : "off";
     setSelectedSubtitle(next);
   };
 
@@ -144,10 +142,7 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
                     strokeWidth="2"
                     opacity="0.4"
                   />
-                  <path
-                    d="M10 8.5L16 12L10 15.5V8.5Z"
-                    fill="currentColor"
-                  />
+                  <path d="M10 8.5L16 12L10 15.5V8.5Z" fill="currentColor" />
                 </svg>
               </span>
             </div>
@@ -273,7 +268,29 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
             <div className={styles.topPill}>
               <button
                 type="button"
-                className={`${styles.pillButton} ${panelTab === "downloads" ? styles.pillButtonActive : ""}`}
+                className={`${styles.pillButton} ${
+                  panelTab === "content" ? styles.pillButtonActive : ""
+                }`}
+                aria-label="Contenido del curso"
+                aria-pressed={panelTab === "content"}
+                onClick={() => setPanelTab("content")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  className="bi bi-play-btn-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2m6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={`${styles.pillButton} ${
+                  panelTab === "downloads" ? styles.pillButtonActive : ""
+                }`}
                 aria-label="Descargas"
                 aria-pressed={panelTab === "downloads"}
                 onClick={() => setPanelTab("downloads")}
@@ -292,27 +309,6 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
                   <path d="M12 3v12" />
                   <path d="m8 11 4 4 4-4" />
                   <path d="M5 21h14" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className={`${styles.pillButton} ${panelTab === "content" ? styles.pillButtonActive : ""}`}
-                aria-label="Contenido del curso"
-                aria-pressed={panelTab === "content"}
-                onClick={() => setPanelTab("content")}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 6l1.5 3 3 .5-2.2 2.3.5 3.2L12 13.8 9.2 15l.5-3.2L7.5 9.5l3-.5L12 6Z" />
                 </svg>
               </button>
             </div>
@@ -355,7 +351,10 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
 
               <div className={styles.sidebarList}>
                 {sections.map((section, sectionIdx) => (
-                  <div key={section.sectionTitle} className={styles.sectionBlock}>
+                  <div
+                    key={section.sectionTitle}
+                    className={styles.sectionBlock}
+                  >
                     <div className={styles.sectionHeader}>
                       <span className={styles.sectionNumber}>
                         Sección {sectionIdx + 1}
@@ -381,7 +380,9 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
                             ? `${cls.duration.hours}h ${cls.duration.minutes
                                 .toString()
                                 .padStart(2, "0")}m`
-                            : `${cls.duration.minutes.toString().padStart(2, "0")}m`;
+                            : `${cls.duration.minutes
+                                .toString()
+                                .padStart(2, "0")}m`;
 
                         return (
                           <li key={`${cls.title}-${classIdx}`}>
@@ -390,7 +391,9 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
                               className={`${styles.classButton} ${
                                 isActive ? styles.classButtonActive : ""
                               }`}
-                              onClick={() => onSelectClass(sectionIdx, classIdx)}
+                              onClick={() =>
+                                onSelectClass(sectionIdx, classIdx)
+                              }
                             >
                               <span className={styles.classIndex}>
                                 {itemNumber.toString().padStart(2, "0")}
@@ -461,12 +464,13 @@ export default function DesktopPurchasedCourseLayout({ course }: Props) {
                   ))}
                 </ul>
               ) : (
-                <p className={styles.downloadEmpty}>No hay descargas disponibles.</p>
+                <p className={styles.downloadEmpty}>
+                  No hay descargas disponibles.
+                </p>
               )}
             </div>
           )}
         </aside>
-
       </div>
     </section>
   );
